@@ -52,6 +52,11 @@
       "static/css/app/contact/page.css",
       "static/chunks/app/contact/page.js"
     ],
+    "/category/[slug]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/category/[slug]/page.js"
+    ],
     "/not-found": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",

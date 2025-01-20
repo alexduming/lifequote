@@ -75,14 +75,14 @@ const featuredQuotes = [
 ];
 
 const categories = [
-  { key: 'philosophy' as CategoryKey, count: 1234, icon: Brain },
-  { key: 'literature' as CategoryKey, count: 890, icon: BookOpen },
-  { key: 'science' as CategoryKey, count: 567, icon: Microscope },
-  { key: 'art' as CategoryKey, count: 432, icon: Palette },
-  { key: 'history' as CategoryKey, count: 765, icon: Clock },
-  { key: 'politics' as CategoryKey, count: 321, icon: Scale },
-  { key: 'economics' as CategoryKey, count: 543, icon: TrendingUp },
-  { key: 'education' as CategoryKey, count: 678, icon: GraduationCap },
+  { key: 'philosophy' as CategoryKey, count: 1234, icon: '🤔', bgClass: 'from-indigo-500/20 to-purple-500/20' },
+  { key: 'literature' as CategoryKey, count: 890, icon: '📚', bgClass: 'from-yellow-500/20 to-amber-500/20' },
+  { key: 'science' as CategoryKey, count: 567, icon: '🔬', bgClass: 'from-cyan-500/20 to-blue-500/20' },
+  { key: 'art' as CategoryKey, count: 432, icon: '🎨', bgClass: 'from-fuchsia-500/20 to-pink-500/20' },
+  { key: 'history' as CategoryKey, count: 765, icon: '⌛', bgClass: 'from-amber-500/20 to-orange-500/20' },
+  { key: 'politics' as CategoryKey, count: 321, icon: '⚖️', bgClass: 'from-slate-500/20 to-gray-500/20' },
+  { key: 'economics' as CategoryKey, count: 543, icon: '📈', bgClass: 'from-emerald-500/20 to-teal-500/20' },
+  { key: 'education' as CategoryKey, count: 678, icon: '🎓', bgClass: 'from-violet-500/20 to-purple-500/20' },
 ];
 
 const quickCategories: CategoryKey[] = ['motivation', 'life', 'love', 'success', 'wisdom'];
@@ -179,23 +179,21 @@ export default function Home() {
               <a
                 key={category.key}
                 href={`/category/${category.key}`}
-                className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm p-6 transition-all duration-300 hover:bg-primary-500/20 hover:shadow-lg hover:scale-[1.02]"
+                className="group relative overflow-hidden rounded-2xl bg-dark-100/50"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-secondary-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-full bg-primary-500/10 flex items-center justify-center mb-4 group-hover:bg-white/10 transition-colors">
-                    {React.createElement(category.icon, {
-                      size: 24,
-                      className: "text-primary-500 group-hover:text-white transition-colors"
-                    })}
-                  </div>
-                  <h3 className="text-lg font-[oswald] text-dark-900 mb-2 group-hover:text-white transition-colors">
+                <div className={`absolute inset-0 bg-gradient-to-br ${category.bgClass} opacity-0 group-hover:opacity-60 transition-all duration-300`} />
+                <div className="relative p-8" >
+                  <span className="text-6xl mb-6 block transform group-hover:scale-110 transition-transform duration-300">
+                    {category.icon}
+                  </span>
+                  <h3 className="text-2xl font-[oswald] font-bold text-dark-900 mb-2 uppercase group-hover:text-primary-600 transition-colors duration-300">
                     {t.categories[category.key]}
                   </h3>
-                  <p className="text-sm text-dark-600 group-hover:text-white/90 transition-colors">
+                  <p className="text-dark-600">
                     {category.count} {t.actions.quotes}
                   </p>
                 </div>
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary-500/50 rounded-2xl transition-colors duration-300" />
               </a>
             ))}
           </div>
