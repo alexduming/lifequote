@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply antialiased text-dark-800 bg-dark-50;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-oswald);
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 shadow-primary-500/25 hover:shadow-primary-500/50;
+  }
+
+  .btn-outline {
+    @apply border border-dark-200 hover:border-primary-500 hover:text-primary-600;
+  }
+
+  .card {
+    @apply bg-white/50 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .input {
+    @apply w-full bg-white/50 backdrop-blur-sm rounded-xl border border-dark-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-secondary-600;
+  }
+
+  .noise-bg {
+    background-image: url('/noise.png');
+    background-repeat: repeat;
+    background-size: 100px 100px;
+  }
+
+  .noise-bg::before {
+    @apply content-[''] absolute inset-0 bg-noise opacity-[0.025] pointer-events-none;
+  }
+}
+
+/* 自定义动画 */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 毛玻璃效果 */
+.glass {
+  @apply bg-white/80 backdrop-blur-md border border-white/20;
+}
+
+/* 渐变边框 */
+.gradient-border {
+  @apply relative before:absolute before:inset-0 before:p-[1px] before:rounded-2xl before:bg-gradient-to-r before:from-primary-500/50 before:to-secondary-500/50 before:-z-10;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(to right, theme('colors.primary.500'), theme('colors.secondary.500'));
+  border-radius: inherit;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+} 
