@@ -1,182 +1,173 @@
 'use client';
 
 import React from 'react';
-import { Search, BookOpen } from 'lucide-react';
+import { Book } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import QuoteCard from '@/components/QuoteCard';
+import { translations } from '@/config/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { translations, CategoryKey } from '@/config/translations';
+import type { Language } from '@/config/translations';
 
-// 示例数据
-const featuredBooks = [
-  {
-    cover: '/images/books/tao-te-ching.jpg', // 需要添加对应的图片
-    title: {
-      en: "Tao Te Ching",
-      zh: "道德经"
-    },
-    author: {
-      en: "Lao Tzu",
-      zh: "老子"
-    },
-    quotes: [
-      {
-        quote: {
-          en: "A journey of a thousand miles begins with a single step.",
-          zh: "千里之行，始于足下。"
-        },
-        author: {
-          en: "Lao Tzu",
-          zh: "老子"
-        },
-        authorTitle: {
-          en: "Ancient Chinese Philosopher",
-          zh: "中国古代哲学家"
-        },
-        category: "wisdom" as CategoryKey,
-        likes: 2345,
-        isLiked: false,
-      }
-    ]
-  },
-  {
-    cover: '/images/books/the-art-of-war.jpg', // 需要添加对应的图片
-    title: {
-      en: "The Art of War",
-      zh: "孙子兵法"
-    },
-    author: {
-      en: "Sun Tzu",
-      zh: "孙子"
-    },
-    quotes: [
-      {
-        quote: {
-          en: "Supreme excellence consists of breaking the enemy's resistance without fighting.",
-          zh: "不战而屈人之兵，善之善者也。"
-        },
-        author: {
-          en: "Sun Tzu",
-          zh: "孙子"
-        },
-        authorTitle: {
-          en: "Ancient Chinese Military Strategist",
-          zh: "中国古代军事家"
-        },
-        category: "wisdom" as CategoryKey,
-        likes: 1876,
-        isLiked: true,
-      }
-    ]
-  },
-];
+// 获取页面数据
+async function getBooksPageData(language: Language) {
+  const response = await fetch('/api/quotes');
+  const quotes = await response.json();
+  
+  // 按书籍分组语录
+  const bookMap = new Map();
+  quotes.forEach((quote: any) => {
+    const book = quote.book;
+    if (!bookMap.has(book)) {
+      const bookTitle = {
+        zh: book,
+        en: quote.book_en,
+      };
+      // 根据英文书名生成封面图片路径
+      const coverImage = `/images/books/${quote.book_en.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+      
+      bookMap.set(book, {
+        title: bookTitle,
+        quotes: [],
+        authors: new Set(),
+        categories: new Set(),
+        coverImage: coverImage,
+      });
+    }
+    const bookData = bookMap.get(book);
+    bookData.quotes.push(quote);
+    bookData.authors.add(quote.author.zh);
+    bookData.categories.add(quote.category);
+  });
 
-const bookCategories = [
-  { id: 'philosophy', icon: '🤔', name: { en: 'Philosophy', zh: '哲学' } },
-  { id: 'literature', icon: '📚', name: { en: 'Literature', zh: '文学' } },
-  { id: 'science', icon: '🔬', name: { en: 'Science', zh: '科学' } },
-  { id: 'history', icon: '⌛', name: { en: 'History', zh: '历史' } },
-  { id: 'psychology', icon: '🧠', name: { en: 'Psychology', zh: '心理学' } },
-  { id: 'business', icon: '💼', name: { en: 'Business', zh: '商业' } },
-];
+  // 转换为数组并添加统计信息
+  const books = Array.from(bookMap.entries()).map(([_, data]) => ({
+    title: data.title,
+    quotes: data.quotes,
+    quoteCount: data.quotes.length,
+    authorCount: data.authors.size,
+    categories: Array.from(data.categories),
+    coverImage: data.coverImage,
+    // 选择第一条语录作为代表
+    featuredQuote: data.quotes[0],
+  }));
+
+  return { 
+    books,
+    authorText: language === 'en' ? 'authors' : '位作者',
+  };
+}
 
 export default function BooksPage() {
   const { language } = useLanguage();
   const t = translations[language];
+  const [pageData, setPageData] = React.useState<{ books: any[]; authorText: string } | null>(null);
+
+  React.useEffect(() => {
+    getBooksPageData(language).then(data => {
+      setPageData(data);
+    });
+  }, [language]);
+
+  if (!pageData) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 pt-16">
+          <div className="container mx-auto px-4 py-12">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-6"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const { books, authorText } = pageData;
 
   return (
-    <div className="noise-bg min-h-screen">
+    <>
       <Navbar />
-      <main className="container py-20">
-        {/* Hero Section */}
-        <div className="max-w-4xl mx-auto text-center mb-20">
-          <h1 className="text-4xl md:text-6xl font-[oswald] font-bold text-dark-900 mb-6 uppercase tracking-tight">
-            {language === 'en' ? 'Book Quotes' : '书籍语录'}
-          </h1>
-          <p className="text-xl text-dark-600 mb-12">
-            {language === 'en' 
-              ? 'Discover wisdom from the greatest books ever written'
-              : '发现最伟大书籍中的智慧'}
-          </p>
-          
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity" />
-              <input
-                type="text"
-                placeholder={language === 'en' ? 'Search books or quotes...' : '搜索书籍或语录...'}
-                className="input h-14 pl-6 pr-12 text-lg group-hover:shadow-lg"
-              />
-              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-500 hover:text-primary-600 transition-colors">
-                <Search size={24} />
-              </button>
+      <main className="min-h-screen bg-gray-50 pt-16">
+        {/* Header */}
+        <div className="bg-white border-b">
+          <div className="container mx-auto px-4 py-12">
+            <h1 className="text-4xl font-[oswald] font-bold text-dark-900 tracking-tight uppercase !leading-none mb-4">
+              {t.books.title}
+            </h1>
+            <p className="text-xl text-gray-600 mb-6 max-w-3xl">
+              {t.books.subtitle}
+            </p>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <span>{books.length} {t.books.stats.books}</span>
+              <span>•</span>
+              <span>{books.reduce((sum, book) => sum + book.quoteCount, 0)} {t.books.stats.quotes}</span>
             </div>
           </div>
         </div>
 
-        {/* Book Categories */}
-        <div className="mb-20">
-          <h2 className="text-2xl font-[oswald] font-bold text-dark-900 mb-8 uppercase">
-            {language === 'en' ? 'Browse by Category' : '按类别浏览'}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {bookCategories.map((category) => (
-              <a
-                key={category.id}
-                href={`/books/category/${category.id}`}
-                className="flex flex-col items-center justify-center p-6 bg-white/50 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all group"
-              >
-                <span className="text-4xl mb-3 transform group-hover:scale-110 transition-transform">
-                  {category.icon}
-                </span>
-                <span className="font-medium text-dark-900 group-hover:text-primary-600 transition-colors">
-                  {category.name[language]}
-                </span>
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Featured Books */}
-        <div className="mb-20">
-          <h2 className="text-2xl font-[oswald] font-bold text-dark-900 mb-8 uppercase">
-            {language === 'en' ? 'Featured Books' : '精选书籍'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {featuredBooks.map((book, index) => (
-              <div key={index} className="bg-white/50 backdrop-blur-sm rounded-xl p-6 hover:shadow-lg transition-all">
-                <div className="flex gap-6 mb-6">
-                  <div className="w-32 h-48 bg-dark-100 rounded-lg overflow-hidden">
-                    {/* 这里需要添加书籍封面图片 */}
-                    <div className="w-full h-full flex items-center justify-center bg-primary-100 text-primary-500">
-                      <BookOpen size={32} />
+        {/* Books Grid */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {books.map((book) => (
+              <div key={book.title[language]} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div className="flex">
+                  {/* Book Cover */}
+                  <Link 
+                    href={`/books/${encodeURIComponent(book.title.en.toLowerCase().replace(/\s+/g, '-'))}`}
+                    className="w-48 flex-shrink-0 relative"
+                    style={{ aspectRatio: '3/4' }}
+                  >
+                    <div className="absolute inset-0 bg-gray-100">
+                      {book.coverImage ? (
+                        <Image
+                          src={book.coverImage}
+                          alt={book.title[language]}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="text-center p-4">
+                            <Book className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                            <div className="text-sm text-gray-500 font-medium">
+                              {book.title[language]}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-[oswald] font-bold text-dark-900 mb-2">
-                      {book.title[language]}
-                    </h3>
-                    <p className="text-dark-600 mb-4">
-                      {book.author[language]}
-                    </p>
-                    <a
-                      href={`/books/${book.title.en.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="text-primary-600 hover:text-primary-700 font-medium"
+                  </Link>
+
+                  {/* Book Info */}
+                  <div className="flex-grow p-6">
+                    <Link 
+                      href={`/books/${encodeURIComponent(book.title.en.toLowerCase().replace(/\s+/g, '-'))}`}
+                      className="block"
                     >
-                      {language === 'en' ? 'View Quotes' : '查看语录'} →
-                    </a>
+                      <h2 className="text-xl font-[oswald] font-bold text-primary-600 hover:text-primary-700 transition-colors mb-2 uppercase tracking-tight">
+                        {book.title[language]}
+                      </h2>
+                    </Link>
+                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
+                      <span>{book.quoteCount} {t.books.stats.quotes}</span>
+                      <span>•</span>
+                      <span>{book.authorCount} {authorText}</span>
+                    </div>
+                    {/* Featured Quote */}
+                    <blockquote className="text-sm text-gray-600 italic">
+                      "{book.featuredQuote.quote[language]}"
+                    </blockquote>
                   </div>
                 </div>
-                {/* Featured Quote */}
-                {book.quotes[0] && (
-                  <QuoteCard {...book.quotes[0]} />
-                )}
               </div>
             ))}
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 } 

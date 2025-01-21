@@ -1,0 +1,59 @@
+/*!***************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[12].use[3]!./src/app/icons.css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************/
+/* 社交媒体图标卡片样式 */
+.social-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.social-card:hover {
+  transform: scale(1.02);
+}
+
+.social-card .icon-container {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.social-card:hover .icon-container {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.social-card .iconfont {
+  font-size: 1.75rem;
+  transition: color 0.3s ease;
+}
+
+.social-card .platform-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.3s ease;
+}
+
+.social-card .username {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s ease;
+}
+
+.social-card:hover .platform-name {
+  color: rgba(255, 255, 255, 1);
+}
+
+.social-card:hover .username {
+  color: rgba(255, 255, 255, 0.9);
+} 

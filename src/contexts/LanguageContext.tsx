@@ -1,35 +1,37 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { Language } from '@/config/translations';
+import { Language } from '@/config/translations';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const defaultContext: LanguageContextType = {
+  language: 'en',
+  setLanguage: () => {},
+};
+
+const LanguageContext = createContext<LanguageContextType>(defaultContext);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('en');
 
-  // 从本地存储加载语言设置
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') as Language;
     if (savedLanguage) {
-      setLanguage(savedLanguage);
+      setLanguageState(savedLanguage);
     }
-    // 移除自动检测浏览器语言的逻辑，默认使用英文
   }, []);
 
-  // 保存语言设置到本地存储
-  const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
     localStorage.setItem('language', lang);
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage }}>
+    <LanguageContext.Provider value={{ language, setLanguage }}>
       {children}
     </LanguageContext.Provider>
   );

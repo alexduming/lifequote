@@ -26,6 +26,8 @@ export interface Quote {
   likes: number;
   views: number;
   created_at: string;
+  book: string;
+  book_en: string;
 }
 
 // 缓存机制
@@ -72,6 +74,8 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
           likes: parseInt(data.likes),
           views: parseInt(data.views),
           created_at: data.created_at,
+          book: data.book,
+          book_en: data.book_en,
         };
         results.push(quote);
       })

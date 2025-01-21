@@ -3,8 +3,7 @@
 import React from 'react';
 import { Heart, Share2, BookmarkPlus } from 'lucide-react';
 import Link from 'next/link';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { translations, CategoryKey } from '@/config/translations';
+import { translations, CategoryKey, Language } from '@/config/translations';
 
 interface BilingualText {
   en: string;
@@ -18,6 +17,7 @@ interface QuoteCardProps {
   category: CategoryKey;
   likes?: number;
   isLiked?: boolean;
+  language?: Language;
 }
 
 export default function QuoteCard({
@@ -27,12 +27,12 @@ export default function QuoteCard({
   category,
   likes = 0,
   isLiked = false,
+  language = 'en',
 }: QuoteCardProps) {
-  const { language } = useLanguage();
   const t = translations[language];
 
   return (
-    <div className="card p-6 group">
+    <div className="card p-6 group bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
       {/* Quote Content */}
       <blockquote className="text-xl font-display text-dark-800 mb-6 relative leading-relaxed">
         <span className="absolute -top-4 -left-2 text-6xl text-primary-200/50 font-display select-none">"</span>
@@ -49,13 +49,15 @@ export default function QuoteCard({
             {author[language]}
           </Link>
           {authorTitle && (
-            <p className="text-sm text-dark-500 mt-1 font-light">{authorTitle[language]}</p>
+            <p className="text-sm text-dark-500 mt-1 font-light">
+              {authorTitle[language]}
+            </p>
           )}
         </div>
 
         {/* Category Tag */}
-        <Link 
-          href={`/category/${category.toLowerCase()}`}
+        <Link
+          href={`/category/${category}`}
           className="text-sm px-3 py-1 rounded-full bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors font-medium"
         >
           {t.categories[category]}

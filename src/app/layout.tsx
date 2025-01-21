@@ -1,8 +1,6 @@
 import React from 'react';
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Oswald } from "next/font/google";
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import Footer from '@/components/Footer';
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -35,13 +33,9 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap"
         />
-        <link rel="stylesheet" href="//at.alicdn.com/t/c/font_4815599_0e03su13486.css" />
       </head>
       <body className={`${plusJakarta.variable} ${oswald.variable} font-sans`}>
-        <LanguageProvider>
-          {children}
-          <Footer />
-        </LanguageProvider>
+        {children}
       </body>
     </html>
   );

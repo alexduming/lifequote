@@ -24,15 +24,15 @@
   }
 
   .btn {
-    @apply px-4 py-2 rounded-lg transition-all duration-300;
+    @apply inline-flex items-center px-6 py-2 rounded-full text-sm font-medium transition-all;
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 shadow-primary-500/25 hover:shadow-primary-500/50;
+    @apply bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/50;
   }
 
   .btn-outline {
-    @apply border border-dark-200 hover:border-primary-500 hover:text-primary-600;
+    @apply border-2 border-dark-200 text-dark-600 hover:border-primary-500 hover:text-primary-600;
   }
 
   .card {
@@ -40,7 +40,7 @@
   }
 
   .input {
-    @apply w-full bg-white/50 backdrop-blur-sm rounded-xl border border-dark-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300;
+    @apply w-full bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow;
   }
 
   .gradient-text {
@@ -48,9 +48,8 @@
   }
 
   .noise-bg {
+    @apply bg-white relative;
     background-image: url('/noise.png');
-    background-repeat: repeat;
-    background-size: 100px 100px;
   }
 
   .noise-bg::before {
@@ -71,8 +70,23 @@
   }
 }
 
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out forwards;
 }
 
 /* 毛玻璃效果 */
@@ -98,4 +112,9 @@
 
 .gradient-border:hover::before {
   opacity: 1;
+}
+
+/* 背景渐变 */
+.bg-gradient-radial {
+  background-image: radial-gradient(circle at center, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
 } 

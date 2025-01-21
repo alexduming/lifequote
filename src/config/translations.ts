@@ -37,6 +37,14 @@ export type TranslationType = {
     share: string;
     quotes: string;
   };
+  books: {
+    title: string;
+    subtitle: string;
+    stats: {
+      books: string;
+      quotes: string;
+    };
+  };
 };
 
 export const translations: Record<Language, TranslationType> = {
@@ -85,6 +93,14 @@ export const translations: Record<Language, TranslationType> = {
       share: 'Share',
       quotes: 'quotes',
     },
+    books: {
+      title: 'Book Quotes',
+      subtitle: 'Explore timeless wisdom from classic works across centuries',
+      stats: {
+        books: 'books',
+        quotes: 'quotes',
+      },
+    },
   },
   zh: {
     nav: {
@@ -96,7 +112,7 @@ export const translations: Record<Language, TranslationType> = {
     },
     hero: {
       title: '在过去的1000年中\n那些鼓励着全人类的句子',
-      subtitle: '发现历史上最伟大思想家的智慧之言。在这里找到激励、智慧和指引。',
+      subtitle: '发现历史上最伟大思想家的智慧之言。在这里找到激励、智慧和行动指引。',
       searchPlaceholder: '搜索语录、作者或主题...',
     },
     categories: {
@@ -130,6 +146,14 @@ export const translations: Record<Language, TranslationType> = {
       save: '收藏',
       share: '分享',
       quotes: '条语录',
+    },
+    books: {
+      title: '书籍语录',
+      subtitle: '探索经典著作中的智慧结晶，感受跨越时空的思想火花',
+      stats: {
+        books: '本书籍',
+        quotes: '条语录',
+      },
     },
   },
 }; 

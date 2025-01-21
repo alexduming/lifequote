@@ -1,89 +1,51 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Menu, X, Languages } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
-import type { Language } from '@/config/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { language, setLanguage } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
   const t = translations[language];
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'zh' : 'en' as Language);
-  };
-
   return (
-    <nav className="fixed w-full bg-white/80 backdrop-blur-sm z-50 border-b border-dark-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="fixed top-0 left-0 right-0 bg-white border-b z-50">
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors">
+          <Link href="/" className="text-xl font-bold text-primary-600">
             LifeQuote
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            {Object.entries(t.nav).map(([key, value]) => (
-              <Link
-                key={key}
-                href={`/${key === 'home' ? '' : key}`}
-                className="text-dark-600 hover:text-primary-600 transition-colors"
-              >
-                {value}
-              </Link>
-            ))}
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center space-x-1.5 text-dark-600 hover:text-primary-600 transition-colors"
-            >
-              <Languages size={20} />
-              <span>{language.toUpperCase()}</span>
-            </button>
+            <Link href="/" className="text-gray-600 hover:text-primary-600">
+              {t.nav.home}
+            </Link>
+            <Link href="/authors" className="text-gray-600 hover:text-primary-600">
+              {t.nav.authors}
+            </Link>
+            <Link href="/topics" className="text-gray-600 hover:text-primary-600">
+              {t.nav.topics}
+            </Link>
+            <Link href="/daily" className="text-gray-600 hover:text-primary-600">
+              {t.nav.daily}
+            </Link>
+            <Link href="/books" className="text-gray-600 hover:text-primary-600">
+              {t.nav.books}
+            </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-dark-600 hover:text-primary-600 transition-colors"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLanguage}
+            className="px-3 py-1 rounded border border-gray-200 text-sm text-gray-600 hover:border-primary-500 hover:text-primary-600"
+          >
+            {language === 'en' ? '中文' : 'EN'}
+          </button>
         </div>
       </div>
-
-      {/* Mobile Navigation */}
-      {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-b border-dark-100">
-            {Object.entries(t.nav).map(([key, value]) => (
-              <Link
-                key={key}
-                href={`/${key === 'home' ? '' : key}`}
-                className="block px-3 py-2 text-dark-600 hover:text-primary-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                {value}
-              </Link>
-            ))}
-            <button
-              onClick={() => {
-                toggleLanguage();
-                setIsOpen(false);
-              }}
-              className="w-full text-left flex items-center space-x-1.5 px-3 py-2 text-dark-600 hover:text-primary-600 transition-colors"
-            >
-              <Languages size={20} />
-              <span>{language.toUpperCase()}</span>
-            </button>
-          </div>
-        </div>
-      )}
     </nav>
   );
 } 
