@@ -54,7 +54,7 @@ export default function QuoteCard({
         </div>
 
         {/* Category Tag */}
-        <Link
+        <Link 
           href={`/category/${category.toLowerCase()}`}
           className="text-sm px-3 py-1 rounded-full bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors font-medium"
         >

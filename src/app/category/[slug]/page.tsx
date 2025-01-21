@@ -2,47 +2,35 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
 import { Filter, ArrowDownUp } from 'lucide-react';
+import { CategoryKey, translations } from '@/config/translations';
+import { getQuotesByCategory, getCategoryStats } from '@/lib/quotes';
 
-// 示例数据
-const categoryData = {
-  name: '哲学',
-  description: '探索人生的意义，思考存在的本质，追寻真理的智慧之言。',
-  quoteCount: 1234,
-  authors: ['老子', '孔子', '苏格拉底', '柏拉图', '亚里士多德'],
-};
+// 获取页面数据
+async function getCategoryPageData(category: CategoryKey) {
+  const quotes = await getQuotesByCategory(category);
+  const stats = await getCategoryStats();
+  const categoryData = {
+    name: translations.zh.categories[category],
+    description: '探索人生的意义，思考存在的本质，追寻真理的智慧之言。',
+    quoteCount: quotes.length,
+    authors: Array.from(new Set(quotes.map(q => q.author.zh))),
+  };
+  
+  return { quotes, categoryData };
+}
 
-const quotes = [
-  {
-    quote: "未经审视的人生不值得过。",
-    author: "苏格拉底",
-    authorTitle: "古希腊哲学家",
-    category: "哲学",
-    likes: 3456,
-    isLiked: false,
-  },
-  {
-    quote: "人不能两次踏入同一条河流。",
-    author: "赫拉克利特",
-    authorTitle: "古希腊哲学家",
-    category: "哲学",
-    likes: 2345,
-    isLiked: true,
-  },
-  {
-    quote: "知人者智，自知者明。",
-    author: "老子",
-    authorTitle: "中国古代哲学家",
-    category: "哲学",
-    likes: 4567,
-    isLiked: false,
-  },
-];
+export default async function CategoryPage({ 
+  params 
+}: { 
+  params: { slug: string } 
+}) {
+  const category = params.slug as CategoryKey;
+  const { quotes, categoryData } = await getCategoryPageData(category);
 
-export default function CategoryPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 pt-16">
         {/* Category Header */}
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-12">
@@ -74,7 +62,7 @@ export default function CategoryPage() {
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">时期</h3>
                   <div className="space-y-2">
-                    {['古代', '近代', '现代', '当代'].map((period) => (
+                    {Array.from(new Set(quotes.map(q => q.period.zh))).map((period) => (
                       <label key={period} className="flex items-center">
                         <input type="checkbox" className="rounded border-gray-300 text-primary-600" />
                         <span className="ml-2 text-sm text-gray-600">{period}</span>
@@ -82,37 +70,32 @@ export default function CategoryPage() {
                     ))}
                   </div>
                 </div>
-
-                {/* Author Filter */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">作者</h3>
-                  <div className="space-y-2">
-                    {categoryData.authors.map((author) => (
-                      <label key={author} className="flex items-center">
-                        <input type="checkbox" className="rounded border-gray-300 text-primary-600" />
-                        <span className="ml-2 text-sm text-gray-600">{author}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* Quotes List */}
+            {/* Quotes Grid */}
             <div className="flex-grow">
-              {/* Sort Options */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-serif font-bold text-gray-900">所有语录</h2>
-                <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary-600">
+                <h2 className="text-xl font-medium text-gray-900">
+                  全部语录
+                </h2>
+                <button className="flex items-center gap-2 text-sm text-gray-500">
                   <ArrowDownUp size={16} />
                   <span>排序</span>
                 </button>
               </div>
 
-              {/* Quotes Grid */}
               <div className="space-y-6">
-                {quotes.map((quote, index) => (
-                  <QuoteCard key={index} {...quote} />
+                {quotes.map((quote) => (
+                  <QuoteCard
+                    key={quote.id}
+                    quote={quote.quote}
+                    author={quote.author}
+                    authorTitle={quote.authorTitle}
+                    category={quote.category}
+                    likes={quote.likes}
+                    isLiked={false}
+                  />
                 ))}
               </div>
             </div>
