@@ -7,14 +7,23 @@ import { translations } from '@/config/translations';
 import { readQuotesFromCsv, Quote as QuoteType } from '@/lib/quotes';
 import type { Language, CategoryKey } from '@/config/translations';
 
+// 生成规范化的slug
+function generateSlug(text: string) {
+  return text.toLowerCase()
+    .replace(/[:']/g, '')  // 移除冒号和单引号
+    .replace(/\s+/g, '-')  // 空格替换为连字符
+    .replace(/-+/g, '-')   // 多个连字符替换为单个
+    .replace(/^-|-$/g, ''); // 移除首尾的连字符
+}
+
 // 获取页面数据
 async function getBookPageData(slug: string) {
   const quotes = await readQuotesFromCsv();
   
   // 查找匹配的书籍
-  const bookTitle = slug.split('-').join(' ').toLowerCase();
   const bookQuotes = quotes.filter(quote => {
-    return quote.book_en.toLowerCase() === bookTitle;
+    const quoteSlug = generateSlug(quote.book_en);
+    return quoteSlug === slug;
   });
 
   if (bookQuotes.length === 0) {
@@ -31,7 +40,7 @@ async function getBookPageData(slug: string) {
     quotes: bookQuotes,
     authors: Array.from(new Set(bookQuotes.map(quote => quote.author.zh))),
     categories: Array.from(new Set(bookQuotes.map(quote => quote.category))),
-    coverImage: `/images/books/${firstQuote.book_en.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+    coverImage: `/images/books/${generateSlug(firstQuote.book_en)}.jpg`,
   };
 
   return bookData;

@@ -1,9 +1,8 @@
 id,quote_zh,quote_en,author_zh,author_en,author_title_zh,author_title_en,category,period_zh,period_en,likes,views,book,book_en
 1,道可道，非常道。名可名，非常名。,The way that can be spoken of is not the constant way,老子,Laozi,中国古代哲学家,Ancient Chinese Philosopher,philosophy,春秋时期,Spring and Autumn Period,986,1500,《道德经》,Tao Te Ching
 2,千里之行，始于足下,The journey of a thousand miles begins with a single step,老子,Laozi,中国古代哲学家,Ancient Chinese Philosopher,wisdom,春秋时期,Spring and Autumn Period,756,1200,《道德经》,Tao Te Ching
-3,生活就是当你忙着制定计划时发生的事情,Life is what happens while you're busy making other plans,约翰·列侬,John Lennon,歌手、作曲家,Singer-songwriter,life,现代,Modern Era,1234,2000,《约翰列侬：传奇人生》,John Lennon: The Life
-4,生活中最重要的不是所处的位置，而是所朝的方向。,The most important thing in life is not where we stand but in what direction we are moving.,奥利弗·霍姆斯,Oliver Wendell Holmes,美国作家、法学家,American Writer & Jurist,life,近代,Modern Era,1234,1800,《霍姆斯法律文集》,The Common Law
-5,不要等待机会，而要创造机会。,Don't wait for opportunities create them.,孙中山,Sun Yat-sen,中国革命先行者,Chinese Revolutionary Pioneer,motivation,近代,Modern Era,856,1600,《建国方略》,The Fundamentals of National Reconstruction
-6,教育不是灌输，而是点燃火焰。,Education is not the filling of a pail but the lighting of a fire.,苏格拉底,Socrates,古希腊哲学家,Ancient Greek Philosopher,education,古希腊,Ancient Greece,967,1700,《柏拉图对话录》,Plato's Dialogues
-7,困难之中蕴藏着机遇。,In the middle of difficulty lies opportunity.,阿尔伯特·爱因斯坦,Albert Einstein,理论物理学家,Theoretical Physicist,motivation,现代,Modern Era,1876,2200,《爱因斯坦文集》,The Einstein Reader
-8,生活本来很简单，是我们执意要把它变复杂。,Life is really simple but we insist on making it complicated.,孔子,Confucius,中国哲学家,Chinese Philosopher,life,春秋时期,Spring and Autumn Period,1543,1900,《论语》,The Analects 
+3,生活中最重要的不是所处的位置，而是所朝的方向。,The most important thing in life is not where we stand but in what direction we are moving.,奥利弗·霍姆斯,Oliver Wendell Holmes,美国作家、法学家,American Writer & Jurist,life,近代,Modern Era,1234,1800,《霍姆斯法律文集》,The Common Law
+4,不要等待机会，而要创造机会。,Don't wait for opportunities create them.,孙中山,Sun Yat-sen,中国革命先行者,Chinese Revolutionary Pioneer,motivation,近代,Modern Era,856,1600,《建国方略》,The Fundamentals of National Reconstruction
+5,教育不是灌输，而是点燃火焰。,Education is not the filling of a pail but the lighting of a fire.,苏格拉底,Socrates,古希腊哲学家,Ancient Greek Philosopher,education,古希腊,Ancient Greece,967,1700,《柏拉图对话录》,Plato's Dialogues
+6,困难之中蕴藏着机遇。,In the middle of difficulty lies opportunity.,阿尔伯特·爱因斯坦,Albert Einstein,理论物理学家,Theoretical Physicist,motivation,现代,Modern Era,1876,2200,《爱因斯坦文集》,The Einstein Reader
+7,生活本来很简单，是我们执意要把它变复杂。,Life is really simple but we insist on making it complicated.,孔子,Confucius,中国哲学家,Chinese Philosopher,life,春秋时期,Spring and Autumn Period,1543,1900,《论语》,The Analects

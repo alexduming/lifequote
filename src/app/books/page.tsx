@@ -23,8 +23,14 @@ async function getBooksPageData(language: Language) {
         zh: book,
         en: quote.book_en,
       };
-      // 根据英文书名生成封面图片路径
-      const coverImage = `/images/books/${quote.book_en.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+      // 根据英文书名生成封面图片路径和URL slug
+      const slug = quote.book_en.toLowerCase()
+        .replace(/[:']/g, '')  // 移除冒号和单引号
+        .replace(/\s+/g, '-')  // 空格替换为连字符
+        .replace(/-+/g, '-')   // 多个连字符替换为单个
+        .replace(/^-|-$/g, ''); // 移除首尾的连字符
+      
+      const coverImage = `/images/books/${slug}.jpg`;
       
       bookMap.set(book, {
         title: bookTitle,
@@ -32,6 +38,7 @@ async function getBooksPageData(language: Language) {
         authors: new Set(),
         categories: new Set(),
         coverImage: coverImage,
+        slug: slug,
       });
     }
     const bookData = bookMap.get(book);
@@ -48,6 +55,7 @@ async function getBooksPageData(language: Language) {
     authorCount: data.authors.size,
     categories: Array.from(data.categories),
     coverImage: data.coverImage,
+    slug: data.slug,
     // 选择第一条语录作为代表
     featuredQuote: data.quotes[0],
   }));
@@ -117,7 +125,7 @@ export default function BooksPage() {
                 <div className="flex">
                   {/* Book Cover */}
                   <Link 
-                    href={`/books/${encodeURIComponent(book.title.en.toLowerCase().replace(/\s+/g, '-'))}`}
+                    href={`/books/${book.slug}`}
                     className="w-48 flex-shrink-0 relative"
                     style={{ aspectRatio: '3/4' }}
                   >
@@ -145,7 +153,7 @@ export default function BooksPage() {
                   {/* Book Info */}
                   <div className="flex-grow p-6">
                     <Link 
-                      href={`/books/${encodeURIComponent(book.title.en.toLowerCase().replace(/\s+/g, '-'))}`}
+                      href={`/books/${book.slug}`}
                       className="block"
                     >
                       <h2 className="text-xl font-[oswald] font-bold text-primary-600 hover:text-primary-700 transition-colors mb-2 uppercase tracking-tight">

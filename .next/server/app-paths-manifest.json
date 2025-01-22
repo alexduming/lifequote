@@ -1,10 +1,7 @@
 {
   "/not-found": "app/not-found.js",
-  "/books/page": "app/books/page.js",
-  "/daily/page": "app/daily/page.js",
-  "/books/[slug]/page": "app/books/[slug]/page.js",
   "/page": "app/page.js",
-  "/authors/page": "app/authors/page.js",
-  "/api/quotes/route": "app/api/quotes/route.js",
-  "/topics/page": "app/topics/page.js"
+  "/books/page": "app/books/page.js",
+  "/books/[slug]/page": "app/books/[slug]/page.js",
+  "/api/quotes/route": "app/api/quotes/route.js"
 }
