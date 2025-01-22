@@ -13,13 +13,15 @@
 'use client';
 
 import React from 'react';
-import { Search, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
 import Footer from '@/components/Footer';
 import ClientLayout from '@/components/ClientLayout';
+import SearchResults from '@/components/SearchResults';
 import { translations, CategoryKey } from '@/config/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Quote } from '@/lib/quotes';
 
 // 示例数据
 const featuredQuotes = [
@@ -92,6 +94,44 @@ const quickCategories: CategoryKey[] = ['motivation', 'life', 'love', 'success',
 export default function Home() {
   const { language } = useLanguage();
   const t = translations[language];
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchResults, setSearchResults] = React.useState<{ results: Quote[]; total: number } | null>(null);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const searchTimeoutRef = React.useRef<NodeJS.Timeout>();
+
+  // 处理搜索
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query.trim()) {
+      setSearchResults(null);
+      return;
+    }
+
+    setIsSearching(true);
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&lang=${language}`);
+        const data = await response.json();
+        setSearchResults(data);
+      } catch (error) {
+        console.error('搜索失败:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+  };
+
+  // 清除搜索
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults(null);
+  };
 
   return (
     <ClientLayout>
@@ -117,14 +157,37 @@ export default function Home() {
                 <div className="max-w-2xl mx-auto mt-12">
                   <div className="relative group">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity" />
-                    <input
-                      type="text"
-                      placeholder={t.hero.searchPlaceholder}
-                      className="input h-14 pl-6 pr-12 text-lg group-hover:shadow-lg"
-                    />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-500 hover:text-primary-600 transition-colors">
-                      <Search size={24} />
-                    </button>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        placeholder={t.hero.searchPlaceholder}
+                        className="input h-14 pl-6 pr-24 text-lg group-hover:shadow-lg"
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        {searchQuery && (
+                          <button
+                            onClick={clearSearch}
+                            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                          >
+                            <X size={20} />
+                          </button>
+                        )}
+                        <button className="text-primary-500 hover:text-primary-600 transition-colors">
+                          <Search size={24} />
+                        </button>
+                      </div>
+                    </div>
+                    {/* Search Results */}
+                    {searchResults && (
+                      <SearchResults
+                        results={searchResults.results}
+                        total={searchResults.total}
+                        language={language}
+                        onClose={clearSearch}
+                      />
+                    )}
                   </div>
                 </div>
 
