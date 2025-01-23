@@ -21,26 +21,26 @@ export default function CategoriesGrid() {
 
   return (
     <section className="container py-20">
-      <h2 className="text-3xl font-[oswald] font-bold text-dark-900 mb-4 tracking-tight uppercase !leading-none">
+      <h2 className="text-4xl md:text-5xl font-[oswald] font-bold text-dark-900 mb-6 tracking-tight uppercase !leading-none">
         {t.sections.explore.title}
       </h2>
-      <p className="text-dark-500 mb-12 font-light">
+      <p className="text-lg md:text-xl text-dark-500 mb-16 font-light max-w-3xl">
         {t.sections.explore.subtitle}
       </p>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {categories.map((category) => (
           <a
             key={category.key}
             href={`/category/${category.key}`}
-            className="group relative overflow-hidden rounded-2xl bg-dark-100/50"
+            className="group relative overflow-hidden rounded-2xl bg-dark-100/50 hover:scale-105 transition-all duration-300"
           >
-            <div className={`absolute inset-0 bg-gradient-to-br ${category.bgClass} opacity-0 group-hover:opacity-60 transition-all duration-300`} />
-            <div className="relative p-6 flex flex-col items-center text-center">
-              <span className="text-4xl mb-3">{category.icon}</span>
-              <h3 className="text-lg font-[oswald] font-medium text-dark-800 mb-1">
+            <div className={`absolute inset-0 bg-gradient-to-br ${category.bgClass} opacity-0 group-hover:opacity-80 transition-all duration-300`} />
+            <div className="relative p-8 flex flex-col items-center text-center">
+              <span className="text-5xl md:text-6xl mb-4">{category.icon}</span>
+              <h3 className="text-xl md:text-2xl font-[oswald] font-bold text-dark-800 mb-2 uppercase tracking-wide">
                 {t.categories[category.key]}
               </h3>
-              <p className="text-sm text-dark-500">
+              <p className="text-base text-dark-500">
                 {category.count} {t.sections.stats.quotes}
               </p>
             </div>

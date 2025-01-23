@@ -1007,6 +1007,9 @@ video {
 .mt-6 {
   margin-top: 1.5rem;
 }
+.mb-16 {
+  margin-bottom: 4rem;
+}
 .block {
   display: block;
 }
@@ -1993,6 +1996,11 @@ video {
   --tw-scale-y: 1.02;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
+.hover\:scale-105:hover {
+  --tw-scale-x: 1.05;
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 .hover\:bg-\[\#E6162D\]:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(230 22 45 / var(--tw-bg-opacity, 1));
@@ -2113,6 +2121,9 @@ video {
 .group:hover .group-hover\:opacity-60 {
   opacity: 0.6;
 }
+.group:hover .group-hover\:opacity-80 {
+  opacity: 0.8;
+}
 .group:hover .group-hover\:shadow-lg {
   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
@@ -2179,6 +2190,16 @@ video {
   .md\:text-7xl {
     font-size: 4.5rem;
     line-height: 1;
+  }
+
+  .md\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .md\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
 }
 @media (min-width: 1024px) {
