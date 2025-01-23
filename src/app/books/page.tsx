@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Book } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -71,7 +71,7 @@ export default function BooksPage() {
   const t = translations[language];
   const [pageData, setPageData] = React.useState<{ books: any[]; authorText: string } | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getBooksPageData(language).then(data => {
       setPageData(data);
     });

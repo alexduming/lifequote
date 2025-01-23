@@ -12,72 +12,68 @@
 
 'use client';
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
-import { Language } from '@/config/translations';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import type { Language } from '@/config/translations';
 
-interface LanguageContextType {
+type LanguageContextType = {
   language: Language;
   setLanguage: (lang: Language) => void;
-}
-
-interface LanguageState {
-  language: Language;
-  version: number;
-}
-
-const defaultContext: LanguageContextType = {
-  language: 'en',
-  setLanguage: () => {},
+  isClient: boolean;
 };
 
-const LanguageContext = createContext<LanguageContextType>(defaultContext);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // 使用 useReducer 来强制所有子组件重新渲染
-  const [state, dispatch] = useReducer(
-    (state: LanguageState, action: Language): LanguageState => ({
-      language: action,
-      version: state.version + 1
-    }), 
-    { language: 'en', version: 0 }
-  );
-
-  // 客户端初始化
-  useEffect(() => {
-    try {
-      const savedLanguage = localStorage.getItem('language') as Language;
-      if (savedLanguage === 'zh' || savedLanguage === 'en') {
-        dispatch(savedLanguage);
-      } else {
-        const browserLang = navigator.language.startsWith('zh') ? 'zh' : 'en';
-        dispatch(browserLang);
-        localStorage.setItem('language', browserLang);
-      }
-    } catch (error) {
-      console.error('Error initializing language:', error);
+  const [mounted, setMounted] = useState(false);
+  const [language, setLanguageState] = useState<Language>(() => {
+    // 在服务器端返回默认语言
+    if (typeof window === 'undefined') return 'en';
+    
+    // 在客户端从 localStorage 读取或使用浏览器语言
+    const savedLanguage = localStorage.getItem('language') as Language;
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'zh')) {
+      return savedLanguage;
     }
+    const browserLang = window.navigator.language.toLowerCase();
+    return browserLang.startsWith('zh') ? 'zh' : 'en';
+  });
+
+  // 组件挂载时的初始化
+  useEffect(() => {
+    setMounted(true);
+    document.documentElement.lang = language;
+    localStorage.setItem('language', language);
   }, []);
 
   const setLanguage = useCallback((newLanguage: Language) => {
-    if (newLanguage === 'en' || newLanguage === 'zh') {
-      try {
-        localStorage.setItem('language', newLanguage);
-        document.documentElement.lang = newLanguage;
-        document.documentElement.setAttribute('data-language', newLanguage);
-        dispatch(newLanguage);
-      } catch (error) {
-        console.error('Error setting language:', error);
-      }
-    }
-  }, []);
+    if (newLanguage === language) return;
+    
+    setLanguageState(newLanguage);
+    localStorage.setItem('language', newLanguage);
+    document.documentElement.lang = newLanguage;
+    
+    // 触发自定义事件通知其他组件语言已更改
+    const event = new CustomEvent('languagechange', { detail: { language: newLanguage } });
+    window.dispatchEvent(event);
+  }, [language]);
 
-  const value = useMemo(() => ({
-    language: state.language,
-    setLanguage
-  }), [state.language, setLanguage]);
+  const contextValue = {
+    language,
+    setLanguage,
+    isClient: mounted
+  };
+
+  // 在客户端渲染之前返回服务器端的默认内容
+  if (!mounted) {
+    return (
+      <LanguageContext.Provider value={{ language: 'en', setLanguage: () => {}, isClient: false }}>
+        {children}
+      </LanguageContext.Provider>
+    );
+  }
 
   return (
-    <LanguageContext.Provider value={value}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );
@@ -85,7 +81,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;

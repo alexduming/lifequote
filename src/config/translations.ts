@@ -33,6 +33,10 @@ export type TranslationType = {
     stats: {
       quotes: string;
     };
+    topics: {
+      title: string;
+      description: string;
+    };
   };
   actions: {
     like: string;
@@ -41,6 +45,7 @@ export type TranslationType = {
     quotes: string;
     close: string;
     viewDetails: string;
+    searchTopics: string;
   };
   books: {
     title: string;
@@ -53,6 +58,16 @@ export type TranslationType = {
   search: {
     results: string;
     noResults: string;
+  };
+  stats: {
+    quotes: string;
+    collections: string;
+    shares: string;
+  };
+  author: {
+    bio: string;
+    achievements: string;
+    quotes: string;
   };
 };
 
@@ -98,6 +113,10 @@ export const translations: Record<Language, TranslationType> = {
       stats: {
         quotes: 'quotes',
       },
+      topics: {
+        title: 'Explore Topics',
+        description: 'Discover wisdom from various fields and perspectives',
+      },
     },
     actions: {
       like: 'Like',
@@ -106,6 +125,7 @@ export const translations: Record<Language, TranslationType> = {
       quotes: 'quotes',
       close: 'Close',
       viewDetails: 'View Details',
+      searchTopics: 'Search topics...',
     },
     books: {
       title: 'Book Quotes',
@@ -118,6 +138,16 @@ export const translations: Record<Language, TranslationType> = {
     search: {
       results: 'Found %d results',
       noResults: 'No results found',
+    },
+    stats: {
+      quotes: 'Quotes',
+      collections: 'Collections',
+      shares: 'Shares',
+    },
+    author: {
+      bio: 'Biography',
+      achievements: 'Achievements',
+      quotes: 'Notable Quotes',
     },
   },
   zh: {
@@ -161,6 +191,10 @@ export const translations: Record<Language, TranslationType> = {
       stats: {
         quotes: '条语录',
       },
+      topics: {
+        title: '探索主题',
+        description: '探索不同领域和视角的智慧',
+      },
     },
     actions: {
       like: '喜欢',
@@ -169,6 +203,7 @@ export const translations: Record<Language, TranslationType> = {
       quotes: '条语录',
       close: '关闭',
       viewDetails: '查看详情',
+      searchTopics: '搜索主题...',
     },
     books: {
       title: '书籍语录',
@@ -181,6 +216,16 @@ export const translations: Record<Language, TranslationType> = {
     search: {
       results: '找到 %d 条结果',
       noResults: '未找到相关结果',
+    },
+    stats: {
+      quotes: '条语录',
+      collections: '次收藏',
+      shares: '次分享',
+    },
+    author: {
+      bio: '简介',
+      achievements: '成就',
+      quotes: '经典语录',
     },
   },
 }; 

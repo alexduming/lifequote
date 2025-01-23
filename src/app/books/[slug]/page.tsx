@@ -1,10 +1,12 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { Book } from 'lucide-react';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
 import { translations } from '@/config/translations';
-import { readQuotesFromCsv, Quote as QuoteType } from '@/lib/quotes';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language, CategoryKey } from '@/config/translations';
 
 // 生成规范化的slug
@@ -18,10 +20,11 @@ function generateSlug(text: string) {
 
 // 获取页面数据
 async function getBookPageData(slug: string) {
-  const quotes = await readQuotesFromCsv();
+  const response = await fetch('/api/quotes');
+  const quotes = await response.json();
   
   // 查找匹配的书籍
-  const bookQuotes = quotes.filter(quote => {
+  const bookQuotes = quotes.filter((quote: any) => {
     const quoteSlug = generateSlug(quote.book_en);
     return quoteSlug === slug;
   });
@@ -46,10 +49,16 @@ async function getBookPageData(slug: string) {
   return bookData;
 }
 
-export default async function BookPage({ params }: { params: { slug: string } }) {
-  const book = await getBookPageData(params.slug);
-  const language = 'en' as Language; // 默认使用英文
+export default function BookPage({ params }: { params: { slug: string } }) {
+  const { language } = useLanguage();
   const t = translations[language];
+  const [book, setBook] = useState<any>(null);
+
+  useEffect(() => {
+    getBookPageData(params.slug).then(data => {
+      setBook(data);
+    });
+  }, [params.slug]);
 
   if (!book) {
     return (
@@ -130,7 +139,7 @@ export default async function BookPage({ params }: { params: { slug: string } })
         {/* Book Quotes */}
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-3xl mx-auto space-y-6">
-            {book.quotes.map((quote: QuoteType) => (
+            {book.quotes.map((quote: any) => (
               <QuoteCard
                 key={quote.id}
                 quote={quote.quote}

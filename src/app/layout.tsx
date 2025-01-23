@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Oswald } from "next/font/google";
 import "./globals.css";
+import ClientLayout from '@/components/ClientLayout';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -35,7 +36,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakarta.variable} ${oswald.variable} font-sans`}>
-        {children}
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
