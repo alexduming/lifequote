@@ -46,46 +46,62 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
 
   return new Promise((resolve, reject) => {
     const results: Quote[] = [];
-    const csvPath = path.join(process.cwd(), 'src', 'data', 'quotes.csv');
+    const csvPaths = [
+      path.join(process.cwd(), 'src', 'data', 'quotes.csv'),
+      path.join(process.cwd(), 'src', 'data', 'quotes_new.csv')
+    ];
 
-    fs.createReadStream(csvPath)
-      .pipe(csv())
-      .on('data', (data: any) => {
-        // 转换CSV数据为Quote对象
-        const quote: Quote = {
-          id: parseInt(data.id),
-          quote: {
-            zh: data.quote_zh,
-            en: data.quote_en,
-          },
-          author: {
-            zh: data.author_zh,
-            en: data.author_en,
-          },
-          authorTitle: {
-            zh: data.author_title_zh,
-            en: data.author_title_en,
-          },
-          category: data.category as CategoryKey,
-          period: {
-            zh: data.period_zh,
-            en: data.period_en,
-          },
-          likes: parseInt(data.likes),
-          views: parseInt(data.views),
-          created_at: data.created_at,
-          book: data.book,
-          book_en: data.book_en,
-        };
-        results.push(quote);
-      })
-      .on('end', () => {
-        // 更新缓存
-        quotesCache = results;
-        lastFetchTime = currentTime;
-        resolve(results);
-      })
-      .on('error', reject);
+    let completedFiles = 0;
+
+    csvPaths.forEach(csvPath => {
+      fs.createReadStream(csvPath)
+        .pipe(csv())
+        .on('data', (data: any) => {
+          // 转换CSV数据为Quote对象
+          const quote: Quote = {
+            id: parseInt(data.id),
+            quote: {
+              zh: data.quote_zh,
+              en: data.quote_en,
+            },
+            author: {
+              zh: data.author_zh,
+              en: data.author_en,
+            },
+            authorTitle: {
+              zh: data.author_title_zh,
+              en: data.author_title_en,
+            },
+            category: data.category as CategoryKey,
+            period: {
+              zh: data.period_zh,
+              en: data.period_en,
+            },
+            likes: parseInt(data.likes) || 0,
+            views: parseInt(data.views) || 0,
+            created_at: data.created_at,
+            book: data.book || '',
+            book_en: data.book_en || '',
+          };
+          results.push(quote);
+        })
+        .on('end', () => {
+          completedFiles++;
+          if (completedFiles === csvPaths.length) {
+            // 更新缓存
+            quotesCache = results;
+            lastFetchTime = currentTime;
+            resolve(results);
+          }
+        })
+        .on('error', (error) => {
+          console.error(`Error reading ${csvPath}:`, error);
+          completedFiles++;
+          if (completedFiles === csvPaths.length) {
+            resolve(results); // 即使有一个文件失败，也返回已读取的结果
+          }
+        });
+    });
   });
 }
 
