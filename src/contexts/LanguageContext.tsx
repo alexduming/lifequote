@@ -1,21 +1,28 @@
 /**
- * @version 0.8
+ * @version 0.9
  * @description 语言上下文实现，包含以下功能：
  * - 支持中英文切换
  * - 本地存储语言偏好
  * - 浏览器语言检测
  * - SSR 支持
  * - 客户端水合优化
+ * - 组件动态导入
+ * - 修复服务器端渲染问题
  */
 
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { Language } from '@/config/translations';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
+}
+
+interface LanguageState {
+  language: Language;
+  version: number;
 }
 
 const defaultContext: LanguageContextType = {
@@ -26,54 +33,51 @@ const defaultContext: LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType>(defaultContext);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
-  const [language, setLanguageState] = useState<Language>('en');
+  // 使用 useReducer 来强制所有子组件重新渲染
+  const [state, dispatch] = useReducer(
+    (state: LanguageState, action: Language): LanguageState => ({
+      language: action,
+      version: state.version + 1
+    }), 
+    { language: 'en', version: 0 }
+  );
 
-  // 只在客户端初始化语言设置
+  // 客户端初始化
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'zh')) {
-      setLanguageState(savedLanguage);
-    } else {
-      const browserLang = navigator.language.toLowerCase();
-      const initialLang = browserLang.startsWith('zh') ? 'zh' : 'en';
-      setLanguageState(initialLang);
-      localStorage.setItem('language', initialLang);
+    try {
+      const savedLanguage = localStorage.getItem('language') as Language;
+      if (savedLanguage === 'zh' || savedLanguage === 'en') {
+        dispatch(savedLanguage);
+      } else {
+        const browserLang = navigator.language.startsWith('zh') ? 'zh' : 'en';
+        dispatch(browserLang);
+        localStorage.setItem('language', browserLang);
+      }
+    } catch (error) {
+      console.error('Error initializing language:', error);
     }
-    setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('language', language);
-      document.documentElement.lang = language;
-      document.documentElement.setAttribute('data-language', language);
-      forceUpdate();
-    }
-  }, [language, mounted]);
-
-  const setLanguage = useCallback((lang: Language) => {
-    if (lang === 'en' || lang === 'zh') {
-      setLanguageState(lang);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('languagechange'));
+  const setLanguage = useCallback((newLanguage: Language) => {
+    if (newLanguage === 'en' || newLanguage === 'zh') {
+      try {
+        localStorage.setItem('language', newLanguage);
+        document.documentElement.lang = newLanguage;
+        document.documentElement.setAttribute('data-language', newLanguage);
+        dispatch(newLanguage);
+      } catch (error) {
+        console.error('Error setting language:', error);
       }
     }
   }, []);
 
-  const contextValue = React.useMemo(() => ({
-    language,
-    setLanguage,
-  }), [language, setLanguage]);
-
-  // 在客户端挂载前使用默认语言
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  const value = useMemo(() => ({
+    language: state.language,
+    setLanguage
+  }), [state.language, setLanguage]);
 
   return (
-    <LanguageContext.Provider value={contextValue}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
@@ -81,7 +85,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;

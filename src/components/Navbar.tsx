@@ -14,6 +14,7 @@ export default function Navbar() {
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'zh' : 'en');
+    setIsOpen(false);
   };
 
   return (
@@ -47,7 +48,7 @@ export default function Navbar() {
               {t.nav.topics}
             </Link>
             <button
-              onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
+              onClick={toggleLanguage}
               className="text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors"
             >
               {language === 'zh' ? 'EN' : '中文'}
@@ -81,7 +82,7 @@ export default function Navbar() {
               {t.nav.topics}
             </Link>
             <button
-              onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
+              onClick={toggleLanguage}
               className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
             >
               {language === 'zh' ? 'EN' : '中文'}
