@@ -44,7 +44,7 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
     return quotesCache;
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise<Quote[]>((resolve) => {
     const results: Quote[] = [];
     const csvPaths = [
       path.join(process.cwd(), 'src', 'data', 'quotes.csv'),

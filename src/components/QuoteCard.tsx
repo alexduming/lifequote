@@ -4,6 +4,7 @@ import React from 'react';
 import { Heart, Share2, BookmarkPlus } from 'lucide-react';
 import Link from 'next/link';
 import { translations, CategoryKey, Language } from '@/config/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BilingualText {
   en: string;
@@ -17,7 +18,6 @@ interface QuoteCardProps {
   category: CategoryKey;
   likes?: number;
   isLiked?: boolean;
-  language?: Language;
 }
 
 export default function QuoteCard({
@@ -27,8 +27,8 @@ export default function QuoteCard({
   category,
   likes = 0,
   isLiked = false,
-  language = 'en',
 }: QuoteCardProps) {
+  const { language } = useLanguage();
   const t = translations[language];
 
   return (
@@ -66,7 +66,7 @@ export default function QuoteCard({
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between mt-6 pt-4 border-t border-dark-100">
-        <button className="flex items-center space-x-1.5 text-dark-500 hover:text-primary-600 transition-colors">
+        <button className="flex items-center space-x-1.5 text-dark-500 hover:text-primary-600 transition-colors relative group/btn">
           <Heart
             size={18}
             className={`transition-all duration-300 transform group-hover:scale-110 ${
@@ -74,17 +74,20 @@ export default function QuoteCard({
             }`}
           />
           <span className="text-sm font-medium">{likes}</span>
+          <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity">
+            {t.actions.like}
+          </span>
         </button>
         <div className="flex items-center space-x-4">
           <button className="text-dark-400 hover:text-primary-600 transition-colors relative group/btn">
             <BookmarkPlus size={18} className="transform group-hover:scale-110 transition-transform duration-300" />
-            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity">
+            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
               {t.actions.save}
             </span>
           </button>
           <button className="text-dark-400 hover:text-primary-600 transition-colors relative group/btn">
             <Share2 size={18} className="transform group-hover:scale-110 transition-transform duration-300" />
-            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity">
+            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
               {t.actions.share}
             </span>
           </button>

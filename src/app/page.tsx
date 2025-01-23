@@ -98,6 +98,22 @@ export default function Home() {
   const [searchResults, setSearchResults] = React.useState<{ results: Quote[]; total: number } | null>(null);
   const [isSearching, setIsSearching] = React.useState(false);
   const searchTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+
+  // 监听语言变化
+  React.useEffect(() => {
+    const handleLanguageChange = () => {
+      forceUpdate();
+    };
+
+    window.addEventListener('languagechange', handleLanguageChange);
+    return () => window.removeEventListener('languagechange', handleLanguageChange);
+  }, []);
+
+  // 强制重新渲染当语言改变时
+  React.useEffect(() => {
+    forceUpdate();
+  }, [language]);
 
   // 处理搜索
   const handleSearch = async (query: string) => {
@@ -226,7 +242,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredQuotes.map((quote, index) => (
                 <div key={index} className="animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
-                  <QuoteCard {...quote} language={language} />
+                  <QuoteCard {...quote} />
                 </div>
               ))}
             </div>
@@ -248,18 +264,15 @@ export default function Home() {
                   className="group relative overflow-hidden rounded-2xl bg-dark-100/50"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${category.bgClass} opacity-0 group-hover:opacity-60 transition-all duration-300`} />
-                  <div className="relative p-8" >
-                    <span className="text-6xl mb-6 block transform group-hover:scale-110 transition-transform duration-300">
-                      {category.icon}
-                    </span>
-                    <h3 className="text-2xl font-[oswald] font-bold text-dark-900 mb-2 uppercase group-hover:text-primary-600 transition-colors duration-300">
+                  <div className="relative p-6 flex flex-col items-center text-center">
+                    <span className="text-4xl mb-3">{category.icon}</span>
+                    <h3 className="text-lg font-[oswald] font-medium text-dark-800 mb-1">
                       {t.categories[category.key]}
                     </h3>
-                    <p className="text-dark-600">
-                      {category.count} {t.actions.quotes}
+                    <p className="text-sm text-dark-500">
+                      {category.count} {t.sections.stats.quotes}
                     </p>
                   </div>
-                  <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary-500/50 rounded-2xl transition-colors duration-300" />
                 </a>
               ))}
             </div>

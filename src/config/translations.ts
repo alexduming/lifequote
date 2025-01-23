@@ -30,12 +30,17 @@ export type TranslationType = {
       title: string;
       subtitle: string;
     };
+    stats: {
+      quotes: string;
+    };
   };
   actions: {
     like: string;
     save: string;
     share: string;
     quotes: string;
+    close: string;
+    viewDetails: string;
   };
   books: {
     title: string;
@@ -44,6 +49,10 @@ export type TranslationType = {
       books: string;
       quotes: string;
     };
+  };
+  search: {
+    results: string;
+    noResults: string;
   };
 };
 
@@ -86,12 +95,17 @@ export const translations: Record<Language, TranslationType> = {
         title: 'Explore Categories',
         subtitle: 'Discover wisdom sparks from different fields',
       },
+      stats: {
+        quotes: 'quotes',
+      },
     },
     actions: {
       like: 'Like',
       save: 'Save',
       share: 'Share',
       quotes: 'quotes',
+      close: 'Close',
+      viewDetails: 'View Details',
     },
     books: {
       title: 'Book Quotes',
@@ -100,6 +114,10 @@ export const translations: Record<Language, TranslationType> = {
         books: 'books',
         quotes: 'quotes',
       },
+    },
+    search: {
+      results: 'Found %d results',
+      noResults: 'No results found',
     },
   },
   zh: {
@@ -140,12 +158,17 @@ export const translations: Record<Language, TranslationType> = {
         title: '探索分类',
         subtitle: '发现不同领域的智慧火花',
       },
+      stats: {
+        quotes: '条语录',
+      },
     },
     actions: {
       like: '喜欢',
       save: '收藏',
       share: '分享',
       quotes: '条语录',
+      close: '关闭',
+      viewDetails: '查看详情',
     },
     books: {
       title: '书籍语录',
@@ -154,6 +177,10 @@ export const translations: Record<Language, TranslationType> = {
         books: '本书籍',
         quotes: '条语录',
       },
+    },
+    search: {
+      results: '找到 %d 条结果',
+      noResults: '未找到相关结果',
     },
   },
 }; 

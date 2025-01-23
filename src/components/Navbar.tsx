@@ -9,8 +9,12 @@ import { translations } from '@/config/translations';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { language, toggleLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const t = translations[language];
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'zh' : 'en');
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -43,7 +47,7 @@ export default function Navbar() {
               {t.nav.topics}
             </Link>
             <button
-              onClick={toggleLanguage}
+              onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
               className="text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors"
             >
               {language === 'zh' ? 'EN' : '中文'}
@@ -77,7 +81,7 @@ export default function Navbar() {
               {t.nav.topics}
             </Link>
             <button
-              onClick={toggleLanguage}
+              onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
               className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
             >
               {language === 'zh' ? 'EN' : '中文'}

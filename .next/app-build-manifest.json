@@ -46,10 +46,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/topics/page.js"
     ],
-    "/not-found": [
+    "/category/[slug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/not-found.js"
+      "static/chunks/app/category/[slug]/page.js"
     ]
   }
 }
