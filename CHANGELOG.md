@@ -35,4 +35,4 @@
 - TypeScript
 - Tailwind CSS
 - Lucide React
-- Context API (用于语言切换) 
+- Context API (用于语言切换)

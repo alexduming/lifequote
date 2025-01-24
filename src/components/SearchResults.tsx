@@ -4,23 +4,29 @@ import React from 'react';
 import Link from 'next/link';
 import { Quote } from '@/lib/quotes';
 import { Language, translations } from '@/config/translations';
+import { ArrowRight } from 'lucide-react';
 
 interface SearchResultsProps {
   results: Quote[];
   total: number;
   language: Language;
   onClose: () => void;
+  searchQuery: string;
 }
 
-export default function SearchResults({ results, total, language, onClose }: SearchResultsProps) {
+const MAX_PREVIEW_RESULTS = 5;
+
+export default function SearchResults({ results, total, language, onClose, searchQuery }: SearchResultsProps) {
   const t = translations[language];
+  const hasMoreResults = total > MAX_PREVIEW_RESULTS;
+  const previewResults = results.slice(0, MAX_PREVIEW_RESULTS);
 
   if (results.length === 0) {
     return null;
   }
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl z-50 max-h-[80vh] overflow-y-auto">
+    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl z-[9999] max-h-[60vh] overflow-y-auto backdrop-blur-sm border border-gray-100">
       <div className="sticky top-0 bg-gray-50 p-4 border-b">
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-500">
@@ -37,7 +43,7 @@ export default function SearchResults({ results, total, language, onClose }: Sea
         </div>
       </div>
       <div className="divide-y">
-        {results.map((quote) => (
+        {previewResults.map((quote) => (
           <div key={quote.id} className="p-4 hover:bg-gray-50">
             <blockquote className="text-gray-800 mb-2">
               "{quote.quote[language]}"
@@ -62,6 +68,20 @@ export default function SearchResults({ results, total, language, onClose }: Sea
           </div>
         ))}
       </div>
+      {hasMoreResults && (
+        <Link
+          href={`/search?q=${encodeURIComponent(results[0]?.quote[language] || '')}`}
+          className="block p-4 text-center bg-gray-50 text-primary-600 hover:text-primary-700 font-medium border-t group"
+          onClick={onClose}
+        >
+          <button className="btn btn-outline btn-sm w-full">
+            <span className="inline-flex items-center gap-2">
+              {t.search.viewAll}
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </span>
+          </button>
+        </Link>
+      )}
     </div>
   );
 } 

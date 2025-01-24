@@ -11,6 +11,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/topics/page.js"
     ],
+    "/authors/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/authors/page.js"
+    ],
     "/daily/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",

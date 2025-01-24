@@ -25,24 +25,21 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
-  const [language, setLanguageState] = useState<Language>(() => {
-    // 在服务器端返回默认语言
-    if (typeof window === 'undefined') return 'en';
-    
-    // 在客户端从 localStorage 读取或使用浏览器语言
+  const [language, setLanguageState] = useState<Language>('en');
+
+  useEffect(() => {
+    // 初始化时从 localStorage 读取语言设置
     const savedLanguage = localStorage.getItem('language') as Language;
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'zh')) {
-      return savedLanguage;
+      setLanguageState(savedLanguage);
+    } else {
+      // 如果没有保存的语言设置，尝试使用浏览器语言
+      const browserLang = navigator.language.toLowerCase();
+      const newLang = browserLang.startsWith('zh') ? 'zh' : 'en';
+      setLanguageState(newLang);
+      localStorage.setItem('language', newLang);
     }
-    const browserLang = window.navigator.language.toLowerCase();
-    return browserLang.startsWith('zh') ? 'zh' : 'en';
-  });
-
-  // 组件挂载时的初始化
-  useEffect(() => {
     setMounted(true);
-    document.documentElement.lang = language;
-    localStorage.setItem('language', language);
   }, []);
 
   const setLanguage = useCallback((newLanguage: Language) => {
@@ -52,9 +49,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('language', newLanguage);
     document.documentElement.lang = newLanguage;
     
-    // 触发自定义事件通知其他组件语言已更改
-    const event = new CustomEvent('languagechange', { detail: { language: newLanguage } });
-    window.dispatchEvent(event);
+    // 触发自定义事件，让需要更新的组件知道语言已更改
+    window.dispatchEvent(new CustomEvent('languagechange', { detail: newLanguage }));
   }, [language]);
 
   const contextValue = {
@@ -62,15 +58,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLanguage,
     isClient: mounted
   };
-
-  // 在客户端渲染之前返回服务器端的默认内容
-  if (!mounted) {
-    return (
-      <LanguageContext.Provider value={{ language: 'en', setLanguage: () => {}, isClient: false }}>
-        {children}
-      </LanguageContext.Provider>
-    );
-  }
 
   return (
     <LanguageContext.Provider value={contextValue}>

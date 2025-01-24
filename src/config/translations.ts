@@ -56,8 +56,12 @@ export type TranslationType = {
     };
   };
   search: {
-    results: string;
+    placeholder: string;
     noResults: string;
+    results: string;
+    viewAll: string;
+    resultsFor: string;
+    tryDifferent: string;
   };
   stats: {
     quotes: string;
@@ -136,8 +140,12 @@ export const translations: Record<Language, TranslationType> = {
       },
     },
     search: {
-      results: 'Found %d results',
+      placeholder: 'Search quotes...',
       noResults: 'No results found',
+      results: 'Found %d results',
+      viewAll: 'View all results',
+      resultsFor: 'Search results for "%s"',
+      tryDifferent: 'Try searching with different keywords',
     },
     stats: {
       quotes: 'Quotes',
@@ -160,7 +168,7 @@ export const translations: Record<Language, TranslationType> = {
     },
     hero: {
       title: '在过去的1000年中\n那些鼓励着全人类的句子',
-      subtitle: '发现历史上最伟大思想家的智慧之言。在这里找到激励、智慧和行动指引。',
+      subtitle: '在这里找到激励、智慧和行动指引，发现历史上最伟大思想家的智慧之言。',
       searchPlaceholder: '搜索语录、作者或主题...',
     },
     categories: {
@@ -214,8 +222,12 @@ export const translations: Record<Language, TranslationType> = {
       },
     },
     search: {
-      results: '找到 %d 条结果',
+      placeholder: '搜索名言...',
       noResults: '未找到相关结果',
+      results: '找到 %d 条结果',
+      viewAll: '查看全部结果',
+      resultsFor: '"%s" 的搜索结果',
+      tryDifferent: '尝试使用不同的关键词搜索',
     },
     stats: {
       quotes: '条语录',

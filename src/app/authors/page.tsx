@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Search, Filter, Globe2, BookOpen, Quote } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -89,9 +89,47 @@ const regions = [
 ];
 
 export default function AuthorsPage() {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, isClient } = useLanguage();
   const [showFilters, setShowFilters] = useState(false);
+  const [filteredAuthors, setFilteredAuthors] = useState(featuredAuthors);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const t = translations[language];
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    setIsSearching(true);
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      const filtered = featuredAuthors.filter(author =>
+        author.name[language].toLowerCase().includes(query.toLowerCase()) ||
+        author.title[language].toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredAuthors(filtered);
+      setIsSearching(false);
+    }, 300);
+  }, [language]);
+
+  if (!isClient) {
+    return (
+      <div className="noise-bg min-h-screen">
+        <Navbar />
+        <main className="container py-20">
+          <div className="max-w-4xl mx-auto text-center mb-20">
+            <div className="animate-pulse">
+              <div className="h-12 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
+              <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="noise-bg min-h-screen">
@@ -100,35 +138,49 @@ export default function AuthorsPage() {
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center mb-20">
           <h1 className="text-4xl md:text-6xl font-[oswald] font-bold text-dark-900 mb-6 uppercase tracking-tight">
-            {language === 'en' ? 'Great Minds' : '伟大思想家'}
+            {t.nav.authors}
           </h1>
           <p className="text-xl text-dark-600 mb-12">
-            {language === 'en' 
-              ? "Explore the wisdom of history's most influential thinkers"
-              : '探索历史上最具影响力的思想家们的智慧'}
+            探索历史上最伟大的思想家和他们的智慧结晶
           </p>
           
-          {/* Search and Filter */}
-          <div className="max-w-2xl mx-auto space-y-4">
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity" />
-              <input
-                type="text"
-                placeholder={language === 'en' ? 'Search authors...' : '搜索作者...'}
-                className="input h-14 pl-6 pr-12 text-lg group-hover:shadow-lg"
-              />
-              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-500 hover:text-primary-600 transition-colors">
-                <Search size={24} />
-              </button>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity pointer-events-none" />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder={language === 'en' ? 'Search authors...' : '搜索作者...'}
+                  className="w-full h-14 px-6 pr-24 rounded-xl bg-white text-lg shadow-sm focus:ring-2 focus:ring-primary-500/50 border border-gray-200 focus:border-primary-500 transition-shadow hover:shadow-md"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  {searchQuery && !isSearching && (
+                    <button
+                      onClick={() => handleSearch('')}
+                      className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  )}
+                  <button 
+                    className="p-2 text-primary-500 hover:text-primary-600 transition-colors"
+                    onClick={() => handleSearch(searchQuery)}
+                  >
+                    {isSearching ? (
+                      <div className="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
+                    ) : (
+                      <Search size={20} />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
-            
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 text-dark-600 hover:text-primary-600 transition-colors mx-auto"
-            >
-              <Filter size={20} />
-              <span>{language === 'en' ? 'Show Filters' : '显示筛选'}</span>
-            </button>
           </div>
         </div>
 
@@ -175,7 +227,7 @@ export default function AuthorsPage() {
 
         {/* Featured Authors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredAuthors.map((author, index) => (
+          {filteredAuthors.map((author, index) => (
             <div
               key={index}
               className="group bg-white/50 backdrop-blur-sm rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300"
