@@ -126,27 +126,42 @@ export default function BooksPage() {
                   {/* Book Cover */}
                   <Link 
                     href={`/books/${book.slug}`}
-                    className="w-48 flex-shrink-0 relative"
+                    className="w-48 flex-shrink-0 relative group"
                     style={{ aspectRatio: '3/4' }}
                   >
-                    <div className="absolute inset-0 bg-gray-100">
-                      {book.coverImage ? (
-                        <Image
-                          src={book.coverImage}
-                          alt={book.title[language]}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="text-center p-4">
-                            <Book className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                            <div className="text-sm text-gray-500 font-medium">
-                              {book.title[language]}
-                            </div>
-                          </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-l-xl overflow-hidden">
+                      {book.coverImage && (
+                        <div className="absolute inset-0">
+                          <Image
+                            src={book.coverImage}
+                            alt={book.title[language]}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none'; // 隐藏加载失败的图片
+                            }}
+                          />
                         </div>
                       )}
+                      
+                      {/* 默认显示图标和书名 */}
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 group-hover:bg-gray-50/50 transition-colors">
+                        <div className="flex-1 flex items-center justify-center">
+                          <Book 
+                            className="w-16 h-16 text-dark-900/50 group-hover:text-dark-900/60 transition-colors" 
+                            strokeWidth={1} 
+                          />
+                        </div>
+                        <div className="text-center">
+                          <h3 className="font-[oswald] text-lg font-bold text-dark-900 mb-1 line-clamp-2">
+                            {book.title[language]}
+                          </h3>
+                          <div className="text-xs text-gray-500">
+                            {book.quoteCount} {t.books.stats.quotes}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </Link>
 
