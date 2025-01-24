@@ -80,14 +80,14 @@ export default function TopicsPage() {
       <Navbar />
       <main className="container py-20">
         {/* Hero Section - 主标题区域 */}
-        <div className="max-w-4xl mx-auto text-center mb-20">
+        <div className="max-w-6xl mx-auto text-center mb-20">
           {/* 主标题: 默认36px(text-4xl)，中等屏幕60px(md:text-6xl) */}
           <h1 className="text-4xl md:text-6xl font-[oswald] font-bold text-dark-900 mb-6 uppercase tracking-tight">
             {t.sections.topics.title}
           </h1>
           
           {/* 副标题/描述: 20px(text-xl) */}
-          <p className="text-xl text-dark-600 mb-12">
+          <p className="text-xl text-dark-600 mb-12 whitespace-nowrap">
             {t.sections.topics.description}
           </p>
           
@@ -148,7 +148,7 @@ export default function TopicsPage() {
                   </div>
                   <div className="text-center">
                     {/* 分类标题: 24px(text-2xl) */}
-                    <h3 className="text-2xl font-[oswald] font-bold text-dark-900 mb-2 tracking-wide group-hover:text-primary-600 transition-colors duration-300">
+                    <h3 className="text-3xl font-[oswald] font-bold text-dark-900 mb-2 tracking-wide group-hover:text-primary-600 transition-colors duration-300">
                       {t.categories[category.key]}
                     </h3>
                     {/* 分类计数: 16px(text-base) */}
