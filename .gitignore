@@ -1,1 +1,48 @@
-node_modules
+# 依赖目录
+/node_modules
+/.pnp
+.pnp.js
+
+# 测试覆盖率
+/coverage
+
+# next.js 构建输出
+/.next/
+/out/
+
+# 生产环境构建文件
+/build
+/dist
+
+# 其他
+.DS_Store
+*.pem
+
+# 调试日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 本地环境文件
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE 配置文件
+.idea
+.vscode
+*.swp
+*.swo
+
+# 缓存
+.cache
+.npm
+
+# 系统文件
+Thumbs.db
