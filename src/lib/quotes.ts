@@ -1,7 +1,21 @@
-import fs from 'fs-extra';
-import csv from 'csv-parser';
-import path from 'path';
+/**
+ * @file 语录数据处理模块
+ * @description 提供从 Supabase 数据库读取和处理语录数据的功能
+ */
+
+import { createClient } from '@supabase/supabase-js';
 import { CategoryKey } from '@/config/translations';
+
+// 创建 Supabase 客户端
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    auth: {
+      persistSession: false
+    }
+  }
+);
 
 /**
  * 定义数据类型
@@ -41,11 +55,11 @@ export interface Quote {
  */
 let quotesCache: Quote[] | null = null;
 let lastFetchTime: number = 0;
-const CACHE_DURATION = 30 * 60 * 1000; // 增加到30分钟
+const CACHE_DURATION = 30 * 60 * 1000;
 
 /**
- * 读取CSV文件
- * @description 从CSV文件中读取语录数据，并使用缓存机制优化性能
+ * 从 Supabase 读取语录数据
+ * @description 从数据库读取语录数据，并使用缓存机制优化性能
  * @returns Promise<Quote[]> 返回语录数据数组
  */
 export async function readQuotesFromCsv(): Promise<Quote[]> {
@@ -57,77 +71,84 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
     return quotesCache;
   }
 
-  console.log('Reading quotes from CSV files');
-  
-  return new Promise<Quote[]>((resolve, reject) => {
-    const results: Quote[] = [];
-    const csvPaths = [
-      path.join(process.cwd(), 'src', 'data', 'quotes.csv'),
-      path.join(process.cwd(), 'src', 'data', 'quotes_new.csv')
-    ];
+  console.log('Fetching quotes from Supabase');
+  const startTime = Date.now();
 
-    let completedFiles = 0;
-    const startTime = Date.now();
+  try {
+    // 从 Supabase 获取数据
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .order('id', { ascending: true });
 
-    csvPaths.forEach(csvPath => {
-      fs.createReadStream(csvPath)
-        .pipe(csv())
-        .on('data', (data: any) => {
-          // 转换CSV数据为Quote对象
-          const quote: Quote = {
-            id: parseInt(data.id),
-            quote: {
-              zh: data.quote_zh,
-              en: data.quote_en,
-            },
-            author: {
-              zh: data.author_zh,
-              en: data.author_en,
-            },
-            authorTitle: {
-              zh: data.author_title_zh,
-              en: data.author_title_en,
-            },
-            category: data.category as CategoryKey,
-            period: {
-              zh: data.period_zh,
-              en: data.period_en,
-            },
-            likes: parseInt(data.likes) || 0,
-            views: parseInt(data.views) || 0,
-            created_at: data.created_at,
-            book: data.book || '',
-            book_en: data.book_en || '',
-          };
-          results.push(quote);
-        })
-        .on('end', () => {
-          completedFiles++;
-          if (completedFiles === csvPaths.length) {
-            const endTime = Date.now();
-            console.log(`CSV reading completed in ${endTime - startTime}ms`);
-            
-            // 更新缓存
-            quotesCache = results;
-            lastFetchTime = currentTime;
-            resolve(results);
-          }
-        })
-        .on('error', (error) => {
-          console.error(`Error reading ${csvPath}:`, error);
-          completedFiles++;
-          if (completedFiles === csvPaths.length) {
-            resolve(results);
-          }
-        });
-    });
-  });
+    if (error) {
+      throw error;
+    }
+
+    // 转换数据格式
+    const quotes: Quote[] = data.map(row => ({
+      id: row.id,
+      quote: {
+        zh: row.quote_zh,
+        en: row.quote_en,
+      },
+      author: {
+        zh: row.author_zh,
+        en: row.author_en,
+      },
+      authorTitle: {
+        zh: row.author_title_zh || '',
+        en: row.author_title_en || '',
+      },
+      category: row.category as CategoryKey,
+      period: {
+        zh: row.period_zh || '',
+        en: row.period_en || '',
+      },
+      likes: row.likes || 0,
+      views: row.views || 0,
+      created_at: row.created_at,
+      book: row.book || '',
+      book_en: row.book_en || '',
+    }));
+
+    const endTime = Date.now();
+    console.log(`Fetched ${quotes.length} quotes in ${endTime - startTime}ms`);
+
+    // 更新缓存
+    quotesCache = quotes;
+    lastFetchTime = currentTime;
+
+    return quotes;
+  } catch (error) {
+    console.error('Error fetching quotes:', error);
+    throw error;
+  }
 }
 
-// 按分类获取引用
+/**
+ * 按分类获取语录
+ * @param category 分类
+ * @returns Promise<Quote[]>
+ */
 export async function getQuotesByCategory(category: CategoryKey): Promise<Quote[]> {
   const quotes = await readQuotesFromCsv();
   return quotes.filter(quote => quote.category === category);
+}
+
+/**
+ * 获取分类统计信息
+ * @returns Promise<{ [key: string]: number }>
+ */
+export async function getCategoryStats(): Promise<{ [key: string]: number }> {
+  const quotes = await readQuotesFromCsv();
+  const stats: { [key: string]: number } = {};
+  
+  quotes.forEach(quote => {
+    stats[quote.category] = (stats[quote.category] || 0) + 1;
+  });
+  
+  return stats;
 }
 
 // 按作者获取引用
@@ -166,23 +187,4 @@ export async function getAllAuthors(): Promise<Array<{
   });
 
   return Array.from(authorMap.values());
-}
-
-// 获取所有分类统计
-export async function getCategoryStats(): Promise<Array<{
-  category: CategoryKey;
-  count: number;
-}>> {
-  const quotes = await readQuotesFromCsv();
-  const categoryMap = new Map();
-
-  quotes.forEach(quote => {
-    const count = categoryMap.get(quote.category) || 0;
-    categoryMap.set(quote.category, count + 1);
-  });
-
-  return Array.from(categoryMap.entries()).map(([category, count]) => ({
-    category: category as CategoryKey,
-    count: count as number
-  }));
 } 
