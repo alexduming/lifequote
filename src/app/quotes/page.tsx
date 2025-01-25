@@ -5,19 +5,37 @@ import { Filter, ArrowDownUp, Search } from 'lucide-react';
 import { CategoryKey, translations } from '@/config/translations';
 import { readQuotesFromCsv } from '@/lib/quotes';
 
-// 获取页面数据
-async function getQuotesPageData() {
+/**
+ * 获取页面数据
+ * @description 从CSV文件读取语录数据，并进行分页处理
+ * @param page 当前页码
+ * @param pageSize 每页显示数量
+ * @returns 返回分页后的数据和过滤选项
+ */
+async function getQuotesPageData(page: number = 1, pageSize: number = 10) {
   const quotes = await readQuotesFromCsv();
+  
+  // 计算分页
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  const paginatedQuotes = quotes.slice(start, end);
+  
+  // 获取过滤选项
   const periods = Array.from(new Set(quotes.map(q => q.period.zh)));
   const authors = Array.from(new Set(quotes.map(q => q.author.zh)));
   const categories = Object.entries(translations.zh.categories);
 
   return {
-    quotes,
+    quotes: paginatedQuotes,
     filters: {
       periods,
       authors,
       categories,
+    },
+    pagination: {
+      currentPage: page,
+      totalPages: Math.ceil(quotes.length / pageSize),
+      totalItems: quotes.length,
     },
     stats: {
       total: quotes.length,
@@ -27,8 +45,13 @@ async function getQuotesPageData() {
   };
 }
 
-export default async function QuotesPage() {
-  const { quotes, filters, stats } = await getQuotesPageData();
+export default async function QuotesPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const page = parseInt(searchParams.page || '1');
+  const { quotes, filters, pagination, stats } = await getQuotesPageData(page);
 
   return (
     <>
@@ -146,6 +169,27 @@ export default async function QuotesPage() {
                   />
                 ))}
               </div>
+
+              {/* Pagination */}
+              {pagination.totalPages > 1 && (
+                <div className="mt-8 flex justify-center">
+                  <nav className="flex items-center gap-2">
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <a
+                        key={pageNum}
+                        href={`/quotes?page=${pageNum}`}
+                        className={`px-4 py-2 rounded-lg ${
+                          pageNum === pagination.currentPage
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+              )}
             </div>
           </div>
         </div>

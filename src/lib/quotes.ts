@@ -3,7 +3,9 @@ import csv from 'csv-parser';
 import path from 'path';
 import { CategoryKey } from '@/config/translations';
 
-// 定义数据类型
+/**
+ * 定义数据类型
+ */
 export interface Quote {
   id: number;
   quote: {
@@ -30,21 +32,34 @@ export interface Quote {
   book_en: string;
 }
 
-// 缓存机制
+/**
+ * 缓存机制
+ * @description 使用内存缓存存储已读取的语录数据
+ * quotesCache: 存储语录数据的缓存
+ * lastFetchTime: 最后一次获取数据的时间戳
+ * CACHE_DURATION: 缓存有效期，默认30分钟
+ */
 let quotesCache: Quote[] | null = null;
 let lastFetchTime: number = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+const CACHE_DURATION = 30 * 60 * 1000; // 增加到30分钟
 
-// 读取CSV文件
+/**
+ * 读取CSV文件
+ * @description 从CSV文件中读取语录数据，并使用缓存机制优化性能
+ * @returns Promise<Quote[]> 返回语录数据数组
+ */
 export async function readQuotesFromCsv(): Promise<Quote[]> {
   const currentTime = Date.now();
   
   // 如果缓存有效，直接返回缓存数据
   if (quotesCache && (currentTime - lastFetchTime < CACHE_DURATION)) {
+    console.log('Using cached quotes data');
     return quotesCache;
   }
 
-  return new Promise<Quote[]>((resolve) => {
+  console.log('Reading quotes from CSV files');
+  
+  return new Promise<Quote[]>((resolve, reject) => {
     const results: Quote[] = [];
     const csvPaths = [
       path.join(process.cwd(), 'src', 'data', 'quotes.csv'),
@@ -52,6 +67,7 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
     ];
 
     let completedFiles = 0;
+    const startTime = Date.now();
 
     csvPaths.forEach(csvPath => {
       fs.createReadStream(csvPath)
@@ -88,6 +104,9 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
         .on('end', () => {
           completedFiles++;
           if (completedFiles === csvPaths.length) {
+            const endTime = Date.now();
+            console.log(`CSV reading completed in ${endTime - startTime}ms`);
+            
             // 更新缓存
             quotesCache = results;
             lastFetchTime = currentTime;
@@ -98,7 +117,7 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
           console.error(`Error reading ${csvPath}:`, error);
           completedFiles++;
           if (completedFiles === csvPaths.length) {
-            resolve(results); // 即使有一个文件失败，也返回已读取的结果
+            resolve(results);
           }
         });
     });

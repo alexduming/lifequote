@@ -1036,6 +1036,9 @@ video {
 .mt-6 {
   margin-top: 1.5rem;
 }
+.mt-8 {
+  margin-top: 2rem;
+}
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -1854,6 +1857,9 @@ video {
   --tw-text-opacity: 1;
   color: rgb(15 23 42 / var(--tw-text-opacity, 1));
 }
+.text-dark-900\/50 {
+  color: rgb(15 23 42 / 0.5);
+}
 .text-gray-400 {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity, 1));
@@ -1920,9 +1926,6 @@ video {
 .text-yellow-500 {
   --tw-text-opacity: 1;
   color: rgb(234 179 8 / var(--tw-text-opacity, 1));
-}
-.text-dark-900\/50 {
-  color: rgb(15 23 42 / 0.5);
 }
 .opacity-0 {
   opacity: 0;
@@ -2207,15 +2210,15 @@ video {
   --tw-text-opacity: 1;
   color: rgb(51 65 85 / var(--tw-text-opacity, 1));
 }
+.group:hover .group-hover\:text-dark-900\/60 {
+  color: rgb(15 23 42 / 0.6);
+}
 .group:hover .group-hover\:text-primary-500\/40 {
   color: rgb(227 21 99 / 0.4);
 }
 .group:hover .group-hover\:text-primary-600 {
   --tw-text-opacity: 1;
   color: rgb(204 14 84 / var(--tw-text-opacity, 1));
-}
-.group:hover .group-hover\:text-dark-900\/60 {
-  color: rgb(15 23 42 / 0.6);
 }
 .group\/btn:hover .group-hover\/btn\:opacity-100 {
   opacity: 1;

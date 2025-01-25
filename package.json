@@ -1,16 +1,22 @@
 {
   "name": "lifequote",
-  "version": "0.7.0",
+  "version": "1.2.3",
+  "description": "A website for life quotes",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "convert": "node src/scripts/convert_quotes.js"
   },
   "dependencies": {
     "autoprefixer": "^10.4.17",
-    "csv-parser": "^3.1.0",
+    "axios": "^1.6.7",
+    "crypto-js": "^4.2.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.4.1",
     "fs-extra": "^11.3.0",
     "lucide-react": "^0.320.0",
     "next": "14.1.0",
@@ -20,6 +26,7 @@
     "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.52",
