@@ -46,3 +46,7 @@ next-env.d.ts
 
 # 系统文件
 Thumbs.db
+
+# 数据文件
+/src/data/*.csv
+/src/data/*.json
