@@ -1,3 +1,8 @@
+/**
+ * 多语言翻译配置
+ * @module translations
+ */
+
 export type Language = 'en' | 'zh';
 
 export type CategoryKey = 'motivation' | 'life' | 'love' | 'success' | 'wisdom' | 
@@ -7,6 +12,11 @@ export type CategoryKey = 'motivation' | 'life' | 'love' | 'success' | 'wisdom' 
 export type TranslationType = {
   nav: {
     home: string;
+    about: string;
+    contact: string;
+    login: string;
+    register: string;
+    profile: string;
     authors: string;
     topics: string;
     daily: string;
@@ -73,12 +83,34 @@ export type TranslationType = {
     achievements: string;
     quotes: string;
   };
+  register: {
+    title: string;
+    username: string;
+    email: string;
+    password: string;
+    submit: string;
+    registering: string;
+    loginLink: string;
+  };
+  login: {
+    title: string;
+    email: string;
+    password: string;
+    submit: string;
+    loggingIn: string;
+    registerLink: string;
+  };
 };
 
 export const translations: Record<Language, TranslationType> = {
   en: {
     nav: {
       home: 'Home',
+      about: 'About',
+      contact: 'Contact',
+      login: 'Login',
+      register: 'Register',
+      profile: 'Profile',
       authors: 'Authors',
       topics: 'Topics',
       daily: 'Daily Picks',
@@ -157,10 +189,32 @@ export const translations: Record<Language, TranslationType> = {
       achievements: 'Achievements',
       quotes: 'Notable Quotes',
     },
+    register: {
+      title: 'Create your account',
+      username: 'Username',
+      email: 'Email address',
+      password: 'Password',
+      submit: 'Register',
+      registering: 'Registering...',
+      loginLink: 'Already have an account? Sign in'
+    },
+    login: {
+      title: 'Sign in to your account',
+      email: 'Email address',
+      password: 'Password',
+      submit: 'Sign in',
+      loggingIn: 'Signing in...',
+      registerLink: 'Don\'t have an account? Register'
+    }
   },
   zh: {
     nav: {
       home: '首页',
+      about: '关于',
+      contact: '联系',
+      login: '登录',
+      register: '注册',
+      profile: '个人中心',
       authors: '名人语录',
       topics: '主题分类',
       daily: '每日精选',
@@ -239,5 +293,22 @@ export const translations: Record<Language, TranslationType> = {
       achievements: '成就',
       quotes: '经典语录',
     },
+    register: {
+      title: '创建账号',
+      username: '用户名',
+      email: '邮箱地址',
+      password: '密码',
+      submit: '注册',
+      registering: '注册中...',
+      loginLink: '已有账号？点击登录'
+    },
+    login: {
+      title: '登录账号',
+      email: '邮箱地址',
+      password: '密码',
+      submit: '登录',
+      loggingIn: '登录中...',
+      registerLink: '没有账号？点击注册'
+    }
   },
 }; 

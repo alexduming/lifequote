@@ -5,9 +5,10 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { CategoryKey } from '@/config/translations';
+import type { Database } from '@/types/database.types';
 
 // 创建 Supabase 客户端
-const supabase = createClient(
+const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   {
@@ -21,29 +22,22 @@ const supabase = createClient(
  * 定义数据类型
  */
 export interface Quote {
-  id: number;
-  quote: {
-    zh: string;
-    en: string;
-  };
-  author: {
-    zh: string;
-    en: string;
-  };
-  authorTitle: {
-    zh: string;
-    en: string;
-  };
+  id: string;
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh: string | null;
+  author_title_en: string | null;
   category: CategoryKey;
-  period: {
-    zh: string;
-    en: string;
-  };
+  period_zh: string | null;
+  period_en: string | null;
   likes: number;
   views: number;
+  book: string | null;
+  book_en: string | null;
   created_at: string;
-  book: string;
-  book_en: string;
+  updated_at: string;
 }
 
 /**
@@ -67,11 +61,11 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
   
   // 如果缓存有效，直接返回缓存数据
   if (quotesCache && (currentTime - lastFetchTime < CACHE_DURATION)) {
-    console.log('Using cached quotes data');
+    console.log('使用缓存的语录数据');
     return quotesCache;
   }
 
-  console.log('Fetching quotes from Supabase');
+  console.log('从 Supabase 获取语录数据');
   const startTime = Date.now();
 
   try {
@@ -79,41 +73,35 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
     const { data, error } = await supabase
       .from('quotes')
       .select('*')
-      .order('id', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (error) {
+      console.error('获取语录数据失败:', error);
       throw error;
     }
 
     // 转换数据格式
     const quotes: Quote[] = data.map(row => ({
       id: row.id,
-      quote: {
-        zh: row.quote_zh,
-        en: row.quote_en,
-      },
-      author: {
-        zh: row.author_zh,
-        en: row.author_en,
-      },
-      authorTitle: {
-        zh: row.author_title_zh || '',
-        en: row.author_title_en || '',
-      },
+      quote_zh: row.quote_zh,
+      quote_en: row.quote_en,
+      author_zh: row.author_zh,
+      author_en: row.author_en,
+      author_title_zh: row.author_title_zh || null,
+      author_title_en: row.author_title_en || null,
       category: row.category as CategoryKey,
-      period: {
-        zh: row.period_zh || '',
-        en: row.period_en || '',
-      },
+      period_zh: row.period_zh || null,
+      period_en: row.period_en || null,
       likes: row.likes || 0,
       views: row.views || 0,
+      book: row.book || null,
+      book_en: row.book_en || null,
       created_at: row.created_at,
-      book: row.book || '',
-      book_en: row.book_en || '',
+      updated_at: row.updated_at,
     }));
 
     const endTime = Date.now();
-    console.log(`Fetched ${quotes.length} quotes in ${endTime - startTime}ms`);
+    console.log(`获取了 ${quotes.length} 条语录，耗时 ${endTime - startTime}ms`);
 
     // 更新缓存
     quotesCache = quotes;
@@ -121,7 +109,7 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
 
     return quotes;
   } catch (error) {
-    console.error('Error fetching quotes:', error);
+    console.error('获取语录数据时出错:', error);
     throw error;
   }
 }
@@ -132,8 +120,37 @@ export async function readQuotesFromCsv(): Promise<Quote[]> {
  * @returns Promise<Quote[]>
  */
 export async function getQuotesByCategory(category: CategoryKey): Promise<Quote[]> {
-  const quotes = await readQuotesFromCsv();
-  return quotes.filter(quote => quote.category === category);
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('category', category)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(row => ({
+      id: row.id,
+      quote_zh: row.quote_zh,
+      quote_en: row.quote_en,
+      author_zh: row.author_zh,
+      author_en: row.author_en,
+      author_title_zh: row.author_title_zh || null,
+      author_title_en: row.author_title_en || null,
+      category: row.category as CategoryKey,
+      period_zh: row.period_zh || null,
+      period_en: row.period_en || null,
+      likes: row.likes || 0,
+      views: row.views || 0,
+      book: row.book || null,
+      book_en: row.book_en || null,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
+  } catch (error) {
+    console.error('按分类获取语录失败:', error);
+    throw error;
+  }
 }
 
 /**
@@ -141,50 +158,143 @@ export async function getQuotesByCategory(category: CategoryKey): Promise<Quote[
  * @returns Promise<{ [key: string]: number }>
  */
 export async function getCategoryStats(): Promise<{ [key: string]: number }> {
-  const quotes = await readQuotesFromCsv();
-  const stats: { [key: string]: number } = {};
-  
-  quotes.forEach(quote => {
-    stats[quote.category] = (stats[quote.category] || 0) + 1;
-  });
-  
-  return stats;
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('category');
+
+    if (error) throw error;
+
+    const stats: { [key: string]: number } = {};
+    data.forEach(row => {
+      stats[row.category] = (stats[row.category] || 0) + 1;
+    });
+    
+    return stats;
+  } catch (error) {
+    console.error('获取分类统计失败:', error);
+    throw error;
+  }
 }
 
-// 按作者获取引用
+/**
+ * 按作者获取语录
+ * @param authorEn 作者英文名
+ * @returns Promise<Quote[]>
+ */
 export async function getQuotesByAuthor(authorEn: string): Promise<Quote[]> {
-  const quotes = await readQuotesFromCsv();
-  return quotes.filter(quote => quote.author.en.toLowerCase() === authorEn.toLowerCase());
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('author_en', authorEn)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(row => ({
+      id: row.id,
+      quote_zh: row.quote_zh,
+      quote_en: row.quote_en,
+      author_zh: row.author_zh,
+      author_en: row.author_en,
+      author_title_zh: row.author_title_zh || null,
+      author_title_en: row.author_title_en || null,
+      category: row.category as CategoryKey,
+      period_zh: row.period_zh || null,
+      period_en: row.period_en || null,
+      likes: row.likes || 0,
+      views: row.views || 0,
+      book: row.book || null,
+      book_en: row.book_en || null,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
+  } catch (error) {
+    console.error('按作者获取语录失败:', error);
+    throw error;
+  }
 }
 
-// 获取随机引用
+/**
+ * 获取随机语录
+ * @param count 获取数量
+ * @returns Promise<Quote[]>
+ */
 export async function getRandomQuotes(count: number = 1): Promise<Quote[]> {
-  const quotes = await readQuotesFromCsv();
-  const shuffled = [...quotes].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .limit(count)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(row => ({
+      id: row.id,
+      quote_zh: row.quote_zh,
+      quote_en: row.quote_en,
+      author_zh: row.author_zh,
+      author_en: row.author_en,
+      author_title_zh: row.author_title_zh || null,
+      author_title_en: row.author_title_en || null,
+      category: row.category as CategoryKey,
+      period_zh: row.period_zh || null,
+      period_en: row.period_en || null,
+      likes: row.likes || 0,
+      views: row.views || 0,
+      book: row.book || null,
+      book_en: row.book_en || null,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
+  } catch (error) {
+    console.error('获取随机语录失败:', error);
+    throw error;
+  }
 }
 
-// 获取所有作者
+/**
+ * 获取所有作者
+ * @returns Promise<Array<{ name: { zh: string; en: string }; title: { zh: string; en: string }; quoteCount: number }>>
+ */
 export async function getAllAuthors(): Promise<Array<{
   name: { zh: string; en: string };
   title: { zh: string; en: string };
   quoteCount: number;
 }>> {
-  const quotes = await readQuotesFromCsv();
-  const authorMap = new Map();
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('author_zh, author_en, author_title_zh, author_title_en');
 
-  quotes.forEach(quote => {
-    const key = quote.author.en;
-    if (!authorMap.has(key)) {
-      authorMap.set(key, {
-        name: quote.author,
-        title: quote.authorTitle,
-        quoteCount: 1
-      });
-    } else {
-      authorMap.get(key).quoteCount++;
-    }
-  });
+    if (error) throw error;
 
-  return Array.from(authorMap.values());
+    const authorMap = new Map();
+
+    data.forEach(row => {
+      const key = row.author_en;
+      if (!authorMap.has(key)) {
+        authorMap.set(key, {
+          name: {
+            zh: row.author_zh,
+            en: row.author_en,
+          },
+          title: {
+            zh: row.author_title_zh || '',
+            en: row.author_title_en || '',
+          },
+          quoteCount: 1
+        });
+      } else {
+        authorMap.get(key).quoteCount++;
+      }
+    });
+
+    return Array.from(authorMap.values());
+  } catch (error) {
+    console.error('获取所有作者失败:', error);
+    throw error;
+  }
 } 

@@ -1,31 +1,12 @@
 import { NextResponse } from 'next/server';
-import { readQuotesFromCsv, Quote } from '@/lib/quotes';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database.types';
 
-/**
- * 搜索函数
- * @description 根据关键词搜索语录
- * @param quotes 语录数据
- * @param query 搜索关键词
- * @param lang 语言
- * @returns 过滤后的语录数据
- */
-function searchQuotes(quotes: Quote[], query: string, lang: 'zh' | 'en' = 'zh'): Quote[] {
-  const searchTerms = query.toLowerCase().split(' ').filter(Boolean);
-  
-  return quotes.filter(quote => {
-    const searchableFields = [
-      quote.quote[lang],
-      quote.author[lang],
-      quote.authorTitle[lang],
-      quote.period[lang],
-      lang === 'zh' ? quote.book : quote.book_en
-    ].map(field => (field || '').toLowerCase());
-    
-    return searchTerms.every(term =>
-      searchableFields.some(field => field.includes(term))
-    );
-  });
-}
+// 创建 Supabase 客户端
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 /**
  * 搜索API路由处理函数
@@ -46,28 +27,42 @@ export async function GET(request: Request) {
     
     console.log(`Searching for: "${query}" in ${lang}`);
     const startTime = Date.now();
-    
-    // 获取所有语录
-    const allQuotes = await readQuotesFromCsv();
-    
-    // 执行搜索
-    const searchResults = searchQuotes(allQuotes, query, lang);
-    
-    // 计算分页
+
+    // 构建搜索条件
+    let searchQuery = supabase
+      .from('quotes')
+      .select('*', { count: 'exact' });
+
+    // 根据语言选择搜索字段
+    if (lang === 'zh') {
+      searchQuery = searchQuery.or(`quote_zh.ilike.%${query}%,author_zh.ilike.%${query}%,author_title_zh.ilike.%${query}%,book.ilike.%${query}%`);
+    } else {
+      searchQuery = searchQuery.or(`quote_en.ilike.%${query}%,author_en.ilike.%${query}%,author_title_en.ilike.%${query}%,book_en.ilike.%${query}%`);
+    }
+
+    // 添加分页
     const start = (page - 1) * limit;
-    const end = start + limit;
-    const paginatedResults = searchResults.slice(start, end);
-    
+    searchQuery = searchQuery
+      .range(start, start + limit - 1)
+      .order('created_at', { ascending: false });
+
+    // 执行查询
+    const { data: results, count, error } = await searchQuery;
+
+    if (error) {
+      throw error;
+    }
+
     const endTime = Date.now();
     console.log(`Search completed in ${endTime - startTime}ms`);
     
     return NextResponse.json({
-      results: paginatedResults,
-      total: searchResults.length,
+      results: results || [],
+      total: count || 0,
       pagination: {
         currentPage: page,
-        totalPages: Math.ceil(searchResults.length / limit),
-        totalItems: searchResults.length,
+        totalPages: Math.ceil((count || 0) / limit),
+        totalItems: count || 0,
       },
       timing: {
         duration: endTime - startTime,

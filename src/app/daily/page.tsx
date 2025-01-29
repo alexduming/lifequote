@@ -10,52 +10,34 @@ import { translations, CategoryKey } from '@/config/translations';
 // 示例数据
 const dailyQuotes = [
   {
-    quote: {
-      en: "The journey of a thousand miles begins with a single step.",
-      zh: "千里之行，始于足下。"
-    },
-    author: {
-      en: "Lao Tzu",
-      zh: "老子"
-    },
-    authorTitle: {
-      en: "Ancient Chinese Philosopher",
-      zh: "中国古代哲学家"
-    },
+    quote_zh: "千里之行，始于足下。",
+    quote_en: "The journey of a thousand miles begins with a single step.",
+    author_zh: "老子",
+    author_en: "Lao Tzu",
+    author_title_zh: "中国古代哲学家",
+    author_title_en: "Ancient Chinese Philosopher",
     category: "wisdom" as CategoryKey,
     likes: 2345,
     isLiked: false,
   },
   {
-    quote: {
-      en: "In the middle of difficulty lies opportunity.",
-      zh: "困难之中蕴藏着机遇。"
-    },
-    author: {
-      en: "Albert Einstein",
-      zh: "阿尔伯特·爱因斯坦"
-    },
-    authorTitle: {
-      en: "Theoretical Physicist",
-      zh: "理论物理学家"
-    },
+    quote_zh: "困难之中蕴藏着机遇。",
+    quote_en: "In the middle of difficulty lies opportunity.",
+    author_zh: "阿尔伯特·爱因斯坦",
+    author_en: "Albert Einstein",
+    author_title_zh: "理论物理学家",
+    author_title_en: "Theoretical Physicist",
     category: "motivation" as CategoryKey,
     likes: 1876,
     isLiked: true,
   },
   {
-    quote: {
-      en: "Life is really simple, but we insist on making it complicated.",
-      zh: "生活本来很简单，是我们执意要把它变复杂。"
-    },
-    author: {
-      en: "Confucius",
-      zh: "孔子"
-    },
-    authorTitle: {
-      en: "Chinese Philosopher",
-      zh: "中国哲学家"
-    },
+    quote_zh: "生活本来很简单，是我们执意要把它变复杂。",
+    quote_en: "Life is really simple, but we insist on making it complicated.",
+    author_zh: "孔子",
+    author_en: "Confucius",
+    author_title_zh: "中国哲学家",
+    author_title_en: "Chinese Philosopher",
     category: "life" as CategoryKey,
     likes: 1543,
     isLiked: false,
@@ -99,7 +81,23 @@ export default function DailyPage() {
               {language === 'en' ? 'Quote of the Day' : '今日金句'}
             </h2>
           </div>
-          <QuoteCard {...dailyQuotes[0]} />
+          <QuoteCard
+            quote={{
+              zh: dailyQuotes[0].quote_zh,
+              en: dailyQuotes[0].quote_en
+            }}
+            author={{
+              zh: dailyQuotes[0].author_zh,
+              en: dailyQuotes[0].author_en
+            }}
+            authorTitle={{
+              zh: dailyQuotes[0].author_title_zh,
+              en: dailyQuotes[0].author_title_en
+            }}
+            category={dailyQuotes[0].category}
+            likes={dailyQuotes[0].likes}
+            isLiked={dailyQuotes[0].isLiked}
+          />
         </div>
 
         {/* More Daily Picks */}
@@ -110,7 +108,23 @@ export default function DailyPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {dailyQuotes.slice(1).map((quote, index) => (
               <div key={index} className="animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
-                <QuoteCard {...quote} />
+                <QuoteCard
+                  quote={{
+                    zh: quote.quote_zh,
+                    en: quote.quote_en
+                  }}
+                  author={{
+                    zh: quote.author_zh,
+                    en: quote.author_en
+                  }}
+                  authorTitle={{
+                    zh: quote.author_title_zh,
+                    en: quote.author_title_en
+                  }}
+                  category={quote.category}
+                  likes={quote.likes}
+                  isLiked={quote.isLiked}
+                />
               </div>
             ))}
           </div>

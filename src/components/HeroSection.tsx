@@ -5,7 +5,9 @@ import { Search, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations, CategoryKey } from '@/config/translations';
 import SearchResults from '@/components/SearchResults';
-import { Quote } from '@/lib/quotes';
+import type { Database } from '@/types/database.types';
+
+type Quote = Database['public']['Tables']['quotes']['Row'];
 
 const quickCategories: CategoryKey[] = ['motivation', 'life', 'love', 'success', 'wisdom'];
 
@@ -34,11 +36,23 @@ export default function HeroSection() {
 
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&lang=${language}`);
+        const params = new URLSearchParams({
+          q: query,
+          lang: language,
+          limit: '5'
+        });
+        
+        const response = await fetch(`/api/search?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('搜索请求失败');
+        }
+        
         const data = await response.json();
+        console.log('搜索结果:', data);
         setSearchResults(data);
       } catch (error) {
         console.error('搜索失败:', error);
+        setSearchResults({ results: [], total: 0 });
       } finally {
         setIsSearching(false);
       }

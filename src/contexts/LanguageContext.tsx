@@ -12,6 +12,12 @@
 
 'use client';
 
+/**
+ * 语言上下文组件
+ * @module LanguageContext
+ * @description 提供语言切换功能和状态管理
+ */
+
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { Language } from '@/config/translations';
 

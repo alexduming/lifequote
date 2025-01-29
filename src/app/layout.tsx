@@ -1,8 +1,13 @@
+/**
+ * 根布局组件
+ * @module RootLayout
+ */
+
 import React from 'react';
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Oswald } from "next/font/google";
 import "./globals.css";
-import ClientLayout from '@/components/ClientLayout';
+import Providers from '@/components/Providers';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -22,6 +27,12 @@ export const metadata: Metadata = {
   keywords: "quotes, life quotes, inspirational quotes, motivational quotes, famous quotes, wisdom quotes",
 };
 
+/**
+ * 根布局组件
+ * @param {object} props - 组件属性
+ * @param {React.ReactNode} props.children - 子组件
+ * @returns {JSX.Element} 根布局组件
+ */
 export default function RootLayout({
   children,
 }: {
@@ -36,9 +47,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakarta.variable} ${oswald.variable} font-sans`}>
-        <ClientLayout>
+        <Providers>
           {children}
-        </ClientLayout>
+        </Providers>
       </body>
     </html>
   );
