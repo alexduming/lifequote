@@ -76,7 +76,7 @@ export default function HeroSection() {
           <h1 className="text-5xl md:text-7xl font-[oswald] font-bold gradient-text animate-float whitespace-pre-line tracking-tight uppercase !leading-tight">
             {t.hero.title}
           </h1>
-          <p className="text-xl md:text-2xl text-dark-600 max-w-6xl mx-auto font-light whitespace-nowrap">
+          <p className="text-xl md:text-2xl text-dark-600 max-w-6xl mx-auto font-light whitespace-pre-line">
             {t.hero.subtitle}
           </p>
           
