@@ -44,11 +44,15 @@ interface AuthorData {
  */
 async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
   try {
+    // 从 URL slug 解码作者名称
+    const authorName = decodeURIComponent(authorSlug).replace(/-/g, ' ');
+    console.log('正在查找作者:', authorName);
+
     // 从 Supabase 获取作者的语录
     const { data: quotes, error } = await supabase
       .from('quotes')
       .select('*')
-      .eq('author_en', decodeURIComponent(authorSlug).replace(/-/g, ' '))
+      .or(`author_en.ilike.${authorName},author_en.ilike.%${authorName}%`)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -57,7 +61,7 @@ async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
     }
 
     if (!quotes || quotes.length === 0) {
-      console.error('未找到作者数据:', authorSlug);
+      console.error('未找到作者数据:', authorName);
       return null;
     }
 
