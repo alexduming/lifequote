@@ -37,7 +37,7 @@ export default async function CategoryPage({
         {/* Category Header */}
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-12">
-            <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-[oswald] font-bold text-gray-900 mb-4 tracking-wide">
               {categoryData.name}语录
             </h1>
             <p className="text-xl text-gray-600 mb-6 max-w-3xl">
