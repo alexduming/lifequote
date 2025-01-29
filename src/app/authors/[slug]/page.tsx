@@ -43,10 +43,6 @@ interface AuthorData {
  * @param authorSlug 作者的 URL slug
  */
 async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
   try {
     // 从 Supabase 获取作者的语录
     const { data: quotes, error } = await supabase
@@ -61,6 +57,7 @@ async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
     }
 
     if (!quotes || quotes.length === 0) {
+      console.error('未找到作者数据:', authorSlug);
       return null;
     }
 
@@ -68,6 +65,12 @@ async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
     const firstQuote = quotes[0];
     const categories = Array.from(new Set(quotes.map((q: Quote) => q.category))) as CategoryKey[];
     const books = Array.from(new Set(quotes.map((q: Quote) => q.book_en).filter(Boolean)));
+
+    console.log('成功获取作者数据:', {
+      name: firstQuote.author_en,
+      quotesCount: quotes.length,
+      booksCount: books.length
+    });
 
     return {
       name: {
@@ -110,12 +113,25 @@ export default function AuthorPage({
   const t = translations[language];
   const [authorData, setAuthorData] = React.useState<AuthorData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     async function loadAuthorData() {
-      const data = await getAuthorBySlug(params.slug);
-      setAuthorData(data);
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getAuthorBySlug(params.slug);
+        if (!data) {
+          setError('作者数据获取失败');
+          return;
+        }
+        setAuthorData(data);
+      } catch (err) {
+        console.error('加载作者数据时出错:', err);
+        setError('加载作者数据时出错');
+      } finally {
+        setIsLoading(false);
+      }
     }
     loadAuthorData();
   }, [params.slug]);
@@ -126,14 +142,63 @@ export default function AuthorPage({
         <Navbar />
         <div className="min-h-screen bg-gray-50 pt-16">
           <div className="container mx-auto px-4 py-12">
-            <div className="animate-pulse">
-              <div className="h-48 bg-gray-200 rounded-xl w-48 mb-4"></div>
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-6"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="animate-pulse space-y-8">
+              {/* 作者信息骨架屏 */}
+              <div className="flex gap-8">
+                <div className="h-48 w-48 bg-gray-200 rounded-xl"></div>
+                <div className="flex-grow space-y-4">
+                  <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                  <div className="h-20 bg-gray-200 rounded w-3/4"></div>
+                  <div className="flex gap-8">
+                    <div className="w-20">
+                      <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="w-20">
+                      <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="w-20">
+                      <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* 语录列表骨架屏 */}
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
+              ))}
             </div>
           </div>
         </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 pt-16">
+          <div className="container mx-auto px-4 py-12">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                {language === 'zh' ? '出错了' : 'Error'}
+              </h1>
+              <p className="text-gray-600 mb-8">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                {language === 'zh' ? '重试' : 'Retry'}
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
       </>
     );
   }
