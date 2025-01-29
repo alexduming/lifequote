@@ -221,7 +221,7 @@ export const translations: Record<Language, TranslationType> = {
       books: '书籍',
     },
     hero: {
-      title: '千年智慧之言\n启迪人类心灵',
+      title: '在过去的1000年中\n鼓励着全人类的那些话',
       subtitle: '发现历史上最伟大思想家的永恒智慧\n获取灵感、动力与指引',
       searchPlaceholder: '搜索语录、作者或主题...',
     },

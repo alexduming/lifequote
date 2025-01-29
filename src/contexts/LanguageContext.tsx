@@ -39,11 +39,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'zh')) {
       setLanguageState(savedLanguage);
     } else {
-      // 如果没有保存的语言设置，尝试使用浏览器语言
-      const browserLang = navigator.language.toLowerCase();
-      const newLang = browserLang.startsWith('zh') ? 'zh' : 'en';
-      setLanguageState(newLang);
-      localStorage.setItem('language', newLang);
+      // 如果没有保存的语言设置，使用英文作为默认语言
+      setLanguageState('en');
+      localStorage.setItem('language', 'en');
     }
     setMounted(true);
   }, []);
