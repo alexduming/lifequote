@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { translations } from '@/config/translations';
+import { translations, CategoryKey } from '@/config/translations';
 import QuoteCard from '@/components/QuoteCard';
 import { getRandomQuotes, type Quote } from '@/lib/quotes';
 
@@ -84,7 +84,7 @@ export default function FeaturedQuotes() {
                 zh: quote.author_title_zh || '',
                 en: quote.author_title_en || ''
               }}
-              category={quote.category}
+              category={quote.category as CategoryKey}
               likes={quote.likes}
             />
           </div>
