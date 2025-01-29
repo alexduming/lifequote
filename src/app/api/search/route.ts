@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database.types';
+import type { Database } from '@/lib/database.types';
 
 // 创建 Supabase 客户端
 const supabase = createClient<Database>(
@@ -12,9 +12,9 @@ const supabase = createClient<Database>(
  * 搜索API路由处理函数
  * @description 处理搜索请求，支持分页和语言选择
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q') || '';
     const lang = (searchParams.get('lang') || 'zh') as 'zh' | 'en';
     const page = parseInt(searchParams.get('page') || '1');
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Search error:', error);
     return NextResponse.json(
-      { error: 'Failed to perform search' },
+      { error: '搜索失败' },
       { status: 500 }
     );
   }
