@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database.types';
 import { CategoryKey } from '@/config/translations';
 
-type Quote = Database['public']['Tables']['quotes']['Row'];
+export type Quote = Database['public']['Tables']['quotes']['Row'];
 
 // 创建 Supabase 客户端
 const supabase = createClient<Database>(
