@@ -4,6 +4,9 @@ import QuoteCard from '@/components/QuoteCard';
 import { Filter, ArrowDownUp } from 'lucide-react';
 import { CategoryKey, translations } from '@/config/translations';
 import { getQuotesByCategory, getCategoryStats } from '@/lib/quotes';
+import type { Database } from '@/types/database.types';
+
+type Quote = Database['public']['Tables']['quotes']['Row'];
 
 // 获取页面数据
 async function getCategoryPageData(category: CategoryKey) {
@@ -13,7 +16,7 @@ async function getCategoryPageData(category: CategoryKey) {
     name: translations.zh.categories[category],
     description: '探索人生的意义，思考存在的本质，追寻真理的智慧之言。',
     quoteCount: quotes.length,
-    authors: Array.from(new Set(quotes.map(q => q.author.zh))),
+    authors: Array.from(new Set(quotes.map(q => q.author_zh))),
   };
   
   return { quotes, categoryData };
@@ -62,7 +65,7 @@ export default async function CategoryPage({
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">时期</h3>
                   <div className="space-y-2">
-                    {Array.from(new Set(quotes.map(q => q.period.zh))).map((period) => (
+                    {Array.from(new Set(quotes.map(q => q.period_zh))).map((period) => (
                       <label key={period} className="flex items-center">
                         <input type="checkbox" className="rounded border-gray-300 text-primary-600" />
                         <span className="ml-2 text-sm text-gray-600">{period}</span>
@@ -89,10 +92,19 @@ export default async function CategoryPage({
                 {quotes.map((quote) => (
                   <QuoteCard
                     key={quote.id}
-                    quote={quote.quote}
-                    author={quote.author}
-                    authorTitle={quote.authorTitle}
-                    category={quote.category}
+                    quote={{
+                      zh: quote.quote_zh,
+                      en: quote.quote_en
+                    }}
+                    author={{
+                      zh: quote.author_zh,
+                      en: quote.author_en
+                    }}
+                    authorTitle={{
+                      zh: quote.author_title_zh || '',
+                      en: quote.author_title_en || ''
+                    }}
+                    category={quote.category as CategoryKey}
                     likes={quote.likes}
                     isLiked={false}
                   />
