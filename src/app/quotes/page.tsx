@@ -1,7 +1,18 @@
+/**
+ * @file 语录列表页面
+ * @version 1.3.0
+ * @description 展示所有语录的列表页面，包含分页、筛选和搜索功能
+ * @update 2024-03-21
+ * @changelog
+ * - 优化页面最大宽度限制为 max-w-7xl (1280px)
+ * - 改进分页组件设计，添加省略号和上下页按钮
+ * - 优化移动端适配
+ */
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
-import { Filter, ArrowDownUp, Search } from 'lucide-react';
+import { Filter, ArrowDownUp, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CategoryKey, translations } from '@/config/translations';
 import { readQuotesFromCsv } from '@/lib/quotes';
 
@@ -21,8 +32,8 @@ async function getQuotesPageData(page: number = 1, pageSize: number = 10) {
   const paginatedQuotes = quotes.slice(start, end);
   
   // 获取过滤选项
-  const periods = Array.from(new Set(quotes.map(q => q.period.zh)));
-  const authors = Array.from(new Set(quotes.map(q => q.author.zh)));
+  const periods = Array.from(new Set(quotes.map(q => q.period_zh).filter(Boolean)));
+  const authors = Array.from(new Set(quotes.map(q => q.author_zh)));
   const categories = Object.entries(translations.zh.categories);
 
   return {
@@ -53,13 +64,50 @@ export default async function QuotesPage({
   const page = parseInt(searchParams.page || '1');
   const { quotes, filters, pagination, stats } = await getQuotesPageData(page);
 
+  // 生成分页数组
+  const generatePaginationArray = (currentPage: number, totalPages: number) => {
+    const delta = 2; // 当前页码前后显示的页数
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    // 计算需要显示的页码范围
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 || // 第一页
+        i === totalPages || // 最后一页
+        i >= currentPage - delta && // 当前页前delta页
+        i <= currentPage + delta // 当前页后delta页
+      ) {
+        range.push(i);
+      }
+    }
+
+    // 添加省略号
+    for (let i of range) {
+      if (l) {
+        if (i - l === 2) {
+          rangeWithDots.push(l + 1);
+        } else if (i - l !== 1) {
+          rangeWithDots.push('...');
+        }
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
+
+    return rangeWithDots;
+  };
+
+  const paginationArray = generatePaginationArray(pagination.currentPage, pagination.totalPages);
+
   return (
     <>
       <Navbar />
       <main className="min-h-screen bg-gray-50 pt-16">
         {/* Header */}
         <div className="bg-white border-b">
-          <div className="container mx-auto px-4 py-12">
+          <div className="container mx-auto px-4 py-12 max-w-7xl">
             <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">
               精选语录
             </h1>
@@ -78,7 +126,7 @@ export default async function QuotesPage({
 
         {/* Search Bar */}
         <div className="bg-white border-b shadow-sm">
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-4 py-4 max-w-7xl">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
@@ -90,7 +138,7 @@ export default async function QuotesPage({
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <div className="lg:w-64 flex-shrink-0">
@@ -160,10 +208,19 @@ export default async function QuotesPage({
                 {quotes.map((quote) => (
                   <QuoteCard
                     key={quote.id}
-                    quote={quote.quote}
-                    author={quote.author}
-                    authorTitle={quote.authorTitle}
-                    category={quote.category}
+                    quote={{
+                      zh: quote.quote_zh,
+                      en: quote.quote_en
+                    }}
+                    author={{
+                      zh: quote.author_zh,
+                      en: quote.author_en
+                    }}
+                    authorTitle={{
+                      zh: quote.author_title_zh || '',
+                      en: quote.author_title_en || ''
+                    }}
+                    category={quote.category as CategoryKey}
                     likes={quote.likes}
                     isLiked={false}
                   />
@@ -173,20 +230,49 @@ export default async function QuotesPage({
               {/* Pagination */}
               {pagination.totalPages > 1 && (
                 <div className="mt-8 flex justify-center">
-                  <nav className="flex items-center gap-2">
-                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                      <a
-                        key={pageNum}
-                        href={`/quotes?page=${pageNum}`}
-                        className={`px-4 py-2 rounded-lg ${
-                          pageNum === pagination.currentPage
-                            ? 'bg-primary-600 text-white'
-                            : 'bg-white text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        {pageNum}
-                      </a>
+                  <nav className="flex items-center gap-1">
+                    <a
+                      href={`/quotes?page=${Math.max(1, pagination.currentPage - 1)}`}
+                      className={`p-2 rounded-lg ${
+                        pagination.currentPage === 1
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                      aria-disabled={pagination.currentPage === 1}
+                    >
+                      <ChevronLeft size={20} />
+                    </a>
+                    
+                    {paginationArray.map((item, index) => (
+                      <React.Fragment key={index}>
+                        {item === '...' ? (
+                          <span className="px-3 py-2 text-gray-400">...</span>
+                        ) : (
+                          <a
+                            href={`/quotes?page=${item}`}
+                            className={`px-3 py-1 rounded-lg ${
+                              item === pagination.currentPage
+                                ? 'bg-primary-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            {item}
+                          </a>
+                        )}
+                      </React.Fragment>
                     ))}
+
+                    <a
+                      href={`/quotes?page=${Math.min(pagination.totalPages, pagination.currentPage + 1)}`}
+                      className={`p-2 rounded-lg ${
+                        pagination.currentPage === pagination.totalPages
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                      aria-disabled={pagination.currentPage === pagination.totalPages}
+                    >
+                      <ChevronRight size={20} />
+                    </a>
                   </nav>
                 </div>
               )}
