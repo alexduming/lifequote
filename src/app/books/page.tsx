@@ -8,23 +8,32 @@ import Navbar from '@/components/Navbar';
 import { translations } from '@/config/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/config/translations';
+import type { Database } from '@/lib/database.types';
 
-// 获取页面数据
+type Quote = Database['public']['Tables']['quotes']['Row'];
+
+/**
+ * 获取页面数据
+ * @param language 当前语言
+ */
 async function getBooksPageData(language: Language) {
   const response = await fetch('/api/quotes');
-  const quotes = await response.json();
+  const quotes: Quote[] = await response.json();
   
   // 按书籍分组语录
   const bookMap = new Map();
-  quotes.forEach((quote: any) => {
-    const book = quote.book;
+  quotes.forEach((quote) => {
+    const book = language === 'zh' ? quote.book : quote.book_en;
+    if (!book) return; // 跳过没有书籍信息的语录
+    
     if (!bookMap.has(book)) {
       const bookTitle = {
-        zh: book,
-        en: quote.book_en,
+        zh: quote.book || '',
+        en: quote.book_en || '',
       };
+      
       // 根据英文书名生成封面图片路径和URL slug
-      const slug = quote.book_en.toLowerCase()
+      const slug = (quote.book_en || '').toLowerCase()
         .replace(/[:']/g, '')  // 移除冒号和单引号
         .replace(/\s+/g, '-')  // 空格替换为连字符
         .replace(/-+/g, '-')   // 多个连字符替换为单个
@@ -41,9 +50,10 @@ async function getBooksPageData(language: Language) {
         slug: slug,
       });
     }
+    
     const bookData = bookMap.get(book);
     bookData.quotes.push(quote);
-    bookData.authors.add(quote.author.zh);
+    bookData.authors.add(language === 'zh' ? quote.author_zh : quote.author_en);
     bookData.categories.add(quote.category);
   });
 
@@ -139,7 +149,7 @@ export default function BooksPage() {
                             className="object-cover"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              target.style.display = 'none'; // 隐藏加载失败的图片
+                              target.style.display = 'none';
                             }}
                           />
                         </div>
@@ -182,7 +192,7 @@ export default function BooksPage() {
                     </div>
                     {/* Featured Quote */}
                     <blockquote className="text-sm text-gray-600 italic">
-                      "{book.featuredQuote.quote[language]}"
+                      "{language === 'zh' ? book.featuredQuote.quote_zh : book.featuredQuote.quote_en}"
                     </blockquote>
                   </div>
                 </div>
