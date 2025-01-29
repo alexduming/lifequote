@@ -9,6 +9,11 @@ import Navbar from '@/components/Navbar';
 
 type Quote = Database['public']['Tables']['quotes']['Row'];
 
+// 配置页面选项
+export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
+export const revalidate = 0;
+
 /**
  * 搜索结果加载状态组件
  */
@@ -53,11 +58,22 @@ function SearchResults() {
           limit: '100'
         });
         
-        const response = await fetch(`/api/search?${params}`);
+        const response = await fetch(`/api/search?${params}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('搜索请求失败');
+        }
+        
         const data = await response.json();
         setResults(data);
       } catch (error) {
         console.error('搜索失败:', error);
+        setResults(null);
       } finally {
         setIsLoading(false);
       }
@@ -144,7 +160,4 @@ export default function SearchPage() {
       </Suspense>
     </>
   );
-}
-
-// 标记页面为客户端组件
-export const dynamic = 'force-dynamic'; 
+} 

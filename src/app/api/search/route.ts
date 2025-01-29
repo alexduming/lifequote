@@ -8,17 +8,23 @@ const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+// 配置路由选项
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * 搜索API路由处理函数
  * @description 处理搜索请求，支持分页和语言选择
  */
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('q') || '';
-    const lang = (searchParams.get('lang') || 'zh') as 'zh' | 'en';
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    // 从 URL 中获取查询参数
+    const url = new URL(request.url);
+    const query = url.searchParams.get('q') || '';
+    const lang = (url.searchParams.get('lang') || 'zh') as 'zh' | 'en';
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
     
     // 如果没有搜索词，返回空结果
     if (!query.trim()) {
@@ -34,11 +40,15 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact' });
 
     // 根据语言选择搜索字段
-    if (lang === 'zh') {
-      searchQuery = searchQuery.or(`quote_zh.ilike.%${query}%,author_zh.ilike.%${query}%,author_title_zh.ilike.%${query}%,book.ilike.%${query}%`);
-    } else {
-      searchQuery = searchQuery.or(`quote_en.ilike.%${query}%,author_en.ilike.%${query}%,author_title_en.ilike.%${query}%,book_en.ilike.%${query}%`);
-    }
+    const searchFields = lang === 'zh' 
+      ? ['quote_zh', 'author_zh', 'author_title_zh', 'book']
+      : ['quote_en', 'author_en', 'author_title_en', 'book_en'];
+
+    const searchConditions = searchFields
+      .map(field => `${field}.ilike.%${query}%`)
+      .join(',');
+
+    searchQuery = searchQuery.or(searchConditions);
 
     // 添加分页
     const start = (page - 1) * limit;
@@ -67,13 +77,22 @@ export async function GET(request: NextRequest) {
       timing: {
         duration: endTime - startTime,
       }
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      },
     });
     
   } catch (error) {
     console.error('Search error:', error);
     return NextResponse.json(
       { error: '搜索失败' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
     );
   }
 } 
