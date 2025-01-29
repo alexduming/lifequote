@@ -3,9 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
-import { Book, Award, Calendar, MapPin } from 'lucide-react';
+import { Book, Award, Calendar, MapPin, Filter, ArrowDownUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
+import type { Database } from '@/types/database.types';
+
+type Quote = Database['public']['Tables']['quotes']['Row'];
 
 // 获取页面数据
 async function getAuthorPageData(authorSlug: string) {
@@ -70,12 +73,12 @@ async function getAuthorPageData(authorSlug: string) {
     },
     stats: {
       quotes: authorQuotes.length,
-      collections: Math.floor(authorQuotes.reduce((sum, q) => sum + q.likes, 0) / 2),
-      shares: authorQuotes.reduce((sum, q) => sum + q.views, 0),
+      collections: Math.floor(authorQuotes.reduce((sum: number, q: Quote) => sum + q.likes, 0) / 2),
+      shares: authorQuotes.reduce((sum: number, q: Quote) => sum + q.views, 0),
     },
   };
   
-  return { quotes: authorQuotes, authorData };
+  return { authorData, authorQuotes };
 }
 
 export default function AuthorPage({ 
@@ -184,12 +187,10 @@ export default function AuthorPage({
                   <Award className="text-primary-600" size={20} />
                   <h2 className="text-xl font-medium text-gray-900">{t.author.achievements}</h2>
                 </div>
-                <ul className="space-y-3">
-                  {authorData.achievements[language].map((achievement, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2" />
-                      <span className="text-gray-600">{achievement}</span>
-                    </li>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">主要成就</h3>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {authorData.achievements.zh.map((achievement: string, index: number): JSX.Element => (
+                    <li key={index}>{achievement}</li>
                   ))}
                 </ul>
               </div>
