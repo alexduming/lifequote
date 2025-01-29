@@ -3,7 +3,8 @@
  * @description 创建和导出 Supabase 客户端实例，用于数据库操作
  */
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from './database.types';
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
@@ -19,12 +20,11 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
  * 客户端实例会自动从环境变量中读取必要的配置信息。
  */
 
-module.exports = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      persistSession: false
-    }
-  }
+/**
+ * 创建 Supabase 客户端实例
+ * 使用环境变量中的配置信息
+ */
+export const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 ); 
