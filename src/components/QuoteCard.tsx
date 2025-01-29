@@ -1,96 +1,177 @@
+/**
+ * 语录卡片组件
+ * @module QuoteCard
+ */
+
 'use client';
 
 import React from 'react';
-import { Heart, Share2, BookmarkPlus } from 'lucide-react';
-import Link from 'next/link';
-import { translations, CategoryKey, Language } from '@/config/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Heart, Bookmark, Share2 } from 'lucide-react';
+import { CategoryKey, translations } from '@/config/translations';
 
-interface BilingualText {
-  en: string;
-  zh: string;
-}
+// 引号样式选项
+const QUOTE_STYLES = {
+  default: {
+    char: '❝',
+    className: 'text-8xl text-[#fde8ee] -top-6 -left-3'
+  },
+  curly: {
+    char: '"',
+    className: 'font-["Playfair_Display"] text-8xl text-[#fde8ee]'
+  },
+  heavy: {
+    char: '❝',
+    className: 'text-7xl text-[#fde8ee]'
+  },
+  modern: {
+    char: '„',
+    className: 'font-["Noto_Serif"] text-8xl text-[#fde8ee]'
+  },
+  minimal: {
+    char: '›',
+    className: 'text-6xl text-[#fde8ee] rotate-45'
+  }
+};
 
-interface QuoteCardProps {
-  quote: BilingualText;
-  author: BilingualText;
-  authorTitle?: BilingualText;
+/**
+ * 语录卡片组件的属性类型定义
+ */
+export interface QuoteCardProps {
+  quote: {
+    zh: string;
+    en: string;
+  };
+  author: {
+    zh: string;
+    en: string;
+  };
+  authorTitle: {
+    zh: string;
+    en: string;
+  };
   category: CategoryKey;
-  likes?: number;
+  likes: number;
   isLiked?: boolean;
+  isFavorited?: boolean;
+  quoteStyle?: keyof typeof QUOTE_STYLES;
+  onLike?: () => void;
+  onFavorite?: () => void;
+  onShare?: () => void;
 }
 
-export default function QuoteCard({
-  quote,
-  author,
-  authorTitle,
-  category,
-  likes = 0,
-  isLiked = false,
-}: QuoteCardProps) {
+/**
+ * 语录卡片组件
+ * @param props - 组件属性，包含语录的所有信息
+ */
+export default function QuoteCard(props: QuoteCardProps) {
   const { language } = useLanguage();
   const t = translations[language];
+  const { 
+    quote, 
+    author, 
+    authorTitle, 
+    category,
+    likes, 
+    isLiked = false,
+    isFavorited = false,
+    quoteStyle = 'default',
+    onLike,
+    onFavorite,
+    onShare 
+  } = props;
+
+  // 获取选择的引号样式
+  const selectedQuoteStyle = QUOTE_STYLES[quoteStyle];
+
+  // 获取分类的翻译名称
+  const categoryName = t.categories[category];
+
+  // 分类标签的背景色映射
+  const categoryColors: Record<CategoryKey, string> = {
+    philosophy: 'bg-[#fdf2f2] text-[#D70050]',
+    literature: 'bg-[#fdf2f2] text-[#D70050]',
+    science: 'bg-[#fdf2f2] text-[#D70050]',
+    art: 'bg-[#fdf2f2] text-[#D70050]',
+    history: 'bg-[#fdf2f2] text-[#D70050]',
+    politics: 'bg-[#fdf2f2] text-[#D70050]',
+    economics: 'bg-[#fdf2f2] text-[#D70050]',
+    education: 'bg-[#fdf2f2] text-[#D70050]',
+    motivation: 'bg-[#fdf2f2] text-[#D70050]',
+    life: 'bg-[#fdf2f2] text-[#D70050]',
+    love: 'bg-[#fdf2f2] text-[#D70050]',
+    success: 'bg-[#fdf2f2] text-[#D70050]',
+    wisdom: 'bg-[#fdf2f2] text-[#D70050]'
+  };
 
   return (
-    <div className="card p-6 group bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
-      {/* Quote Content */}
-      <blockquote className="text-xl font-display text-dark-800 mb-6 relative leading-relaxed">
-        <span className="absolute -top-4 -left-2 text-6xl text-primary-200/50 font-display select-none">"</span>
-        <span className="relative z-10">{quote[language]}</span>
-      </blockquote>
-
-      {/* Author Info */}
-      <div className="flex items-start justify-between">
-        <div>
-          <Link 
-            href={`/author/${author.en.toLowerCase().replace(/\s+/g, '-')}`}
-            className="font-display font-medium text-primary-600 hover:text-primary-700 transition-colors"
-          >
-            {author[language]}
-          </Link>
-          {authorTitle && (
-            <p className="text-sm text-dark-500 mt-1 font-light">
-              {authorTitle[language]}
+    <div className="relative bg-white rounded-lg shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      <div className="flex flex-col h-full">
+        {/* 语录内容区域 */}
+        <div className="relative mb-6">
+          {/* 装饰性引号 */}
+          <div className={`absolute leading-none ${selectedQuoteStyle.className}`}>
+            {selectedQuoteStyle.char}
+          </div>
+          <blockquote className="relative z-10 pl-4">
+            <p className="text-lg text-dark-900 leading-relaxed">
+              {language === 'zh' ? quote.zh : quote.en}
             </p>
-          )}
+          </blockquote>
         </div>
 
-        {/* Category Tag */}
-        <Link
-          href={`/category/${category}`}
-          className="text-sm px-3 py-1 rounded-full bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors font-medium"
-        >
-          {t.categories[category]}
-        </Link>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-dark-100">
-        <button className="flex items-center space-x-1.5 text-dark-500 hover:text-primary-600 transition-colors relative group/btn">
-          <Heart
-            size={18}
-            className={`transition-all duration-300 transform group-hover:scale-110 ${
-              isLiked ? 'fill-current text-red-500' : ''
-            }`}
-          />
-          <span className="text-sm font-medium">{likes}</span>
-          <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity">
-            {t.actions.like}
+        {/* 作者信息和分类 */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <cite className="not-italic font-medium text-[#D70050] block">
+              {language === 'zh' ? author.zh : author.en}
+            </cite>
+            {authorTitle && (
+              <p className="text-sm text-dark-500 mt-1">
+                {language === 'zh' ? authorTitle.zh : authorTitle.en}
+              </p>
+            )}
+          </div>
+          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${categoryColors[category]}`}>
+            {categoryName}
           </span>
-        </button>
-        <div className="flex items-center space-x-4">
-          <button className="text-dark-400 hover:text-primary-600 transition-colors relative group/btn">
-            <BookmarkPlus size={18} className="transform group-hover:scale-110 transition-transform duration-300" />
-            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-              {t.actions.save}
-            </span>
+        </div>
+
+        {/* 分割线 */}
+        <div className="border-t border-gray-100 my-4"></div>
+
+        {/* 交互按钮 */}
+        <div className="flex items-center justify-between">
+          {/* 点赞按钮 */}
+          <button 
+            onClick={onLike}
+            className="flex items-center gap-1 text-dark-500 hover:text-[#D70050] transition-colors"
+          >
+            <Heart 
+              size={18} 
+              className={isLiked ? 'fill-[#D70050] text-[#D70050]' : ''} 
+            />
+            <span className="text-sm">{likes}</span>
           </button>
-          <button className="text-dark-400 hover:text-primary-600 transition-colors relative group/btn">
-            <Share2 size={18} className="transform group-hover:scale-110 transition-transform duration-300" />
-            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-              {t.actions.share}
-            </span>
-          </button>
+
+          {/* 收藏和分享按钮 */}
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={onFavorite}
+              className="flex items-center text-dark-500 hover:text-[#D70050] transition-colors"
+            >
+              <Bookmark 
+                size={18} 
+                className={isFavorited ? 'fill-[#D70050] text-[#D70050]' : ''} 
+              />
+            </button>
+            <button 
+              onClick={onShare}
+              className="flex items-center text-dark-500 hover:text-[#D70050] transition-colors"
+            >
+              <Share2 size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
