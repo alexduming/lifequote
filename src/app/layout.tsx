@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Oswald } from "next/font/google";
 import "./globals.css";
 import Providers from '@/components/Providers';
+import Script from 'next/script';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -56,6 +57,19 @@ export default function RootLayout({
             font-family: 'Oswald', 'Noto Sans SC', sans-serif;
           }
         `}</style>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-JNJV1MMYTT"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-JNJV1MMYTT');
+          `}
+        </Script>
       </head>
       <body className={`${plusJakarta.variable} ${oswald.variable} font-sans`}>
         <Providers>
