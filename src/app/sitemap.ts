@@ -24,8 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('book_en')
     .order('book_en');
 
-  // 基础页面 URL
-  const baseUrl = 'https://lifequote.vercel.app';
+  // 基础页面 URL - 使用实际部署的域名
+  const baseUrl = 'https://www.lifequote.club';
   
   // 静态页面
   const staticPages = [
