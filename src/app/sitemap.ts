@@ -15,26 +15,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     console.log('开始生成站点地图...');
     
-    // 获取所有作者
-    const { data: authors, error: authorsError } = await supabase
+    // 获取所有作者和书籍（优化查询）
+    const { data: quotes, error: quotesError } = await supabase
       .from('quotes')
-      .select('author_en')
+      .select('author_en, book_en')
       .order('author_en');
 
-    if (authorsError) {
-      console.error('获取作者数据失败:', authorsError);
-      throw authorsError;
-    }
-
-    // 获取所有书籍
-    const { data: books, error: booksError } = await supabase
-      .from('quotes')
-      .select('book_en')
-      .order('book_en');
-
-    if (booksError) {
-      console.error('获取书籍数据失败:', booksError);
-      throw booksError;
+    if (quotesError) {
+      console.error('获取数据失败:', quotesError);
+      throw quotesError;
     }
 
     // 基础页面 URL
@@ -82,20 +71,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     // 生成作者页面 URL
-    const authorUrls = Array.from(new Set(authors?.map(a => a.author_en) || []))
-      .filter(Boolean)
+    const authorUrls = Array.from(new Set(quotes?.map(q => q.author_en) || []))
+      .filter(author => author && author.trim()) // 过滤空值
       .map(author => ({
-        url: `${baseUrl}/author/${author.toLowerCase().replace(/\s+/g, '-')}`,
+        url: `${baseUrl}/authors/${encodeURIComponent(author.toLowerCase().replace(/\s+/g, '-'))}`,
         lastModified: currentDate,
         changeFrequency: 'weekly' as const,
         priority: 0.7,
       }));
 
     // 生成书籍页面 URL
-    const bookUrls = Array.from(new Set(books?.map(b => b.book_en) || []))
-      .filter(Boolean)
+    const bookUrls = Array.from(new Set(quotes?.map(q => q.book_en) || []))
+      .filter(book => book && book.trim()) // 过滤空值
       .map(book => ({
-        url: `${baseUrl}/books/${book.toLowerCase().replace(/\s+/g, '-')}`,
+        url: `${baseUrl}/books/${encodeURIComponent(book.toLowerCase().replace(/\s+/g, '-'))}`,
         lastModified: currentDate,
         changeFrequency: 'weekly' as const,
         priority: 0.7,
@@ -107,7 +96,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       'economics', 'education'];
     
     const categoryUrls = categories.map(category => ({
-      url: `${baseUrl}/category/${category}`,
+      url: `${baseUrl}/category/${encodeURIComponent(category)}`,
       lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 0.6,
@@ -121,6 +110,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     console.log(`站点地图生成完成，共 ${sitemapData.length} 个 URL`);
+    
+    // 验证所有 URL 格式
+    sitemapData.forEach(item => {
+      try {
+        new URL(item.url);
+      } catch (e) {
+        console.error(`无效的 URL: ${item.url}`);
+      }
+    });
+    
     return sitemapData;
     
   } catch (error) {

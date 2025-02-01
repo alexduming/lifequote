@@ -133,13 +133,19 @@ export default async function QuotesPage({
             <div className="flex-grow">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-medium text-gray-900">
-                  全部语录
+                  {translations[locale].quotes.title}
                 </h2>
                 <button className="flex items-center gap-2 text-sm text-gray-500">
                   <ArrowDownUp size={16} />
-                  <span>排序</span>
+                  <span>{translations[locale].quotes.sort}</span>
                 </button>
               </div>
+
+              {/* 筛选按钮 */}
+              <button className="flex items-center gap-2">
+                <Filter size={16} />
+                <span>{translations[locale].quotes.filter}</span>
+              </button>
 
               <div className="space-y-6">
                 {quotes.map((quote) => (

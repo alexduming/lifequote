@@ -11,13 +11,16 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        allow: [
+          '/',
+          '/sitemap.xml'  // 明确允许抓取 sitemap.xml
+        ],
         disallow: [
           '/api/',
           '/private/',
           '/*.json$',
-          '/*.xml$',
           '/search?*',
+          // 移除了 /*.xml$ 规则，避免影响 sitemap.xml
         ],
       },
     ],
