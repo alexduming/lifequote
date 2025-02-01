@@ -70,6 +70,13 @@ export default function RootLayout({
             gtag('config', 'G-JNJV1MMYTT');
           `}
         </Script>
+        {/* Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5692295538625732"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body className={`${plusJakarta.variable} ${oswald.variable} font-sans`}>
         <Providers>
