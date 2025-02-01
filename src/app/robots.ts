@@ -8,11 +8,20 @@ export default function robots(): MetadataRoute.Robots {
   const baseUrl = 'https://www.lifequote.club';
   
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', '/private/'],
-    },
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/api/',
+          '/private/',
+          '/*.json$',
+          '/*.xml$',
+          '/search?*',
+        ],
+      },
+    ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 } 
