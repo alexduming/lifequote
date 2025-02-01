@@ -30,6 +30,12 @@ export type TranslationType = {
   categories: {
     [K in CategoryKey]: string;
   };
+  quotes: {
+    title: string;
+    filter: string;
+    sort: string;
+    total: string;
+  };
   sections: {
     featured: {
       title: string;
@@ -206,6 +212,12 @@ export const translations: Record<Language, TranslationType> = {
       loggingIn: 'Logging in...',
       registerLink: 'No account? Register',
     },
+    quotes: {
+      title: 'All Quotes',
+      filter: 'Filter',
+      sort: 'Sort',
+      total: 'quotes',
+    },
   },
   zh: {
     nav: {
@@ -309,6 +321,12 @@ export const translations: Record<Language, TranslationType> = {
       submit: '登录',
       loggingIn: '登录中...',
       registerLink: '没有账号？注册',
+    },
+    quotes: {
+      title: '所有语录',
+      filter: '筛选',
+      sort: '排序',
+      total: '条语录',
     },
   },
 }; 

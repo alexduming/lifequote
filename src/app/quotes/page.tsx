@@ -13,7 +13,7 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
 import { Filter, ArrowDownUp, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { CategoryKey, translations } from '@/config/translations';
+import { CategoryKey, translations, type Language } from '@/config/translations';
 import { getQuotesByPage } from '@/lib/quotes';
 import type { Database } from '@/types/database.types';
 
@@ -67,8 +67,10 @@ function generatePaginationArray(currentPage: number, totalPages: number) {
 
 export default async function QuotesPage({
   searchParams,
+  params: { locale },
 }: {
   searchParams: { page?: string };
+  params: { locale: Language };
 }) {
   const currentPage = parseInt(searchParams.page || '1');
   const pageSize = 10;
