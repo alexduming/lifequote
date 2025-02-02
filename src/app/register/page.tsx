@@ -27,10 +27,19 @@ function RegisterForm() {
     try {
       // 1. 注册用户
       const { error: signUpError, data } = await signUp(email, password);
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        // 处理特定的错误情况
+        if (signUpError.message.includes('already exists')) {
+          throw new Error('该邮箱已被注册，请直接登录或使用其他邮箱。');
+        } else if (signUpError.message.includes('password')) {
+          throw new Error('密码不符合要求，请至少使用6个字符。');
+        } else {
+          throw signUpError;
+        }
+      }
 
       if (!data?.user?.id) {
-        throw new Error('注册成功但未返回用户ID');
+        throw new Error('注册失败，请稍后重试。');
       }
 
       // 2. 创建用户资料
@@ -43,18 +52,23 @@ function RegisterForm() {
           updated_at: new Date().toISOString(),
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        // 如果是用户名重复错误
+        if (profileError.message.includes('username_length')) {
+          throw new Error('用户名长度必须至少为3个字符。');
+        } else if (profileError.message.includes('unique constraint')) {
+          throw new Error('该用户名已被使用，请选择其他用户名。');
+        } else {
+          console.error('Profile creation error:', profileError);
+          throw new Error('创建用户资料失败，请稍后重试。');
+        }
+      }
       
-      // 3. 注册成功后跳转到登录页
-      router.push('/login');
+      // 3. 显示邮箱验证提示
+      setError('注册成功！请查看您的邮箱并点击验证链接以完成注册。');
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message);
-      
-      // 如果是邮箱已存在的错误，给出更友好的提示
-      if (err.message.includes('already exists')) {
-        setError('该邮箱已被注册，请直接登录或使用其他邮箱。');
-      }
     } finally {
       setLoading(false);
     }
@@ -69,7 +83,11 @@ function RegisterForm() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
+            <div className={`px-4 py-3 rounded-lg text-sm ${
+              error.includes('成功') 
+                ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+            }`}>
               {error}
             </div>
           )}
