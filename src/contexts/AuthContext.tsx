@@ -43,11 +43,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const signUp = async (email: string, password: string) => {
+    // 先清除任何现有会话
+    await supabase.auth.signOut();
+    
     const response = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          email_confirmed_at: null // 确保需要邮箱验证
+        }
       }
     });
     
