@@ -25,6 +25,7 @@ type LanguageContextType = {
   language: Language;
   setLanguage: (lang: Language) => void;
   isClient: boolean;
+  toggleLanguage: () => void;
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -57,10 +58,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     window.dispatchEvent(new CustomEvent('languagechange', { detail: newLanguage }));
   }, [language]);
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'zh' : 'en');
+  };
+
   const contextValue = {
     language,
     setLanguage,
-    isClient: mounted
+    isClient: mounted,
+    toggleLanguage
   };
 
   return (

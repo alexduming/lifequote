@@ -21,6 +21,9 @@ export type TranslationType = {
     topics: string;
     daily: string;
     books: string;
+    quotes: string;
+    favorites: string;
+    signOut: string;
   };
   hero: {
     title: string;
@@ -97,14 +100,27 @@ export type TranslationType = {
     submit: string;
     registering: string;
     loginLink: string;
+    success: string;
   };
   login: {
     title: string;
     email: string;
     password: string;
     submit: string;
-    loggingIn: string;
+    signingIn: string;
     registerLink: string;
+  };
+  profile: {
+    title: string;
+    username: string;
+    bio: string;
+    save: string;
+    saving: string;
+    success: string;
+  };
+  favorites: {
+    title: string;
+    empty: string;
   };
 };
 
@@ -114,13 +130,16 @@ export const translations: Record<Language, TranslationType> = {
       home: 'Home',
       about: 'About',
       contact: 'Contact',
-      login: 'Login',
-      register: 'Register',
+      login: 'Sign In',
+      register: 'Sign Up',
       profile: 'Profile',
       authors: 'Authors',
       topics: 'Topics',
       daily: 'Daily Picks',
       books: 'Books',
+      quotes: 'Quotes',
+      favorites: 'Favorites',
+      signOut: 'Sign Out',
     },
     hero: {
       title: 'Words That Inspired\nHumanity for 1000 Years',
@@ -196,27 +215,40 @@ export const translations: Record<Language, TranslationType> = {
       quotes: 'Quotes',
     },
     register: {
-      title: 'Create Account',
+      title: 'Create an Account',
       username: 'Username',
       email: 'Email',
       password: 'Password',
-      submit: 'Register',
-      registering: 'Registering...',
-      loginLink: 'Already have an account? Login',
+      submit: 'Sign Up',
+      registering: 'Signing up...',
+      loginLink: 'Already have an account?',
+      success: 'Registration successful! Please log in.',
     },
     login: {
-      title: 'Welcome Back',
+      title: 'Sign In',
       email: 'Email',
       password: 'Password',
-      submit: 'Login',
-      loggingIn: 'Logging in...',
-      registerLink: 'No account? Register',
+      submit: 'Sign In',
+      signingIn: 'Signing in...',
+      registerLink: 'Need an account?',
     },
     quotes: {
       title: 'All Quotes',
       filter: 'Filter',
       sort: 'Sort',
       total: 'quotes',
+    },
+    profile: {
+      title: 'Profile Settings',
+      username: 'Username',
+      bio: 'Bio',
+      save: 'Save Changes',
+      saving: 'Saving...',
+      success: 'Profile updated successfully!',
+    },
+    favorites: {
+      title: 'My Favorites',
+      empty: 'No favorites yet. Start adding some quotes to your favorites!',
     },
   },
   zh: {
@@ -231,6 +263,9 @@ export const translations: Record<Language, TranslationType> = {
       topics: '主题',
       daily: '每日精选',
       books: '书籍',
+      quotes: '名言',
+      favorites: '收藏',
+      signOut: '退出',
     },
     hero: {
       title: '在过去的1000年中\n鼓励着全人类的那些话',
@@ -312,21 +347,34 @@ export const translations: Record<Language, TranslationType> = {
       password: '密码',
       submit: '注册',
       registering: '注册中...',
-      loginLink: '已有账号？登录',
+      loginLink: '已有账号？',
+      success: '注册成功！请登录。',
     },
     login: {
-      title: '欢迎回来',
+      title: '登录',
       email: '邮箱',
       password: '密码',
       submit: '登录',
-      loggingIn: '登录中...',
-      registerLink: '没有账号？注册',
+      signingIn: '登录中...',
+      registerLink: '没有账号？',
     },
     quotes: {
       title: '所有语录',
       filter: '筛选',
       sort: '排序',
       total: '条语录',
+    },
+    profile: {
+      title: '个人设置',
+      username: '用户名',
+      bio: '个人简介',
+      save: '保存更改',
+      saving: '保存中...',
+      success: '个人资料更新成功！',
+    },
+    favorites: {
+      title: '我的收藏',
+      empty: '暂无收藏。开始收藏一些喜欢的名言吧！',
     },
   },
 }; 

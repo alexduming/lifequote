@@ -8,6 +8,7 @@
 
 import React from 'react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 /**
  * 全局上下文提供者组件
@@ -17,8 +18,10 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
  */
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <LanguageProvider>
-      {children}
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        {children}
+      </LanguageProvider>
+    </AuthProvider>
   );
 }
