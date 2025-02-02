@@ -7,12 +7,15 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { createClientComponentClient, User } from '@supabase/auth-helpers-nextjs';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, AuthError } from '@supabase/supabase-js';
 
 export type AuthContextType = {
   user: User | null;
   supabase: SupabaseClient;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string) => Promise<{
+    error: AuthError | null;
+    data: { user: User | null } | null;
+  }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 };
@@ -40,11 +43,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const response = await supabase.auth.signUp({
       email,
       password,
     });
-    return { error };
+    return response;
   };
 
   const signIn = async (email: string, password: string) => {

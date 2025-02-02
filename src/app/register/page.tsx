@@ -11,9 +11,10 @@ import Navbar from '@/components/Navbar';
 function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, supabase } = useAuth();
   const router = useRouter();
   const { language } = useLanguage();
   const t = translations[language];
@@ -24,13 +25,36 @@ function RegisterForm() {
     setLoading(true);
 
     try {
-      const { error: signUpError } = await signUp(email, password);
+      // 1. 注册用户
+      const { error: signUpError, data } = await signUp(email, password);
       if (signUpError) throw signUpError;
+
+      if (!data?.user?.id) {
+        throw new Error('注册成功但未返回用户ID');
+      }
+
+      // 2. 创建用户资料
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          user_id: data.user.id,
+          username: username || email.split('@')[0], // 如果没有提供用户名，使用邮箱前缀
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+
+      if (profileError) throw profileError;
       
-      // 注册成功后跳转到登录页
+      // 3. 注册成功后跳转到登录页
       router.push('/login');
     } catch (err: any) {
+      console.error('Registration error:', err);
       setError(err.message);
+      
+      // 如果是邮箱已存在的错误，给出更友好的提示
+      if (err.message.includes('already exists')) {
+        setError('该邮箱已被注册，请直接登录或使用其他邮箱。');
+      }
     } finally {
       setLoading(false);
     }
@@ -49,6 +73,20 @@ function RegisterForm() {
               {error}
             </div>
           )}
+
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-white/60 mb-2">
+              {t.register.username}
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder={t.register.usernamePlaceholder}
+            />
+          </div>
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-white/60 mb-2">
@@ -75,7 +113,11 @@ function RegisterForm() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
+              minLength={6}
             />
+            <p className="mt-1 text-sm text-white/40">
+              {t.register.passwordHint}
+            </p>
           </div>
 
           <button

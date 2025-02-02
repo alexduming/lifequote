@@ -95,8 +95,10 @@ export type TranslationType = {
   register: {
     title: string;
     username: string;
+    usernamePlaceholder: string;
     email: string;
     password: string;
+    passwordHint: string;
     submit: string;
     registering: string;
     loginLink: string;
@@ -217,8 +219,10 @@ export const translations: Record<Language, TranslationType> = {
     register: {
       title: 'Create an Account',
       username: 'Username',
+      usernamePlaceholder: 'Choose a username',
       email: 'Email',
       password: 'Password',
+      passwordHint: 'At least 6 characters',
       submit: 'Sign Up',
       registering: 'Signing up...',
       loginLink: 'Already have an account?',
@@ -343,8 +347,10 @@ export const translations: Record<Language, TranslationType> = {
     register: {
       title: '创建账号',
       username: '用户名',
+      usernamePlaceholder: '请选择用户名',
       email: '邮箱',
       password: '密码',
+      passwordHint: '至少6个字符',
       submit: '注册',
       registering: '注册中...',
       loginLink: '已有账号？',
