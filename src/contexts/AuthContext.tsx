@@ -56,6 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     });
+
+    // 如果注册成功，等待一下让会话建立
+    if (response.data?.user && !response.error) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
     
     return response;
   };
