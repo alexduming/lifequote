@@ -56,22 +56,20 @@ function RegisterForm() {
 
       if (profileError) {
         console.error('Profile creation error:', profileError);
-        if (profileError.message.includes('username_length')) {
-          throw new Error('用户名长度必须至少为3个字符。');
-        } else if (profileError.message.includes('unique constraint')) {
-          throw new Error('该用户名已被使用，请选择其他用户名。');
-        } else if (profileError.code === '42501') {
-          // 如果是权限错误，我们仍然显示注册成功，因为用户已经创建
-          console.warn('权限错误，但用户已创建:', profileError);
-          setError('注册成功！请查看您的邮箱并点击验证链接以完成注册。');
-          return;
-        } else {
-          throw new Error('创建用户资料失败，请稍后重试。');
+        // 对于权限错误，我们不抛出异常，因为用户资料会在邮箱验证后创建
+        if (!profileError.message.includes('policy') && !profileError.message.includes('permission denied')) {
+          if (profileError.message.includes('username_length')) {
+            throw new Error('用户名长度必须至少为3个字符。');
+          } else if (profileError.message.includes('unique constraint')) {
+            throw new Error('该用户名已被使用，请选择其他用户名。');
+          } else {
+            throw new Error('创建用户资料失败，但您的账号已注册。请在验证邮箱后重试。');
+          }
         }
       }
       
       // 3. 显示邮箱验证提示
-      setError('注册成功！请查看您的邮箱并点击验证链接以完成注册。');
+      setError('注册成功！请查看您的邮箱并点击验证链接以完成注册。验证后您将自动登录。');
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message);
