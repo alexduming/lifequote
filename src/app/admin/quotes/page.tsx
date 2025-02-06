@@ -45,10 +45,11 @@ export default function AdminQuotesPage() {
     async function checkAdminRole() {
       if (!user) return;
 
-      const { data: { role } } = await supabase.auth.getUser();
-      if (role !== 'admin') {
+      const { data: { user: userData } } = await supabase.auth.getUser();
+      if (!userData?.user_metadata?.role || userData.user_metadata.role !== 'admin') {
         setError('没有访问权限');
         setLoading(false);
+        return;
       }
     }
 
