@@ -154,16 +154,16 @@ export default async function QuotesPage({
                   <QuoteCard
                     key={quote.id}
                     quote={{
-                      zh: quote.quote_zh,
-                      en: quote.quote_en
+                      content_zh: quote.content_zh,
+                      content_en: quote.content_en
                     }}
                     author={{
-                      zh: quote.author_zh,
-                      en: quote.author_en
+                      author_zh: quote.author_zh,
+                      author_en: quote.author_en
                     }}
                     authorTitle={{
-                      zh: quote.author_title_zh || '',
-                      en: quote.author_title_en || ''
+                      author_title_zh: quote.author_title_zh || '',
+                      author_title_en: quote.author_title_en || ''
                     }}
                     category={quote.category as CategoryKey}
                     likes={quote.likes}

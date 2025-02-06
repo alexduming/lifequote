@@ -12,16 +12,16 @@ import type { Database } from '@/types/supabase';
 type QuoteData = {
   id: number;
   content: {
-    zh: string;
-    en: string;
+    content_zh: string;
+    content_en: string;
   };
   author: {
-    zh: string;
-    en: string;
+    author_zh: string;
+    author_en: string;
   };
   authorTitle: {
-    zh: string;
-    en: string;
+    author_title_zh: string;
+    author_title_en: string;
   };
   category: CategoryKey;
   likes: number;
@@ -40,6 +40,24 @@ export default function FavoritesPage() {
   const { user, supabase } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
+
+  const handleRemoveFavorite = async (quoteId: number) => {
+    try {
+      const { error: removeError } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', user?.id)
+        .eq('quote_id', quoteId);
+
+      if (removeError) throw removeError;
+
+      // 从状态中移除该语录
+      setFavorites(prev => prev.filter(quote => quote.id !== quoteId));
+    } catch (err: any) {
+      console.error('Error removing favorite:', err.message);
+      setError(err.message);
+    }
+  };
 
   useEffect(() => {
     async function loadFavorites() {
@@ -70,18 +88,18 @@ export default function FavoritesPage() {
         const quotes = (data || []).map(f => ({
           id: f.quotes.id,
           content: {
-            zh: f.quotes.content_zh,
-            en: f.quotes.content_en,
+            content_zh: f.quotes.content_zh,
+            content_en: f.quotes.content_en,
           },
           author: {
-            zh: f.quotes.author_zh,
-            en: f.quotes.author_en,
+            author_zh: f.quotes.author_zh,
+            author_en: f.quotes.author_en,
           },
           authorTitle: {
-            zh: f.quotes.author_title_zh,
-            en: f.quotes.author_title_en,
+            author_title_zh: f.quotes.author_title_zh || '',
+            author_title_en: f.quotes.author_title_en || '',
           },
-          category: f.quotes.category,
+          category: f.quotes.category as CategoryKey,
           likes: f.quotes.likes || 0,
         }));
 
@@ -145,6 +163,8 @@ export default function FavoritesPage() {
                   authorTitle={quote.authorTitle}
                   category={quote.category}
                   likes={quote.likes}
+                  isFavorited={true}
+                  onFavorite={() => handleRemoveFavorite(quote.id)}
                 />
               ))}
             </div>

@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { translations } from '@/config/translations';
 import LanguageSwitch from './LanguageSwitch';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,9 +41,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-[oswald] font-bold text-primary-600">
-              {t.common.appName}
-            </span>
+            <Image 
+              src="/logo.svg"
+              alt="LifeQuote Logo"
+              width={120}
+              height={30}
+              className="h-8 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -77,11 +82,11 @@ export default function Navbar() {
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl">
                     <Link
-                      href="/profile"
+                      href="/submit"
                       className="block px-4 py-2 text-sm text-dark-600 hover:bg-primary-50 hover:text-primary-600"
                       onClick={() => setIsProfileOpen(false)}
                     >
-                      {t.nav.profile}
+                      {t.nav.submit}
                     </Link>
                     <Link
                       href="/favorites"
@@ -151,11 +156,11 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link
-                  href="/profile"
+                  href="/submit"
                   className="block px-3 py-2 rounded-md text-base font-medium text-dark-600 hover:text-primary-600 hover:bg-primary-50"
                   onClick={() => setIsOpen(false)}
                 >
-                  {t.nav.profile}
+                  {t.nav.submit}
                 </Link>
                 <Link
                   href="/favorites"

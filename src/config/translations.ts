@@ -70,6 +70,7 @@ export type TranslationType = {
     quotes: string;
     favorites: string;
     signOut: string;
+    submit: string;
   };
   hero: {
     title: string;
@@ -239,6 +240,7 @@ export const translations: Record<Language, TranslationType> = {
       quotes: 'Quotes',
       favorites: 'Favorites',
       signOut: 'Sign Out',
+      submit: 'Submit Quote',
     },
     hero: {
       title: 'Discover Life\'s Wisdom\nFind Millennial Inspiration',
@@ -323,7 +325,7 @@ export const translations: Record<Language, TranslationType> = {
       passwordMismatch: 'Passwords do not match',
       submit: 'Register',
       registering: 'Registering...',
-      loginLink: 'Already have an account?',
+      loginLink: 'Already have an account? Login',
       success: 'Registration successful! Please check your email and click the verification link to complete registration.',
     },
     login: {
@@ -406,6 +408,7 @@ export const translations: Record<Language, TranslationType> = {
       quotes: '语录',
       favorites: '收藏',
       signOut: '退出',
+      submit: '提交语录',
     },
     hero: {
       title: '发现生活的智慧\n感受千年的启迪',

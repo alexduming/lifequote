@@ -78,30 +78,41 @@ export async function getQuotesByCategory(category: CategoryKey) {
 }
 
 /**
- * 获取分页语录
+ * 获取分页语录数据
  * @param page 页码
  * @param pageSize 每页数量
- * @returns 语录数组和总数
+ * @returns 语录数据和总数
  */
 export async function getQuotesByPage(page: number = 1, pageSize: number = 10) {
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;
 
-  const { data: quotes, count, error } = await supabase
-    .from('quotes')
-    .select('*', { count: 'exact' })
-    .range(start, end)
-    .order('created_at', { ascending: false });
+  try {
+    // 获取总数
+    const { count } = await supabase
+      .from('quotes')
+      .select('*', { count: 'exact', head: true });
 
-  if (error) {
-    console.error('获取分页语录失败:', error);
-    return { quotes: [], total: 0 };
+    // 获取当前页数据
+    const { data: quotes, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .range(start, end)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return {
+      quotes: quotes || [],
+      total: count || 0
+    };
+  } catch (error) {
+    console.error('获取语录列表失败:', error);
+    return {
+      quotes: [],
+      total: 0
+    };
   }
-
-  return { 
-    quotes: quotes || [], 
-    total: count || 0 
-  };
 }
 
 /**

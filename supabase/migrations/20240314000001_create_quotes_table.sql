@@ -1,8 +1,8 @@
 -- 创建语录表
 CREATE TABLE IF NOT EXISTS public.quotes (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    quote_zh TEXT NOT NULL,
-    quote_en TEXT NOT NULL,
+    content_zh TEXT NOT NULL,
+    content_en TEXT NOT NULL,
     author_zh TEXT NOT NULL,
     author_en TEXT NOT NULL,
     author_title_zh TEXT,
