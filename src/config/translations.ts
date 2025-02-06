@@ -5,9 +5,57 @@
 
 export type Language = 'en' | 'zh';
 
-export type CategoryKey = 'wisdom' | 'inspiration' | 'life' | 'love' | 'success' | 'happiness' | 'friendship' | 'family';
+export type CategoryKey = 
+  | 'wisdom' 
+  | 'inspiration' 
+  | 'life' 
+  | 'love' 
+  | 'success' 
+  | 'happiness' 
+  | 'friendship' 
+  | 'family'
+  | 'literature'
+  | 'art'
+  | 'philosophy'
+  | 'science'
+  | 'history'
+  | 'politics'
+  | 'economics'
+  | 'education';
 
 export type TranslationType = {
+  common: {
+    appName: string;
+    loading: string;
+    error: string;
+    success: string;
+    confirm: string;
+    cancel: string;
+    save: string;
+    edit: string;
+    delete: string;
+    search: string;
+    submit: string;
+    noData: string;
+  };
+  categories: {
+    wisdom: string;
+    inspiration: string;
+    life: string;
+    love: string;
+    success: string;
+    happiness: string;
+    friendship: string;
+    family: string;
+    literature: string;
+    art: string;
+    philosophy: string;
+    science: string;
+    history: string;
+    politics: string;
+    economics: string;
+    education: string;
+  };
   nav: {
     home: string;
     about: string;
@@ -27,9 +75,6 @@ export type TranslationType = {
     title: string;
     subtitle: string;
     searchPlaceholder: string;
-  };
-  categories: {
-    [K in CategoryKey]: string;
   };
   quotes: {
     title: string;
@@ -142,6 +187,38 @@ export type TranslationType = {
 
 export const translations: Record<Language, TranslationType> = {
   en: {
+    common: {
+      appName: 'Life Quote',
+      loading: 'Loading...',
+      error: 'Error',
+      success: 'Success',
+      confirm: 'Confirm',
+      cancel: 'Cancel',
+      save: 'Save',
+      edit: 'Edit',
+      delete: 'Delete',
+      search: 'Search',
+      submit: 'Submit',
+      noData: 'No Data'
+    },
+    categories: {
+      wisdom: 'Wisdom',
+      inspiration: 'Inspiration',
+      life: 'Life',
+      love: 'Love',
+      success: 'Success',
+      happiness: 'Happiness',
+      friendship: 'Friendship',
+      family: 'Family',
+      literature: 'Literature',
+      art: 'Art',
+      philosophy: 'Philosophy',
+      science: 'Science',
+      history: 'History',
+      politics: 'Politics',
+      economics: 'Economics',
+      education: 'Education'
+    },
     nav: {
       home: 'Home',
       about: 'About',
@@ -161,21 +238,6 @@ export const translations: Record<Language, TranslationType> = {
       title: 'Discover Life\'s Wisdom\nFind Millennial Inspiration',
       subtitle: 'Explore the most influential thoughts in human history\nLet wisdom light your path of life',
       searchPlaceholder: 'Search quotes, authors, or topics...',
-    },
-    categories: {
-      motivation: 'Motivation',
-      life: 'Life',
-      love: 'Love',
-      success: 'Success',
-      wisdom: 'Wisdom',
-      philosophy: 'Philosophy',
-      literature: 'Literature',
-      science: 'Science',
-      art: 'Art',
-      history: 'History',
-      politics: 'Politics',
-      economics: 'Economics',
-      education: 'Education',
     },
     quotes: {
       title: 'Featured Quotes',
@@ -292,6 +354,38 @@ export const translations: Record<Language, TranslationType> = {
     },
   },
   zh: {
+    common: {
+      appName: '生活语录',
+      loading: '加载中...',
+      error: '错误',
+      success: '成功',
+      confirm: '确认',
+      cancel: '取消',
+      save: '保存',
+      edit: '编辑',
+      delete: '删除',
+      search: '搜索',
+      submit: '提交',
+      noData: '暂无数据'
+    },
+    categories: {
+      wisdom: '智慧',
+      inspiration: '励志',
+      life: '生活',
+      love: '爱情',
+      success: '成功',
+      happiness: '幸福',
+      friendship: '友情',
+      family: '家庭',
+      literature: '文学',
+      art: '艺术',
+      philosophy: '哲学',
+      science: '科学',
+      history: '历史',
+      politics: '政治',
+      economics: '经济',
+      education: '教育'
+    },
     nav: {
       home: '首页',
       about: '关于',
@@ -311,21 +405,6 @@ export const translations: Record<Language, TranslationType> = {
       title: '发现生活的智慧\n感受千年的启迪',
       subtitle: '探索人类历史上最具影响力的思想精华\n让智慧之光照亮你的人生之路',
       searchPlaceholder: '搜索名言、作者或主题...',
-    },
-    categories: {
-      motivation: '励志',
-      life: '人生',
-      love: '爱情',
-      success: '成功',
-      wisdom: '智慧',
-      philosophy: '哲学',
-      literature: '文学',
-      science: '科学',
-      art: '艺术',
-      history: '历史',
-      politics: '政治',
-      economics: '经济',
-      education: '教育',
     },
     quotes: {
       title: '精选语录',
