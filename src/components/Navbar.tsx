@@ -5,169 +5,189 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { translations } from '@/config/translations';
-import { Menu, X, Globe, Send, FolderHeart, Shield } from 'lucide-react';
+import LanguageSwitch from './LanguageSwitch';
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
+  const { language } = useLanguage();
   const { user, signOut } = useAuth();
-  const { language, toggleLanguage } = useLanguage();
   const t = translations[language];
 
-  // 检查是否为管理员
-  const isAdmin = user?.user_metadata?.role === 'admin';
+  const mainNavItems = [
+    { href: '/daily', label: t.nav.daily },
+    { href: '/books', label: t.nav.books },
+    { href: '/authors', label: t.nav.authors },
+    { href: '/topics', label: t.nav.topics },
+  ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsProfileOpen(false);
+  };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-lg border-b border-white/10">
-      <div className="container">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-[oswald] text-white">
-            LifeQuote
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-2xl font-[oswald] font-bold text-primary-600">
+              {t.common.appName}
+            </span>
           </Link>
 
-          {/* 桌面端导航 */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="/collections"
-              className={`text-sm ${
-                pathname === '/collections'
-                  ? 'text-white'
-                  : 'text-white/60 hover:text-white'
-              } transition-colors flex items-center gap-2`}
-            >
-              <FolderHeart size={18} />
-              <span>我的收藏夹</span>
-            </Link>
-            <Link
-              href="/submit"
-              className={`text-sm ${
-                pathname === '/submit'
-                  ? 'text-white'
-                  : 'text-white/60 hover:text-white'
-              } transition-colors flex items-center gap-2`}
-            >
-              <Send size={18} />
-              <span>提交语录</span>
-            </Link>
-            {isAdmin && (
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {mainNavItems.map((item) => (
               <Link
-                href="/admin/quotes"
-                className={`text-sm ${
-                  pathname === '/admin/quotes'
-                    ? 'text-white'
-                    : 'text-white/60 hover:text-white'
-                } transition-colors flex items-center gap-2`}
+                key={item.href}
+                href={item.href}
+                className={`text-sm font-medium transition-colors hover:text-primary-600 ${
+                  pathname === item.href ? 'text-primary-600' : 'text-dark-600'
+                }`}
               >
-                <Shield size={18} />
-                <span>语录审核</span>
+                {item.label}
               </Link>
-            )}
-            <button
-              onClick={toggleLanguage}
-              className="text-white/60 hover:text-white transition-colors"
-            >
-              <Globe size={18} />
-            </button>
+            ))}
+          </div>
+
+          {/* Right Section */}
+          <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitch />
+            
             {user ? (
-              <button
-                onClick={signOut}
-                className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
-              >
-                退出
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center space-x-2 text-sm font-medium text-dark-600 hover:text-primary-600 transition-colors"
+                >
+                  <span>{user.email?.split('@')[0]}</span>
+                  <ChevronDown size={16} className={`transform transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-dark-600 hover:bg-primary-50 hover:text-primary-600"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      {t.nav.profile}
+                    </Link>
+                    <Link
+                      href="/favorites"
+                      className="block px-4 py-2 text-sm text-dark-600 hover:bg-primary-50 hover:text-primary-600"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      {t.nav.favorites}
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-2 text-sm text-dark-600 hover:bg-primary-50 hover:text-primary-600"
+                    >
+                      {t.nav.signOut}
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
-              >
-                登录
-              </Link>
+              <div className="flex items-center space-x-4">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-dark-600 hover:text-primary-600 transition-colors"
+                >
+                  {t.nav.login}
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  {t.nav.register}
+                </Link>
+              </div>
             )}
           </div>
 
-          {/* 移动端菜单按钮 */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-white/60 hover:text-white transition-colors"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-dark-600 hover:text-primary-600 transition-colors"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 移动端菜单 */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-dark-800 border-t border-white/10">
-          <div className="container py-4 space-y-4">
-            <Link
-              href="/collections"
-              className={`block text-sm ${
-                pathname === '/collections'
-                  ? 'text-white'
-                  : 'text-white/60'
-              } transition-colors`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              我的收藏夹
-            </Link>
-            <Link
-              href="/submit"
-              className={`block text-sm ${
-                pathname === '/submit'
-                  ? 'text-white'
-                  : 'text-white/60'
-              } transition-colors`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              提交语录
-            </Link>
-            {isAdmin && (
+      {/* Mobile Navigation */}
+      {isOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {mainNavItems.map((item) => (
               <Link
-                href="/admin/quotes"
-                className={`block text-sm ${
-                  pathname === '/admin/quotes'
-                    ? 'text-white'
-                    : 'text-white/60'
-                } transition-colors`}
-                onClick={() => setIsMenuOpen(false)}
+                key={item.href}
+                href={item.href}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  pathname === item.href
+                    ? 'text-primary-600 bg-primary-50'
+                    : 'text-dark-600 hover:text-primary-600 hover:bg-primary-50'
+                }`}
+                onClick={() => setIsOpen(false)}
               >
-                语录审核
+                {item.label}
               </Link>
-            )}
-            <button
-              onClick={() => {
-                toggleLanguage();
-                setIsMenuOpen(false);
-              }}
-              className="block text-sm text-white/60 hover:text-white transition-colors"
-            >
-              {language === 'zh' ? 'English' : '中文'}
-            </button>
+            ))}
+            
             {user ? (
-              <button
-                onClick={() => {
-                  signOut();
-                  setIsMenuOpen(false);
-                }}
-                className="block text-sm text-white/60 hover:text-white transition-colors"
-              >
-                退出
-              </button>
+              <>
+                <Link
+                  href="/profile"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-dark-600 hover:text-primary-600 hover:bg-primary-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {t.nav.profile}
+                </Link>
+                <Link
+                  href="/favorites"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-dark-600 hover:text-primary-600 hover:bg-primary-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {t.nav.favorites}
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-dark-600 hover:text-primary-600 hover:bg-primary-50"
+                >
+                  {t.nav.signOut}
+                </button>
+              </>
             ) : (
-              <Link
-                href="/login"
-                className="block text-sm text-white/60 hover:text-white transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                登录
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-dark-600 hover:text-primary-600 hover:bg-primary-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {t.nav.login}
+                </Link>
+                <Link
+                  href="/register"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-dark-600 hover:text-primary-600 hover:bg-primary-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {t.nav.register}
+                </Link>
+              </>
             )}
           </div>
         </div>
