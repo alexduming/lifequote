@@ -3,13 +3,14 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { translations, CategoryKey } from '@/config/translations';
+import { translations } from '@/config/translations';
+import { QUICK_CATEGORIES } from '@/config/constants';
 import SearchResults from '@/components/SearchResults';
 import type { Database } from '@/types/database.types';
 
 type Quote = Database['public']['Tables']['quotes']['Row'];
 
-const quickCategories: CategoryKey[] = ['motivation', 'life', 'love', 'success', 'wisdom'];
+const quickCategories = QUICK_CATEGORIES;
 
 export default function HeroSection() {
   const { language } = useLanguage();
