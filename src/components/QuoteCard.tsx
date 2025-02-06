@@ -58,6 +58,7 @@ export interface QuoteCardProps {
   onLike?: () => void;
   onFavorite?: () => void;
   onShare?: () => void;
+  onRemove?: () => void;
 }
 
 /**
@@ -78,7 +79,8 @@ export default function QuoteCard(props: QuoteCardProps) {
     quoteStyle = 'default',
     onLike,
     onFavorite,
-    onShare 
+    onShare,
+    onRemove
   } = props;
 
   // 获取选择的引号样式
@@ -89,23 +91,49 @@ export default function QuoteCard(props: QuoteCardProps) {
 
   // 分类标签的背景色映射
   const categoryColors: Record<CategoryKey, string> = {
-    philosophy: 'bg-[#fdf2f2] text-[#D70050]',
-    literature: 'bg-[#fdf2f2] text-[#D70050]',
-    science: 'bg-[#fdf2f2] text-[#D70050]',
-    art: 'bg-[#fdf2f2] text-[#D70050]',
-    history: 'bg-[#fdf2f2] text-[#D70050]',
-    politics: 'bg-[#fdf2f2] text-[#D70050]',
-    economics: 'bg-[#fdf2f2] text-[#D70050]',
-    education: 'bg-[#fdf2f2] text-[#D70050]',
-    motivation: 'bg-[#fdf2f2] text-[#D70050]',
+    wisdom: 'bg-[#fdf2f2] text-[#D70050]',
+    inspiration: 'bg-[#fdf2f2] text-[#D70050]',
     life: 'bg-[#fdf2f2] text-[#D70050]',
     love: 'bg-[#fdf2f2] text-[#D70050]',
     success: 'bg-[#fdf2f2] text-[#D70050]',
-    wisdom: 'bg-[#fdf2f2] text-[#D70050]'
+    happiness: 'bg-[#fdf2f2] text-[#D70050]',
+    friendship: 'bg-[#fdf2f2] text-[#D70050]',
+    family: 'bg-[#fdf2f2] text-[#D70050]',
+    literature: 'bg-[#fdf2f2] text-[#D70050]',
+    art: 'bg-[#fdf2f2] text-[#D70050]',
+    philosophy: 'bg-[#fdf2f2] text-[#D70050]',
+    science: 'bg-[#fdf2f2] text-[#D70050]',
+    history: 'bg-[#fdf2f2] text-[#D70050]',
+    politics: 'bg-[#fdf2f2] text-[#D70050]',
+    economics: 'bg-[#fdf2f2] text-[#D70050]',
+    education: 'bg-[#fdf2f2] text-[#D70050]'
   };
 
   return (
     <div className="relative bg-white rounded-lg shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      {/* 删除按钮 */}
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="absolute top-4 right-4 text-dark-400 hover:text-red-500 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+          </svg>
+        </button>
+      )}
       <div className="flex flex-col h-full">
         {/* 语录内容区域 */}
         <div className="relative mb-6">

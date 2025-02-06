@@ -249,11 +249,15 @@ export default function CollectionDetailPage({
             收藏夹还没有任何语录
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {quotes.map(quote => (
               <QuoteCard
                 key={quote.id}
-                quote={quote}
+                quote={quote.content}
+                author={quote.author}
+                authorTitle={quote.authorTitle}
+                category={quote.category}
+                likes={quote.likes}
                 onRemove={
                   collection.user_id === user?.id
                     ? () => handleRemoveQuote(quote.id)
