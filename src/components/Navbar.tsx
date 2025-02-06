@@ -1,219 +1,174 @@
+/**
+ * 导航栏组件
+ * @module Navbar
+ */
+
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
+import { Menu, X, Globe, Send, FolderHeart, Shield } from 'lucide-react';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const pathname = usePathname();
-  const { language, toggleLanguage } = useLanguage();
   const { user, signOut } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
   const t = translations[language];
 
+  // 检查是否为管理员
+  const isAdmin = user?.user_metadata?.role === 'admin';
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/logo.svg"
-                alt="LifeQuote Logo"
-                width={120}
-                height={30}
-                className="h-8 w-auto"
-                priority
-              />
-            </Link>
-          </div>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-lg border-b border-white/10">
+      <div className="container">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="text-2xl font-[oswald] text-white">
+            LifeQuote
+          </Link>
 
-          <div className="hidden sm:flex sm:space-x-8 sm:items-center">
+          {/* 桌面端导航 */}
+          <div className="hidden md:flex items-center gap-6">
             <Link
-              href="/daily"
-              className={`text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors ${
-                pathname === '/daily' ? 'text-primary-500' : ''
-              }`}
+              href="/collections"
+              className={`text-sm ${
+                pathname === '/collections'
+                  ? 'text-white'
+                  : 'text-white/60 hover:text-white'
+              } transition-colors flex items-center gap-2`}
             >
-              {t.nav.daily}
+              <FolderHeart size={18} />
+              <span>我的收藏夹</span>
             </Link>
             <Link
-              href="/books"
-              className={`text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors ${
-                pathname === '/books' ? 'text-primary-500' : ''
-              }`}
+              href="/submit"
+              className={`text-sm ${
+                pathname === '/submit'
+                  ? 'text-white'
+                  : 'text-white/60 hover:text-white'
+              } transition-colors flex items-center gap-2`}
             >
-              {t.nav.books}
+              <Send size={18} />
+              <span>提交语录</span>
             </Link>
-            <Link
-              href="/authors"
-              className={`text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors ${
-                pathname === '/authors' ? 'text-primary-500' : ''
-              }`}
-            >
-              {t.nav.authors}
-            </Link>
-            <Link
-              href="/topics"
-              className={`text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors ${
-                pathname === '/topics' ? 'text-primary-500' : ''
-              }`}
-            >
-              {t.nav.topics}
-            </Link>
-
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/favorites"
-                  className={`text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/favorites' ? 'text-primary-500' : ''
-                  }`}
-                >
-                  {t.nav.favorites}
-                </Link>
-                <Link
-                  href="/profile"
-                  className={`text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/profile' ? 'text-primary-500' : ''
-                  }`}
-                >
-                  {t.nav.profile}
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors"
-                >
-                  {t.nav.signOut}
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/login"
-                  className="text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors"
-                >
-                  {t.nav.login}
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-primary-500 text-white hover:bg-primary-600 px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                >
-                  {t.nav.register}
-                </Link>
-              </div>
+            {isAdmin && (
+              <Link
+                href="/admin/quotes"
+                className={`text-sm ${
+                  pathname === '/admin/quotes'
+                    ? 'text-white'
+                    : 'text-white/60 hover:text-white'
+                } transition-colors flex items-center gap-2`}
+              >
+                <Shield size={18} />
+                <span>语录审核</span>
+              </Link>
             )}
-
             <button
               onClick={toggleLanguage}
-              className="text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
             >
-              {language === 'en' ? '中文' : 'EN'}
+              <Globe size={18} />
             </button>
+            {user ? (
+              <button
+                onClick={signOut}
+                className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
+              >
+                退出
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
+              >
+                登录
+              </Link>
+            )}
           </div>
 
-          <div className="sm:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-500 hover:text-gray-600 p-2 rounded-md focus:outline-none"
-            >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          {/* 移动端菜单按钮 */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden text-white/60 hover:text-white transition-colors"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
 
-      {isOpen && (
-        <div className="sm:hidden bg-white/95 backdrop-blur-md">
-          <div className="pt-2 pb-3 space-y-1">
+      {/* 移动端菜单 */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-dark-800 border-t border-white/10">
+          <div className="container py-4 space-y-4">
             <Link
-              href="/daily"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-              onClick={() => setIsOpen(false)}
+              href="/collections"
+              className={`block text-sm ${
+                pathname === '/collections'
+                  ? 'text-white'
+                  : 'text-white/60'
+              } transition-colors`}
+              onClick={() => setIsMenuOpen(false)}
             >
-              {t.nav.daily}
+              我的收藏夹
             </Link>
             <Link
-              href="/books"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-              onClick={() => setIsOpen(false)}
+              href="/submit"
+              className={`block text-sm ${
+                pathname === '/submit'
+                  ? 'text-white'
+                  : 'text-white/60'
+              } transition-colors`}
+              onClick={() => setIsMenuOpen(false)}
             >
-              {t.nav.books}
+              提交语录
             </Link>
-            <Link
-              href="/authors"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-              onClick={() => setIsOpen(false)}
-            >
-              {t.nav.authors}
-            </Link>
-            <Link
-              href="/topics"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-              onClick={() => setIsOpen(false)}
-            >
-              {t.nav.topics}
-            </Link>
-
-            {user ? (
-              <>
-                <Link
-                  href="/favorites"
-                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t.nav.favorites}
-                </Link>
-                <Link
-                  href="/profile"
-                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t.nav.profile}
-                </Link>
-                <button
-                  onClick={() => {
-                    signOut();
-                    setIsOpen(false);
-                  }}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-                >
-                  {t.nav.signOut}
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t.nav.login}
-                </Link>
-                <Link
-                  href="/register"
-                  className="block px-3 py-2 text-base font-medium text-primary-500 hover:text-primary-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t.nav.register}
-                </Link>
-              </>
+            {isAdmin && (
+              <Link
+                href="/admin/quotes"
+                className={`block text-sm ${
+                  pathname === '/admin/quotes'
+                    ? 'text-white'
+                    : 'text-white/60'
+                } transition-colors`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                语录审核
+              </Link>
             )}
-
             <button
               onClick={() => {
                 toggleLanguage();
-                setIsOpen(false);
+                setIsMenuOpen(false);
               }}
-              className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50"
+              className="block text-sm text-white/60 hover:text-white transition-colors"
             >
-              {language === 'en' ? '中文' : 'EN'}
+              {language === 'zh' ? 'English' : '中文'}
             </button>
+            {user ? (
+              <button
+                onClick={() => {
+                  signOut();
+                  setIsMenuOpen(false);
+                }}
+                className="block text-sm text-white/60 hover:text-white transition-colors"
+              >
+                退出
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="block text-sm text-white/60 hover:text-white transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                登录
+              </Link>
+            )}
           </div>
         </div>
       )}

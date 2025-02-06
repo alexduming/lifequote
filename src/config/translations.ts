@@ -5,9 +5,7 @@
 
 export type Language = 'en' | 'zh';
 
-export type CategoryKey = 'motivation' | 'life' | 'love' | 'success' | 'wisdom' | 
-  'philosophy' | 'literature' | 'science' | 'art' | 'history' | 'politics' | 
-  'economics' | 'education';
+export type CategoryKey = 'wisdom' | 'inspiration' | 'life' | 'love' | 'success' | 'happiness' | 'friendship' | 'family';
 
 export type TranslationType = {
   nav: {
@@ -65,6 +63,8 @@ export type TranslationType = {
     close: string;
     viewDetails: string;
     searchTopics: string;
+    cancel: string;
+    create: string;
   };
   books: {
     title: string;
@@ -125,6 +125,18 @@ export type TranslationType = {
   favorites: {
     title: string;
     empty: string;
+  };
+  collections: {
+    create: string;
+    edit: string;
+    name: string;
+    namePlaceholder: string;
+    description: string;
+    descriptionPlaceholder: string;
+    makePublic: string;
+    errors: {
+      nameRequired: string;
+    };
   };
 };
 
@@ -197,6 +209,8 @@ export const translations: Record<Language, TranslationType> = {
       close: 'Close',
       viewDetails: 'View Details',
       searchTopics: 'Search Topics',
+      cancel: 'Cancel',
+      create: 'Create',
     },
     books: {
       title: 'Classic Books',
@@ -263,6 +277,18 @@ export const translations: Record<Language, TranslationType> = {
     favorites: {
       title: 'My Favorites',
       empty: 'No favorites yet',
+    },
+    collections: {
+      create: 'Create Collection',
+      edit: 'Edit Collection',
+      name: 'Name',
+      namePlaceholder: 'Enter collection name',
+      description: 'Description',
+      descriptionPlaceholder: 'Add description (optional)',
+      makePublic: 'Make this collection public',
+      errors: {
+        nameRequired: 'Please enter a collection name',
+      },
     },
   },
   zh: {
@@ -333,6 +359,8 @@ export const translations: Record<Language, TranslationType> = {
       close: '关闭',
       viewDetails: '查看详情',
       searchTopics: '搜索主题',
+      cancel: '取消',
+      create: '创建',
     },
     books: {
       title: '经典著作',
@@ -399,6 +427,18 @@ export const translations: Record<Language, TranslationType> = {
     favorites: {
       title: '我的收藏',
       empty: '暂无收藏',
+    },
+    collections: {
+      create: '创建收藏夹',
+      edit: '编辑收藏夹',
+      name: '名称',
+      namePlaceholder: '输入收藏夹名称',
+      description: '描述',
+      descriptionPlaceholder: '添加描述（可选）',
+      makePublic: '设为公开收藏夹',
+      errors: {
+        nameRequired: '请输入收藏夹名称',
+      },
     },
   },
 }; 
