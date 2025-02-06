@@ -1,21 +1,19 @@
 /**
- * 防抖函数
- * @param {Function} func - 要执行的函数
- * @param {number} wait - 等待时间（毫秒）
+ * @description 防抖函数实现
+ * @param fn - 需要防抖的函数
+ * @param delay - 延迟时间（毫秒）
+ * @returns 防抖后的函数
  */
-export const debounce = (func: Function, wait: number) => {
-  let timeout: NodeJS.Timeout;
-  
-  return function executedFunction(...args: any[]) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
+export function debounce<T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout;
 
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
+  return function(this: unknown, ...args: Parameters<T>) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
   };
-};
-
-// 在注册组件中使用
-const debouncedSignUp = debounce(handleSignUp, 1000); 
+} 
