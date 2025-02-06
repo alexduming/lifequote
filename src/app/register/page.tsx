@@ -1,3 +1,8 @@
+/**
+ * 注册页面组件
+ * @module RegisterPage
+ */
+
 'use client';
 
 import React, { useState, Suspense } from 'react';
@@ -11,6 +16,7 @@ import Navbar from '@/components/Navbar';
 function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,141 +28,153 @@ function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // 验证密码匹配
+    if (password !== confirmPassword) {
+      setError('两次输入的密码不一致');
+      return;
+    }
+
+    // 验证密码长度
+    if (password.length < 6) {
+      setError('密码长度至少为6位');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // 1. 注册用户
-      const { error: signUpError, data } = await signUp(email, password);
-      if (signUpError) {
-        // 处理特定的错误情况
-        if (signUpError.message.includes('already exists')) {
-          throw new Error('该邮箱已被注册，请直接登录或使用其他邮箱。');
-        } else if (signUpError.message.includes('password')) {
-          throw new Error('密码不符合要求，请至少使用6个字符。');
-        } else {
-          throw signUpError;
+      const { data, error: signUpError } = await signUp(email, password);
+
+      if (signUpError) throw signUpError;
+
+      if (data?.user) {
+        // 尝试创建用户资料
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: data.user.id,
+            username: username || email.split('@')[0],
+          })
+          .select('*')
+          .single();
+
+        if (profileError) {
+          console.error('创建用户资料失败:', profileError);
+          // 即使资料创建失败，也继续注册流程
         }
-      }
 
-      if (!data?.user?.id) {
-        throw new Error('注册失败，请稍后重试。');
+        // 显示成功消息
+        alert(t.register.success);
+        router.push('/');
       }
-
-      // 2. 创建用户资料
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          user_id: data.user.id,
-          username: username || email.split('@')[0],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select('*')
-        .single();
-
-      if (profileError) {
-        console.error('Profile creation error:', profileError);
-        // 对于权限错误，我们不抛出异常，因为用户资料会在邮箱验证后创建
-        if (!profileError.message.includes('policy') && !profileError.message.includes('permission denied')) {
-          if (profileError.message.includes('username_length')) {
-            throw new Error('用户名长度必须至少为3个字符。');
-          } else if (profileError.message.includes('unique constraint')) {
-            throw new Error('该用户名已被使用，请选择其他用户名。');
-          } else {
-            throw new Error('创建用户资料失败，但您的账号已注册。请在验证邮箱后重试。');
-          }
-        }
-      }
-      
-      // 3. 显示邮箱验证提示
-      setError('注册成功！请查看您的邮箱并点击验证链接以完成注册。验证后您将自动登录。');
-    } catch (err: any) {
-      console.error('Registration error:', err);
-      setError(err.message);
+    } catch (error: any) {
+      console.error('注册错误:', error);
+      setError(error.message || '注册失败，请重试');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container max-w-md mx-auto py-20">
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8">
-        <h1 className="text-3xl font-[oswald] font-bold text-white mb-8 text-center">
-          {t.register.title}
-        </h1>
+    <div className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800">
+      <div className="container mx-auto px-4 py-20">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8">
+            <h1 className="text-3xl font-[oswald] font-bold text-white mb-8">
+              {t.register.title}
+            </h1>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* 用户名输入框 */}
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-white/60 mb-2">
+                  {t.register.username}
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder={t.register.usernamePlaceholder}
+                  className="w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                />
+              </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className={`px-4 py-3 rounded-lg text-sm ${
-              error.includes('成功') 
-                ? 'bg-green-500/10 border border-green-500/20 text-green-400'
-                : 'bg-red-500/10 border border-red-500/20 text-red-400'
-            }`}>
-              {error}
-            </div>
-          )}
+              {/* 邮箱输入框 */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-white/60 mb-2">
+                  {t.register.email}
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                />
+              </div>
 
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-white/60 mb-2">
-              {t.register.username}
-            </label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder={t.register.usernamePlaceholder}
-            />
+              {/* 密码输入框 */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-white/60 mb-2">
+                  {t.register.password}
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                />
+                <p className="mt-1 text-sm text-white/40">
+                  {t.register.passwordHint}
+                </p>
+              </div>
+
+              {/* 确认密码输入框 */}
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/60 mb-2">
+                  确认密码
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              {/* 错误提示 */}
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                  <p className="text-red-500 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* 提交按钮 */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-6 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? t.register.registering : t.register.submit}
+              </button>
+
+              {/* 登录链接 */}
+              <p className="text-center text-white/60">
+                {t.register.loginLink}{' '}
+                <Link href="/login" className="text-primary-500 hover:text-primary-400">
+                  登录
+                </Link>
+              </p>
+            </form>
           </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-white/60 mb-2">
-              {t.register.email}
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-white/60 mb-2">
-              {t.register.password}
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              required
-              minLength={6}
-            />
-            <p className="mt-1 text-sm text-white/40">
-              {t.register.passwordHint}
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary-500 text-white rounded-lg px-4 py-3 font-medium hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? t.register.registering : t.register.submit}
-          </button>
-
-          <p className="text-center text-white/60 text-sm">
-            {t.register.loginLink}{' '}
-            <Link href="/login" className="text-primary-400 hover:text-primary-300">
-              {t.nav.login}
-            </Link>
-          </p>
-        </form>
+        </div>
       </div>
     </div>
   );
@@ -166,22 +184,9 @@ export default function RegisterPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800 pt-16">
-        <Suspense fallback={
-          <div className="container max-w-md mx-auto py-20">
-            <div className="animate-pulse space-y-8">
-              <div className="h-8 bg-white/5 rounded w-3/4 mx-auto" />
-              <div className="space-y-6">
-                <div className="h-12 bg-white/5 rounded" />
-                <div className="h-12 bg-white/5 rounded" />
-                <div className="h-12 bg-white/5 rounded" />
-              </div>
-            </div>
-          </div>
-        }>
-          <RegisterForm />
-        </Suspense>
-      </main>
+      <Suspense fallback={<div>Loading...</div>}>
+        <RegisterForm />
+      </Suspense>
     </>
   );
 } 
