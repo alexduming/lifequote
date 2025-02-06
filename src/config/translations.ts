@@ -81,6 +81,12 @@ export type TranslationType = {
     filter: string;
     sort: string;
     total: string;
+    viewAll: string;
+    noResults: string;
+    searchPlaceholder: string;
+    category: string;
+    author: string;
+    source: string;
   };
   sections: {
     featured: {
@@ -240,10 +246,16 @@ export const translations: Record<Language, TranslationType> = {
       searchPlaceholder: 'Search quotes, authors, or topics...',
     },
     quotes: {
-      title: 'Featured Quotes',
+      title: 'All Quotes',
       filter: 'Filter',
       sort: 'Sort',
-      total: 'quotes',
+      total: '%d quotes',
+      viewAll: 'View All',
+      noResults: 'No quotes found',
+      searchPlaceholder: 'Search quotes...',
+      category: 'Category',
+      author: 'Author',
+      source: 'Source'
     },
     sections: {
       featured: {
@@ -321,12 +333,6 @@ export const translations: Record<Language, TranslationType> = {
       submit: 'Login',
       signingIn: 'Signing in...',
       registerLink: 'Don\'t have an account?',
-    },
-    quotes: {
-      title: 'All Quotes',
-      filter: 'Filter',
-      sort: 'Sort',
-      total: 'quotes',
     },
     profile: {
       title: 'Profile',
@@ -407,10 +413,16 @@ export const translations: Record<Language, TranslationType> = {
       searchPlaceholder: '搜索名言、作者或主题...',
     },
     quotes: {
-      title: '精选语录',
+      title: '所有语录',
       filter: '筛选',
       sort: '排序',
-      total: '条语录',
+      total: '%d 条语录',
+      viewAll: '查看全部',
+      noResults: '未找到语录',
+      searchPlaceholder: '搜索语录...',
+      category: '分类',
+      author: '作者',
+      source: '来源'
     },
     sections: {
       featured: {
@@ -488,12 +500,6 @@ export const translations: Record<Language, TranslationType> = {
       submit: '登录',
       signingIn: '登录中...',
       registerLink: '还没有账号？',
-    },
-    quotes: {
-      title: '所有语录',
-      filter: '筛选',
-      sort: '排序',
-      total: '条语录',
     },
     profile: {
       title: '个人资料',
