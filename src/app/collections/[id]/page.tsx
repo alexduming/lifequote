@@ -27,16 +27,16 @@ type CollectionDetail = {
 type Quote = {
   id: number;
   content: {
-    zh: string;
-    en: string;
+    content_zh: string;
+    content_en: string;
   };
   author: {
-    zh: string;
-    en: string;
+    author_zh: string;
+    author_en: string;
   };
   authorTitle: {
-    zh: string;
-    en: string;
+    author_title_zh: string;
+    author_title_en: string;
   };
   category: CategoryKey;
   likes: number;
@@ -125,16 +125,16 @@ export default function CollectionDetailPage({
         const formattedQuotes = quotesData.map(item => ({
           id: item.quotes.id,
           content: {
-            zh: item.quotes.content_zh,
-            en: item.quotes.content_en,
+            content_zh: item.quotes.content_zh,
+            content_en: item.quotes.content_en,
           },
           author: {
-            zh: item.quotes.author_zh,
-            en: item.quotes.author_en,
+            author_zh: item.quotes.author_zh,
+            author_en: item.quotes.author_en,
           },
           authorTitle: {
-            zh: item.quotes.author_title_zh,
-            en: item.quotes.author_title_en,
+            author_title_zh: item.quotes.author_title_zh,
+            author_title_en: item.quotes.author_title_en,
           },
           category: item.quotes.category,
           likes: item.quotes.likes || 0,
@@ -253,16 +253,21 @@ export default function CollectionDetailPage({
             {quotes.map(quote => (
               <QuoteCard
                 key={quote.id}
-                quote={quote.content}
-                author={quote.author}
-                authorTitle={quote.authorTitle}
+                quote={{
+                  content_zh: quote.content.content_zh,
+                  content_en: quote.content.content_en
+                }}
+                author={{
+                  author_zh: quote.author.author_zh,
+                  author_en: quote.author.author_en
+                }}
+                authorTitle={{
+                  author_title_zh: quote.authorTitle.author_title_zh || '',
+                  author_title_en: quote.authorTitle.author_title_en || ''
+                }}
                 category={quote.category}
                 likes={quote.likes}
-                onRemove={
-                  collection.user_id === user?.id
-                    ? () => handleRemoveQuote(quote.id)
-                    : undefined
-                }
+                onRemove={() => handleRemoveQuote(quote.id)}
               />
             ))}
           </div>
