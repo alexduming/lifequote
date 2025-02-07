@@ -14,6 +14,8 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ClientLayout from '@/components/ClientLayout';
@@ -24,6 +26,9 @@ const FeaturedQuotes = dynamic(() => import('@/components/FeaturedQuotes'), { ss
 const CategoriesGrid = dynamic(() => import('@/components/CategoriesGrid'), { ssr: false });
 
 export default function Home() {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   return (
     <ClientLayout>
       <div className="noise-bg">
@@ -32,15 +37,15 @@ export default function Home() {
           <section className="hero">
             {/* 标题部分 */}
             <h1 className="whitespace-pre-line">
-              {t('hero.title')}
+              {t.hero.title}
             </h1>
             {/* 副标题部分 - 添加 whitespace-pre-line */}
             <p className="whitespace-pre-line">
-              {t('hero.subtitle')}
+              {t.hero.subtitle}
             </p>
             {/* 搜索框部分 */}
             <div>
-              {t('hero.searchPlaceholder')}
+              {t.hero.searchPlaceholder}
             </div>
           </section>
           <FeaturedQuotes />
