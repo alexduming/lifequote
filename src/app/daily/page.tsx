@@ -83,18 +83,18 @@ export default function DailyPage() {
           </div>
           <QuoteCard
             quote={{
-              zh: dailyQuotes[0].quote_zh,
-              en: dailyQuotes[0].quote_en
+              content_zh: dailyQuotes[0].quote_zh,
+              content_en: dailyQuotes[0].quote_en
             }}
             author={{
-              zh: dailyQuotes[0].author_zh,
-              en: dailyQuotes[0].author_en
+              author_zh: dailyQuotes[0].author_zh,
+              author_en: dailyQuotes[0].author_en
             }}
             authorTitle={{
-              zh: dailyQuotes[0].author_title_zh,
-              en: dailyQuotes[0].author_title_en
+              author_title_zh: dailyQuotes[0].author_title_zh || '',
+              author_title_en: dailyQuotes[0].author_title_en || ''
             }}
-            category={dailyQuotes[0].category}
+            category={dailyQuotes[0].category as CategoryKey}
             likes={dailyQuotes[0].likes}
             isLiked={dailyQuotes[0].isLiked}
           />
@@ -110,18 +110,18 @@ export default function DailyPage() {
               <div key={index} className="animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
                 <QuoteCard
                   quote={{
-                    zh: quote.quote_zh,
-                    en: quote.quote_en
+                    content_zh: quote.quote_zh,
+                    content_en: quote.quote_en
                   }}
                   author={{
-                    zh: quote.author_zh,
-                    en: quote.author_en
+                    author_zh: quote.author_zh,
+                    author_en: quote.author_en
                   }}
                   authorTitle={{
-                    zh: quote.author_title_zh,
-                    en: quote.author_title_en
+                    author_title_zh: quote.author_title_zh || '',
+                    author_title_en: quote.author_title_en || ''
                   }}
-                  category={quote.category}
+                  category={quote.category as CategoryKey}
                   likes={quote.likes}
                   isLiked={quote.isLiked}
                 />
