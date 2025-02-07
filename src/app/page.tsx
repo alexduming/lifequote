@@ -29,7 +29,20 @@ export default function Home() {
       <div className="noise-bg">
         <Navbar />
         <main className="min-h-screen">
-          <HeroSection />
+          <section className="hero">
+            {/* 标题部分 */}
+            <h1 className="whitespace-pre-line">
+              {t('hero.title')}
+            </h1>
+            {/* 副标题部分 - 添加 whitespace-pre-line */}
+            <p className="whitespace-pre-line">
+              {t('hero.subtitle')}
+            </p>
+            {/* 搜索框部分 */}
+            <div>
+              {t('hero.searchPlaceholder')}
+            </div>
+          </section>
           <FeaturedQuotes />
           <CategoriesGrid />
         </main>
