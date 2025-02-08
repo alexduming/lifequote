@@ -27,8 +27,8 @@ type CollectionDetail = {
 type Quote = {
   id: number;
   content: {
-    content_zh: string;
-    content_en: string;
+    quote_zh: string;
+    quote_en: string;
   };
   author: {
     author_zh: string;
@@ -125,8 +125,8 @@ export default function CollectionDetailPage({
         const formattedQuotes = quotesData.map(item => ({
           id: item.quotes.id,
           content: {
-            content_zh: item.quotes.content_zh,
-            content_en: item.quotes.content_en,
+            quote_zh: item.quotes.content_zh,
+            quote_en: item.quotes.content_en,
           },
           author: {
             author_zh: item.quotes.author_zh,
@@ -254,8 +254,8 @@ export default function CollectionDetailPage({
               <QuoteCard
                 key={quote.id}
                 quote={{
-                  content_zh: quote.content.content_zh,
-                  content_en: quote.content.content_en
+                  quote_zh: quote.content.quote_zh,
+                  quote_en: quote.content.quote_en
                 }}
                 author={{
                   author_zh: quote.author.author_zh,
