@@ -261,7 +261,7 @@ export const translations: Record<Language, TranslationType> = {
       submit: 'Submit Quote',
     },
     hero: {
-      title: 'Discover Life\'s Wisdom\nFind Millennial Inspiration',
+      title: 'Words That Inspired Humanity for 1000 Years',
       subtitle: 'Explore the most influential thoughts in human history\nLet wisdom light your path of life',
       searchPlaceholder: 'Search quotes, authors, or topics...',
     },

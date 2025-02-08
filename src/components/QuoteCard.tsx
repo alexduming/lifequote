@@ -60,6 +60,10 @@ export interface QuoteCardProps {
   isFavorited?: boolean;
   quoteStyle?: keyof typeof QUOTE_STYLES;
   onRemove?: () => void;
+  book?: {
+    book_zh?: string;
+    book_en?: string;
+  };
 }
 
 /**
@@ -76,35 +80,26 @@ export default function QuoteCard({
   isLiked = false,
   isFavorited = false,
   quoteStyle = 'default',
-  onRemove
+  onRemove,
+  book
 }: QuoteCardProps) {
   const { language } = useLanguage();
   const t = translations[language];
   const style = QUOTE_STYLES[quoteStyle];
+  const [shareUrl, setShareUrl] = React.useState('');
+
+  // 在客户端设置分享 URL
+  React.useEffect(() => {
+    setShareUrl(`${window.location.origin}/quotes/${id}`);
+  }, [id]);
 
   // 获取分类的翻译名称
   const categoryName = t.categories[category];
 
-  // 分类标签的背景色映射
-  const categoryColors: Record<CategoryKey, string> = {
-    wisdom: 'bg-[#fdf2f2] text-[#D70050]',
-    inspiration: 'bg-[#fdf2f2] text-[#D70050]',
-    life: 'bg-[#fdf2f2] text-[#D70050]',
-    love: 'bg-[#fdf2f2] text-[#D70050]',
-    success: 'bg-[#fdf2f2] text-[#D70050]',
-    happiness: 'bg-[#fdf2f2] text-[#D70050]',
-    friendship: 'bg-[#fdf2f2] text-[#D70050]',
-    family: 'bg-[#fdf2f2] text-[#D70050]',
-    literature: 'bg-[#fdf2f2] text-[#D70050]',
-    art: 'bg-[#fdf2f2] text-[#D70050]',
-    philosophy: 'bg-[#fdf2f2] text-[#D70050]',
-    science: 'bg-[#fdf2f2] text-[#D70050]',
-    history: 'bg-[#fdf2f2] text-[#D70050]',
-    politics: 'bg-[#fdf2f2] text-[#D70050]',
-    economics: 'bg-[#fdf2f2] text-[#D70050]',
-    education: 'bg-[#fdf2f2] text-[#D70050]',
-    motivation: 'bg-[#fdf2f2] text-[#D70050]'
-  };
+  // 获取当前语言的文本
+  const currentQuote = language === 'zh' ? quote.quote_zh : quote.quote_en;
+  const currentAuthor = language === 'zh' ? author.author_zh : author.author_en;
+  const currentBook = book ? (language === 'zh' ? book.book_zh : book.book_en) : undefined;
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden">
@@ -116,14 +111,14 @@ export default function QuoteCard({
       <div className="relative z-10">
         <blockquote className="relative z-10 pl-4">
           <p className="text-lg text-dark-900 leading-relaxed">
-            {language === 'zh' ? quote.quote_zh : quote.quote_en}
+            {currentQuote}
           </p>
         </blockquote>
 
         <div className="mt-4 pl-4">
           <div>
             <cite className="not-italic font-medium text-[#D70050] block">
-              {language === 'zh' ? author.author_zh : author.author_en}
+              {currentAuthor}
             </cite>
             {authorTitle && (
               <p className="text-sm text-dark-500 mt-1">
@@ -146,11 +141,11 @@ export default function QuoteCard({
               initialIsFavorited={isFavorited}
             />
             <ShareButton
-              url={`${window.location.origin}/quotes/${id}`}
-              title="LifeQuote"
-              text={`${language === 'zh' ? quote.quote_zh : quote.quote_en} - ${
-                language === 'zh' ? author.author_zh : author.author_en
-              }`}
+              url={shareUrl}
+              title={currentAuthor}
+              text={currentQuote}
+              author={currentAuthor}
+              book={currentBook}
             />
           </div>
 

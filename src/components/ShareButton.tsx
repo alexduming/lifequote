@@ -15,6 +15,8 @@ interface ShareButtonProps {
   url: string;
   title: string;
   text: string;
+  author: string;
+  book?: string;
   disabled?: boolean;
 }
 
@@ -22,7 +24,7 @@ interface ShareButtonProps {
  * 分享按钮组件
  * @param props - 组件属性
  */
-export default function ShareButton({ url, title, text, disabled = false }: ShareButtonProps) {
+export default function ShareButton({ url, title, text, author, book, disabled = false }: ShareButtonProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const { language } = useLanguage();
   const t = translations[language];
@@ -51,6 +53,8 @@ export default function ShareButton({ url, title, text, disabled = false }: Shar
           url={url}
           title={title}
           text={text}
+          author={author}
+          book={book}
           onClose={handleCloseShareMenu}
         />
       )}

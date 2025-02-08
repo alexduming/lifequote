@@ -50,6 +50,8 @@ module.exports = {
         sans: ['Inter', 'sans-serif'],
         serif: ['Merriweather', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
+        oswald: ['var(--font-oswald)'],
+        'noto-sans': ['var(--font-noto-sans)'],
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-in-out',

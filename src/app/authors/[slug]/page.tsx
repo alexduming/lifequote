@@ -35,7 +35,17 @@ interface AuthorData {
     books: number;
   };
   categories: CategoryKey[];
-  quotes: Quote[];
+  quotes: Array<{
+    id: number;
+    quote_zh: string;
+    quote_en: string;
+    author_zh: string;
+    author_en: string;
+    author_title_zh: string | null;
+    author_title_en: string | null;
+    category: CategoryKey;
+    likes: number;
+  }>;
 }
 
 /**
@@ -70,6 +80,19 @@ async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
     const categories = Array.from(new Set(quotes.map((q: Quote) => q.category))) as CategoryKey[];
     const books = Array.from(new Set(quotes.map((q: Quote) => q.book_en).filter(Boolean)));
 
+    // 转换引用数据以匹配 AuthorData 接口
+    const formattedQuotes = quotes.map(q => ({
+      id: q.id,
+      quote_zh: q.quote_zh,
+      quote_en: q.quote_en,
+      author_zh: q.author_zh,
+      author_en: q.author_en,
+      author_title_zh: q.author_title_zh,
+      author_title_en: q.author_title_en,
+      category: q.category as CategoryKey,
+      likes: q.likes
+    }));
+
     console.log('成功获取作者数据:', {
       name: firstQuote.author_en,
       quotesCount: quotes.length,
@@ -96,7 +119,7 @@ async function getAuthorBySlug(authorSlug: string): Promise<AuthorData | null> {
         books: books.length,
       },
       categories,
-      quotes,
+      quotes: formattedQuotes,
     };
   } catch (error) {
     console.error('获取作者数据时出错:', error);
@@ -325,6 +348,7 @@ export default function AuthorPage({
                 {authorData.quotes.map((quote) => (
                   <QuoteCard
                     key={quote.id}
+                    id={quote.id}
                     quote={{
                       quote_zh: quote.quote_zh,
                       quote_en: quote.quote_en
