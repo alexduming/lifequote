@@ -113,7 +113,7 @@ function SearchResults() {
           {results.results.map((quote) => (
             <div key={quote.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
               <blockquote className="text-xl text-gray-800 mb-4">
-                "{language === 'zh' ? quote.quote_zh : quote.quote_en}"
+                "{language === 'zh' ? quote.content_zh : quote.content_en}"
               </blockquote>
               <div className="flex items-center justify-between text-sm">
                 <div className="space-y-1">
