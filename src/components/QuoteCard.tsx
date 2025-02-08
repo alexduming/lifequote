@@ -39,8 +39,8 @@ const QUOTE_STYLES = {
  */
 export interface QuoteCardProps {
   quote: {
-    content_zh: string;
-    content_en: string;
+    quote_zh: string;
+    quote_en: string;
   };
   author: {
     author_zh: string;
@@ -117,7 +117,7 @@ export default function QuoteCard({
       <div className="relative z-10">
         <blockquote className="relative z-10 pl-4">
           <p className="text-lg text-dark-900 leading-relaxed">
-            {language === 'zh' ? quote.content_zh : quote.content_en}
+            {language === 'zh' ? quote.quote_zh : quote.quote_en}
           </p>
         </blockquote>
 

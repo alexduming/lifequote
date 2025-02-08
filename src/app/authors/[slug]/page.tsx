@@ -326,8 +326,8 @@ export default function AuthorPage({
                   <QuoteCard
                     key={quote.id}
                     quote={{
-                      content_zh: quote.content_zh,
-                      content_en: quote.content_en
+                      content_zh: quote.quote_zh,
+                      content_en: quote.quote_en
                     }}
                     author={{
                       author_zh: quote.author_zh,

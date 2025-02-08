@@ -83,8 +83,8 @@ export default function DailyPage() {
           </div>
           <QuoteCard
             quote={{
-              content_zh: dailyQuotes[0].quote_zh,
-              content_en: dailyQuotes[0].quote_en
+              quote_zh: dailyQuotes[0].quote_zh,
+              quote_en: dailyQuotes[0].quote_en
             }}
             author={{
               author_zh: dailyQuotes[0].author_zh,
@@ -110,8 +110,8 @@ export default function DailyPage() {
               <div key={index} className="animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
                 <QuoteCard
                   quote={{
-                    content_zh: quote.quote_zh,
-                    content_en: quote.quote_en
+                    quote_zh: quote.quote_zh,
+                    quote_en: quote.quote_en
                   }}
                   author={{
                     author_zh: quote.author_zh,
