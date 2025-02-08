@@ -214,8 +214,8 @@ export default function BookPage({ params }: { params: { slug: string } }) {
                   <QuoteCard
                     key={quote.id}
                     quote={{
-                      content_zh: quote.content_zh,
-                      content_en: quote.content_en
+                      quote_zh: quote.content_zh,
+                      quote_en: quote.content_en
                     }}
                     author={{
                       author_zh: quote.author_zh,

@@ -12,8 +12,8 @@ import type { Database } from '@/types/supabase';
 type QuoteData = {
   id: number;
   content: {
-    content_zh: string;
-    content_en: string;
+    quote_zh: string;
+    quote_en: string;
   };
   author: {
     author_zh: string;
@@ -88,8 +88,8 @@ export default function FavoritesPage() {
         const quotes = (data || []).map(f => ({
           id: f.quotes.id,
           content: {
-            content_zh: f.quotes.content_zh,
-            content_en: f.quotes.content_en,
+            quote_zh: f.quotes.content_zh,
+            quote_en: f.quotes.content_en,
           },
           author: {
             author_zh: f.quotes.author_zh,
