@@ -9,8 +9,8 @@ export interface Database {
       quotes: {
         Row: {
           id: string
-          content_zh: string
-          content_en: string
+          quote_zh: string
+          quote_en: string
           author_zh: string
           author_en: string
           author_title_zh: string | null
@@ -27,8 +27,8 @@ export interface Database {
         }
         Insert: {
           id?: string
-          content_zh: string
-          content_en: string
+          quote_zh: string
+          quote_en: string
           author_zh: string
           author_en: string
           author_title_zh?: string | null
@@ -45,8 +45,8 @@ export interface Database {
         }
         Update: {
           id?: string
-          content_zh?: string
-          content_en?: string
+          quote_zh?: string
+          quote_en?: string
           author_zh?: string
           author_en?: string
           author_title_zh?: string | null
