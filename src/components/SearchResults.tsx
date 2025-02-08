@@ -2,11 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import type { Database } from '@/types/database.types';
+import type { Quote } from '@/lib/database.types';
 import { Language, translations } from '@/config/translations';
 import { ArrowRight } from 'lucide-react';
-
-type Quote = Database['public']['Tables']['quotes']['Row'];
 
 interface SearchResultsProps {
   results: Quote[];

@@ -7,33 +7,15 @@ import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
 import type { CategoryKey } from '@/config/translations';
-import type { Database } from '@/types/supabase';
-
-type QuoteData = {
-  id: number;
-  quote: {
-    quote_zh: string;
-    quote_en: string;
-  };
-  author: {
-    author_zh: string;
-    author_en: string;
-  };
-  authorTitle: {
-    author_title_zh: string;
-    author_title_en: string;
-  };
-  category: CategoryKey;
-  likes: number;
-};
+import type { Quote } from '@/lib/database.types';
 
 type FavoriteWithQuote = {
   quote_id: number;
-  quotes: Database['public']['Tables']['quotes']['Row'];
+  quotes: Quote;
 };
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<QuoteData[]>([]);
+  const [favorites, setFavorites] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,8 +50,8 @@ export default function FavoritesPage() {
             quote_id,
             quotes (
               id,
-              content_zh,
-              content_en,
+              quote_zh,
+              quote_en,
               author_zh,
               author_en,
               author_title_zh,
@@ -87,20 +69,20 @@ export default function FavoritesPage() {
         // 转换数据结构
         const quotes = (data || []).map(f => ({
           id: f.quotes.id,
-          quote: {
-            quote_zh: f.quotes.content_zh,
-            quote_en: f.quotes.content_en,
-          },
-          author: {
-            author_zh: f.quotes.author_zh,
-            author_en: f.quotes.author_en,
-          },
-          authorTitle: {
-            author_title_zh: f.quotes.author_title_zh || '',
-            author_title_en: f.quotes.author_title_en || '',
-          },
-          category: f.quotes.category as CategoryKey,
+          quote_zh: f.quotes.quote_zh,
+          quote_en: f.quotes.quote_en,
+          author_zh: f.quotes.author_zh,
+          author_en: f.quotes.author_en,
+          author_title_zh: f.quotes.author_title_zh || '',
+          author_title_en: f.quotes.author_title_en || '',
+          category: f.quotes.category,
           likes: f.quotes.likes || 0,
+          views: 0,
+          period_zh: null,
+          period_en: null,
+          book: null,
+          book_en: null,
+          created_at: new Date().toISOString()
         }));
 
         setFavorites(quotes);
@@ -158,10 +140,19 @@ export default function FavoritesPage() {
               {favorites.map((quote) => (
                 <QuoteCard
                   key={quote.id}
-                  quote={quote.quote}
-                  author={quote.author}
-                  authorTitle={quote.authorTitle}
-                  category={quote.category}
+                  quote={{
+                    quote_zh: quote.quote_zh,
+                    quote_en: quote.quote_en
+                  }}
+                  author={{
+                    author_zh: quote.author_zh,
+                    author_en: quote.author_en
+                  }}
+                  authorTitle={{
+                    author_title_zh: quote.author_title_zh || '',
+                    author_title_en: quote.author_title_en || ''
+                  }}
+                  category={quote.category as CategoryKey}
                   likes={quote.likes}
                   isFavorited={true}
                   onFavorite={() => handleRemoveFavorite(quote.id)}

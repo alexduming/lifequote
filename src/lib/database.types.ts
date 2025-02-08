@@ -67,8 +67,9 @@ export interface Database {
   }
 }
 
+// 统一的 Quote 类型定义，供所有组件使用
 export interface Quote {
-  id: string;
+  id: number;
   quote_zh: string;
   quote_en: string;
   author_zh: string;
@@ -83,5 +84,4 @@ export interface Quote {
   book: string | null;
   book_en: string | null;
   created_at: string;
-  updated_at: string;
 } 
