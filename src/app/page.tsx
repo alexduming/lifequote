@@ -34,18 +34,29 @@ export default function Home() {
       <div className="noise-bg">
         <Navbar />
         <main className="min-h-screen">
-          <section className="hero">
-            {/* 标题部分 */}
-            <h1 className="whitespace-pre-line">
-              {t.hero.title}
-            </h1>
-            {/* 副标题部分 - 添加 whitespace-pre-line */}
-            <p className="whitespace-pre-line">
-              {t.hero.subtitle}
-            </p>
-            {/* 搜索框部分 */}
-            <div>
-              {t.hero.searchPlaceholder}
+          <section className="relative py-20 md:py-32">
+            <div className="container relative">
+              <div className="max-w-4xl mx-auto text-center space-y-8">
+                {/* 标题部分 */}
+                <h1 className="text-5xl md:text-7xl font-[oswald] font-bold gradient-text animate-float whitespace-pre-line tracking-tight uppercase !leading-tight">
+                  {t.hero.title}
+                </h1>
+                {/* 副标题部分 */}
+                <p className="text-xl md:text-2xl text-dark-600 max-w-6xl mx-auto font-light whitespace-pre-line">
+                  {t.hero.subtitle}
+                </p>
+                {/* 搜索框部分 */}
+                <div className="max-w-2xl mx-auto mt-12">
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder={t.hero.searchPlaceholder}
+                      className="w-full h-14 px-6 rounded-xl bg-white text-lg shadow-sm focus:ring-2 focus:ring-primary-500/50 border border-gray-200 focus:border-primary-500 transition-shadow hover:shadow-md"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
           <FeaturedQuotes />
