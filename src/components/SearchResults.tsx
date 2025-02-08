@@ -9,7 +9,9 @@ import React from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations, CategoryKey } from '@/config/translations';
-import type { Quote } from '@/lib/database.types';
+import type { Database } from '@/lib/database.types';
+
+type Quote = Database['public']['Tables']['quotes']['Row'];
 
 interface SearchResultsProps {
   results: Quote[];
@@ -62,7 +64,7 @@ export default function SearchResults({ results, total, language, onClose, searc
                 className="block p-4 bg-gray-50 text-center text-primary-600 hover:text-primary-700 font-medium transition-colors group"
                 onClick={onClose}
               >
-                {t.search.viewAll}
+                {language === 'zh' ? '查看全部结果' : 'View All Results'}
                 <ArrowRight className="inline-block ml-2 group-hover:translate-x-1 transition-transform" size={16} />
               </a>
             )}
