@@ -73,8 +73,8 @@ export default function FeaturedQuotes() {
           <div key={quote.id} className="animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
             <QuoteCard
               quote={{
-                quote_zh: quote.content_zh,
-                quote_en: quote.content_en
+                quote_zh: quote.quote_zh || quote.content_zh,
+                quote_en: quote.quote_en || quote.content_en
               }}
               author={{
                 author_zh: quote.author_zh,

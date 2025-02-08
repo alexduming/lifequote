@@ -190,6 +190,21 @@ export type TranslationType = {
       nameRequired: string;
     };
   };
+  submit: {
+    title: string;
+    quoteZh: string;
+    quoteEn: string;
+    quoteZhPlaceholder: string;
+    quoteEnPlaceholder: string;
+    authorZh: string;
+    authorEn: string;
+    authorTitleZh: string;
+    authorTitleEn: string;
+    category: string;
+    source: string;
+    notes: string;
+    submit: string;
+  };
 };
 
 export const translations: Record<Language, TranslationType> = {
@@ -360,6 +375,21 @@ export const translations: Record<Language, TranslationType> = {
         nameRequired: 'Please enter a collection name',
       },
     },
+    submit: {
+      title: 'Submit New Quote',
+      quoteZh: 'Chinese Quote',
+      quoteEn: 'English Quote',
+      quoteZhPlaceholder: 'Enter the quote in Chinese',
+      quoteEnPlaceholder: 'Enter the quote in English',
+      authorZh: 'Author Name (Chinese)',
+      authorEn: 'Author Name (English)',
+      authorTitleZh: 'Author Title (Chinese)',
+      authorTitleEn: 'Author Title (English)',
+      category: 'Category',
+      source: 'Source',
+      notes: 'Notes',
+      submit: 'Submit'
+    },
   },
   zh: {
     common: {
@@ -527,6 +557,21 @@ export const translations: Record<Language, TranslationType> = {
       errors: {
         nameRequired: '请输入收藏夹名称',
       },
+    },
+    submit: {
+      title: '提交新语录',
+      quoteZh: '中文语录',
+      quoteEn: '英文语录',
+      quoteZhPlaceholder: '请输入中文语录内容',
+      quoteEnPlaceholder: '请输入英文语录内容',
+      authorZh: '作者中文名',
+      authorEn: '作者英文名',
+      authorTitleZh: '作者中文头衔',
+      authorTitleEn: '作者英文头衔',
+      category: '分类',
+      source: '出处',
+      notes: '备注',
+      submit: '提交'
     },
   },
 }; 

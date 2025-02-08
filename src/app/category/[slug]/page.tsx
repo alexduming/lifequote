@@ -93,8 +93,8 @@ export default async function CategoryPage({
                   <QuoteCard
                     key={quote.id}
                     quote={{
-                      quote_zh: quote.content_zh,
-                      quote_en: quote.content_en
+                      quote_zh: quote.quote_zh || quote.content_zh,
+                      quote_en: quote.quote_en || quote.content_en
                     }}
                     author={{
                       author_zh: quote.author_zh,
@@ -106,6 +106,7 @@ export default async function CategoryPage({
                     }}
                     category={quote.category as CategoryKey}
                     likes={quote.likes}
+                    isLiked={false}
                   />
                 ))}
               </div>

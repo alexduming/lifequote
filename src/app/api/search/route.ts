@@ -66,8 +66,18 @@ export async function GET(request: NextRequest) {
     const endTime = Date.now();
     console.log(`Search completed in ${endTime - startTime}ms`);
     
+    // 转换数据格式
+    const transformedResults = results?.map(quote => ({
+      ...quote,
+      quote_zh: quote.content_zh,
+      quote_en: quote.content_en,
+      // 删除旧字段
+      content_zh: undefined,
+      content_en: undefined,
+    })) || [];
+    
     return NextResponse.json({
-      results: results || [],
+      results: transformedResults,
       total: count || 0,
       pagination: {
         currentPage: page,

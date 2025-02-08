@@ -8,45 +8,46 @@ import { useRouter } from 'next/navigation';
 import { Send } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import type { CategoryKey } from '@/config/translations';
+import { toast } from 'sonner';
 
 /**
  * 语录提交表单类型
  */
-type QuoteSubmission = {
-  content_zh: string;
-  content_en: string;
+interface FormData {
+  quote_zh: string;
+  quote_en: string;
   author_zh: string;
   author_en: string;
   author_title_zh: string;
   author_title_en: string;
-  category: CategoryKey;
-  source?: string;
-  notes?: string;
-};
+  category: string;
+  source: string;
+  notes: string;
+}
 
 /**
  * 语录提交页面组件
  * @returns {JSX.Element} 语录提交页面
  */
 export default function SubmitQuotePage() {
-  const [formData, setFormData] = useState<QuoteSubmission>({
-    content_zh: '',
-    content_en: '',
+  const { language } = useLanguage();
+  const t = translations[language];
+  const [formData, setFormData] = useState<FormData>({
+    quote_zh: '',
+    quote_en: '',
     author_zh: '',
     author_en: '',
     author_title_zh: '',
     author_title_en: '',
-    category: 'wisdom',
+    category: '',
     source: '',
-    notes: '',
+    notes: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { user, supabase } = useAuth();
-  const { language } = useLanguage();
   const router = useRouter();
-  const t = translations[language];
 
   // 处理表单提交
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,18 +55,25 @@ export default function SubmitQuotePage() {
     setLoading(true);
     setError(null);
 
-    try {
-      // 验证必填字段
-      if (!formData.content_zh || !formData.content_en) {
-        throw new Error('请填写中英文语录内容');
-      }
-      if (!formData.author_zh || !formData.author_en) {
-        throw new Error('请填写作者姓名');
-      }
-      if (!formData.author_title_zh || !formData.author_title_en) {
-        throw new Error('请填写作者头衔');
-      }
+    // 验证必填字段
+    if (!formData.quote_zh || !formData.quote_en) {
+      toast.error('请填写中英文语录');
+      return;
+    }
+    if (!formData.author_zh || !formData.author_en) {
+      toast.error('请填写作者中英文名');
+      return;
+    }
+    if (!formData.author_title_zh || !formData.author_title_en) {
+      toast.error('请填写作者头衔');
+      return;
+    }
+    if (!formData.category) {
+      toast.error('请选择分类');
+      return;
+    }
 
+    try {
       // 提交语录
       const { error: submitError } = await supabase
         .from('quotes')
@@ -79,10 +87,23 @@ export default function SubmitQuotePage() {
 
       // 提交成功，跳转到首页
       router.push('/');
-      alert('语录提交成功，等待审核');
+      toast.success('语录提交成功，等待审核');
+      // 重置表单
+      setFormData({
+        quote_zh: '',
+        quote_en: '',
+        author_zh: '',
+        author_en: '',
+        author_title_zh: '',
+        author_title_en: '',
+        category: '',
+        source: '',
+        notes: ''
+      });
     } catch (err: any) {
       console.error('提交语录失败:', err.message);
       setError(err.message);
+      toast.error('提交失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -106,7 +127,7 @@ export default function SubmitQuotePage() {
         {/* 页面标题 */}
         <div className="max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl font-[oswald] font-bold text-white mb-4">
-            提交新语录
+            {t.submit.title}
           </h1>
           <p className="text-white/60">
             感谢您为 LifeQuote 贡献新的语录。请确保提供准确的中英文内容和作者信息。
@@ -119,28 +140,28 @@ export default function SubmitQuotePage() {
           <div className="grid gap-6">
             <div>
               <label className="block text-white/60 text-sm mb-2">
-                中文语录内容 *
+                {t.submit.quoteZh} *
               </label>
               <textarea
-                name="content_zh"
-                value={formData.content_zh}
+                name="quote_zh"
+                value={formData.quote_zh}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-white/5 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="请输入中文语录内容"
+                placeholder={t.submit.quoteZhPlaceholder}
                 rows={3}
                 required
               />
             </div>
             <div>
               <label className="block text-white/60 text-sm mb-2">
-                英文语录内容 *
+                {t.submit.quoteEn} *
               </label>
               <textarea
-                name="content_en"
-                value={formData.content_en}
+                name="quote_en"
+                value={formData.quote_en}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-white/5 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Please enter the quote in English"
+                placeholder={t.submit.quoteEnPlaceholder}
                 rows={3}
                 required
               />

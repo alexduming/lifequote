@@ -24,23 +24,17 @@ type CollectionDetail = {
 /**
  * 语录类型定义
  */
-type Quote = {
+interface Quote {
   id: number;
-  content: {
-    quote_zh: string;
-    quote_en: string;
-  };
-  author: {
-    author_zh: string;
-    author_en: string;
-  };
-  authorTitle: {
-    author_title_zh: string;
-    author_title_en: string;
-  };
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh: string | null;
+  author_title_en: string | null;
   category: CategoryKey;
   likes: number;
-};
+}
 
 /**
  * 数据库返回的语录类型
@@ -48,8 +42,8 @@ type Quote = {
 type QuoteFromDB = {
   quotes: {
     id: number;
-    content_zh: string;
-    content_en: string;
+    quote_zh: string;
+    quote_en: string;
     author_zh: string;
     author_en: string;
     author_title_zh: string;
@@ -58,6 +52,18 @@ type QuoteFromDB = {
     likes: number;
   };
 };
+
+interface QuoteWithContent {
+  id: number;
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh: string | null;
+  author_title_en: string | null;
+  category: string;
+  likes: number;
+}
 
 /**
  * 收藏夹详情页面组件
@@ -105,8 +111,8 @@ export default function CollectionDetailPage({
             quote_id,
             quotes (
               id,
-              content_zh,
-              content_en,
+              quote_zh,
+              quote_en,
               author_zh,
               author_en,
               author_title_zh,
@@ -122,25 +128,19 @@ export default function CollectionDetailPage({
         if (quotesError) throw quotesError;
 
         // 转换数据结构
-        const formattedQuotes = quotesData.map(item => ({
+        const quotes = quotesData.map(item => ({
           id: item.quotes.id,
-          content: {
-            quote_zh: item.quotes.content_zh,
-            quote_en: item.quotes.content_en,
-          },
-          author: {
-            author_zh: item.quotes.author_zh,
-            author_en: item.quotes.author_en,
-          },
-          authorTitle: {
-            author_title_zh: item.quotes.author_title_zh,
-            author_title_en: item.quotes.author_title_en,
-          },
-          category: item.quotes.category,
-          likes: item.quotes.likes || 0,
+          quote_zh: item.quotes.quote_zh,
+          quote_en: item.quotes.quote_en,
+          author_zh: item.quotes.author_zh,
+          author_en: item.quotes.author_en,
+          author_title_zh: item.quotes.author_title_zh || '',
+          author_title_en: item.quotes.author_title_en || '',
+          category: item.quotes.category as CategoryKey,
+          likes: item.quotes.likes || 0
         }));
 
-        setQuotes(formattedQuotes);
+        setQuotes(quotes);
       } catch (err: any) {
         console.error('加载收藏夹详情失败:', err.message);
         setError(err.message);
@@ -254,18 +254,18 @@ export default function CollectionDetailPage({
               <QuoteCard
                 key={quote.id}
                 quote={{
-                  quote_zh: quote.content.quote_zh,
-                  quote_en: quote.content.quote_en
+                  quote_zh: quote.quote_zh,
+                  quote_en: quote.quote_en
                 }}
                 author={{
-                  author_zh: quote.author.author_zh,
-                  author_en: quote.author.author_en
+                  author_zh: quote.author_zh,
+                  author_en: quote.author_en
                 }}
                 authorTitle={{
-                  author_title_zh: quote.authorTitle.author_title_zh || '',
-                  author_title_en: quote.authorTitle.author_title_en || ''
+                  author_title_zh: quote.author_title_zh || '',
+                  author_title_en: quote.author_title_en || ''
                 }}
-                category={quote.category}
+                category={quote.category as CategoryKey}
                 likes={quote.likes}
                 onRemove={() => handleRemoveQuote(quote.id)}
               />

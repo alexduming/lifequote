@@ -6,9 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import { QUICK_CATEGORIES } from '@/config/constants';
 import SearchResults from '@/components/SearchResults';
-import type { Database } from '@/types/database.types';
-
-type Quote = Database['public']['Tables']['quotes']['Row'];
+import type { Quote } from '@/lib/database.types';
 
 const quickCategories = QUICK_CATEGORIES;
 
@@ -49,8 +47,25 @@ export default function HeroSection() {
         }
         
         const data = await response.json();
-        console.log('搜索结果:', data);
-        setSearchResults(data);
+        // 确保返回的数据符合 Quote 类型
+        const quotes: Quote[] = data.results.map((quote: any) => ({
+          id: quote.id,
+          quote_zh: quote.quote_zh || quote.content_zh,
+          quote_en: quote.quote_en || quote.content_en,
+          author_zh: quote.author_zh,
+          author_en: quote.author_en,
+          author_title_zh: quote.author_title_zh || null,
+          author_title_en: quote.author_title_en || null,
+          category: quote.category,
+          likes: quote.likes || 0,
+          views: quote.views || 0,
+          period_zh: quote.period_zh || null,
+          period_en: quote.period_en || null,
+          book: quote.book || null,
+          book_en: quote.book_en || null,
+          created_at: quote.created_at || new Date().toISOString()
+        }));
+        setSearchResults({ results: quotes, total: data.total });
       } catch (error) {
         console.error('搜索失败:', error);
         setSearchResults({ results: [], total: 0 });

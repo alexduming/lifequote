@@ -10,7 +10,33 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language, CategoryKey } from '@/config/translations';
 import type { Database } from '@/types/database.types';
 
-type Quote = Database['public']['Tables']['quotes']['Row'];
+interface QuoteData {
+  id: number;
+  content_zh: string;
+  content_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh: string | null;
+  author_title_en: string | null;
+  category: string;
+  likes: number;
+  book: string | null;
+  book_en: string | null;
+}
+
+interface Quote {
+  id: number;
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh: string | null;
+  author_title_en: string | null;
+  category: CategoryKey;
+  likes: number;
+  book: string | null;
+  book_en: string | null;
+}
 
 // 生成规范化的slug
 function generateSlug(text: string) {
@@ -22,10 +48,10 @@ function generateSlug(text: string) {
 // 获取页面数据
 async function getBookPageData(slug: string) {
   const response = await fetch('/api/quotes');
-  const quotes = await response.json();
+  const quotesData = await response.json();
   
   // 查找匹配的书籍
-  const bookQuotes = quotes.filter((quote: Quote) => {
+  const bookQuotes = quotesData.filter((quote: QuoteData) => {
     const bookSlug = generateSlug(quote.book_en || '');
     return bookSlug === slug;
   });
@@ -34,21 +60,36 @@ async function getBookPageData(slug: string) {
     return null;
   }
 
+  // 转换数据结构
+  const quotes = bookQuotes.map((quote: QuoteData) => ({
+    id: quote.id,
+    quote_zh: quote.content_zh,
+    quote_en: quote.content_en,
+    author_zh: quote.author_zh,
+    author_en: quote.author_en,
+    author_title_zh: quote.author_title_zh || '',
+    author_title_en: quote.author_title_en || '',
+    category: quote.category as CategoryKey,
+    likes: quote.likes || 0,
+    book: quote.book || null,
+    book_en: quote.book_en || null
+  }));
+
   // 获取书籍信息
-  const firstQuote = bookQuotes[0];
+  const firstQuote = quotes[0];
   const bookData = {
     title: {
-      zh: firstQuote.book,
-      en: firstQuote.book_en,
+      zh: firstQuote.book || '',
+      en: firstQuote.book_en || '',
     },
     description: {
       zh: '这是一本充满智慧的经典著作，包含了许多发人深省的观点和思考。',
       en: 'This is a classic work full of wisdom, containing many thought-provoking insights and reflections.',
     },
-    quotes: bookQuotes,
-    authors: Array.from(new Set(bookQuotes.map((quote: Quote) => quote.author_zh))),
-    categories: Array.from(new Set(bookQuotes.map((quote: Quote) => quote.category))),
-    coverImage: `/images/books/${generateSlug(firstQuote.book_en)}.jpg`,
+    quotes: quotes,
+    authors: Array.from(new Set(quotes.map((quote: Quote) => quote.author_zh))),
+    categories: Array.from(new Set(quotes.map((quote: Quote) => quote.category))),
+    coverImage: `/images/books/${generateSlug(firstQuote.book_en || '')}.jpg`,
   };
 
   return bookData;
@@ -214,8 +255,8 @@ export default function BookPage({ params }: { params: { slug: string } }) {
                   <QuoteCard
                     key={quote.id}
                     quote={{
-                      quote_zh: quote.content_zh,
-                      quote_en: quote.content_en
+                      quote_zh: quote.quote_zh,
+                      quote_en: quote.quote_en
                     }}
                     author={{
                       author_zh: quote.author_zh,
@@ -227,6 +268,7 @@ export default function BookPage({ params }: { params: { slug: string } }) {
                     }}
                     category={quote.category as CategoryKey}
                     likes={quote.likes}
+                    isLiked={false}
                   />
                 ))}
               </div>
