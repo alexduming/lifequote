@@ -52,7 +52,7 @@ export default function SearchResults({ results = [], total = 0, language, onClo
         {previewResults.map((quote) => (
           <div key={quote.id} className="p-4 hover:bg-gray-50">
             <blockquote className="text-gray-800 mb-2">
-              "{language === 'zh' ? quote.content_zh : quote.content_en}"
+              "{language === 'zh' ? quote.quote_zh : quote.quote_en}"
             </blockquote>
             <div className="flex items-center justify-between text-sm">
               <div>

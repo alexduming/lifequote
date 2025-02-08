@@ -15,8 +15,8 @@ import type { CategoryKey } from '@/config/translations';
 
 type QuoteForReview = {
   id: string;
-  content_zh: string;
-  content_en: string;
+  quote_zh: string;
+  quote_en: string;
   author_zh: string;
   author_en: string;
   author_title_zh: string;
@@ -160,11 +160,11 @@ export default function AdminQuotesPage() {
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div>
                     <h3 className="text-white/60 text-sm mb-2">中文内容</h3>
-                    <p className="text-white text-lg">{quote.content_zh}</p>
+                    <p className="text-white text-lg">{quote.quote_zh}</p>
                   </div>
                   <div>
                     <h3 className="text-white/60 text-sm mb-2">英文内容</h3>
-                    <p className="text-white text-lg">{quote.content_en}</p>
+                    <p className="text-white text-lg">{quote.quote_en}</p>
                   </div>
                 </div>
 

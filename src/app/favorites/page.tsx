@@ -11,7 +11,7 @@ import type { Database } from '@/types/supabase';
 
 type QuoteData = {
   id: number;
-  content: {
+  quote: {
     quote_zh: string;
     quote_en: string;
   };
@@ -87,7 +87,7 @@ export default function FavoritesPage() {
         // 转换数据结构
         const quotes = (data || []).map(f => ({
           id: f.quotes.id,
-          content: {
+          quote: {
             quote_zh: f.quotes.content_zh,
             quote_en: f.quotes.content_en,
           },
@@ -158,7 +158,7 @@ export default function FavoritesPage() {
               {favorites.map((quote) => (
                 <QuoteCard
                   key={quote.id}
-                  quote={quote.content}
+                  quote={quote.quote}
                   author={quote.author}
                   authorTitle={quote.authorTitle}
                   category={quote.category}
