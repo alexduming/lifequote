@@ -1,3 +1,8 @@
+/**
+ * Hero Section 组件
+ * @module HeroSection
+ */
+
 'use client';
 
 import React from 'react';
@@ -10,6 +15,9 @@ import type { Quote } from '@/lib/database.types';
 
 const quickCategories = QUICK_CATEGORIES;
 
+/**
+ * Hero Section 组件
+ */
 export default function HeroSection() {
   const { language } = useLanguage();
   const t = translations[language];
@@ -18,8 +26,11 @@ export default function HeroSection() {
   const [isSearching, setIsSearching] = React.useState(false);
   const searchTimeoutRef = React.useRef<NodeJS.Timeout>();
 
-  // 处理搜索
-  const handleSearch = async (query: string) => {
+  /**
+   * 处理搜索
+   * @param query - 搜索关键词
+   */
+  const handleSearch = (query: string) => {
     setSearchQuery(query);
     
     if (searchTimeoutRef.current) {
@@ -75,7 +86,9 @@ export default function HeroSection() {
     }, 300);
   };
 
-  // 清除搜索
+  /**
+   * 清除搜索
+   */
   const clearSearch = () => {
     setSearchQuery('');
     setSearchResults(null);
@@ -100,41 +113,39 @@ export default function HeroSection() {
           <div className="max-w-2xl mx-auto mt-12">
             <div className="relative group z-[9999]">
               <div className="sticky top-4">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity" />
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl blur-xl opacity-25 group-hover:opacity-50 transition-opacity" />
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      placeholder={t.hero.searchPlaceholder}
-                      className="input h-14 pl-6 pr-24 text-lg group-hover:shadow-lg"
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                      {searchQuery && (
-                        <button
-                          onClick={clearSearch}
-                          className="text-gray-400 hover:text-gray-600 transition-colors p-1"
-                        >
-                          <X size={20} />
-                        </button>
-                      )}
-                      <button className="text-primary-500 hover:text-primary-600 transition-colors">
-                        <Search size={24} />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder={t.hero.searchPlaceholder}
+                    className="w-full h-14 px-6 pr-24 rounded-xl bg-white text-lg shadow-sm focus:ring-2 focus:ring-primary-500/50 border border-gray-200 focus:border-primary-500 transition-shadow hover:shadow-md"
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    {searchQuery && (
+                      <button
+                        onClick={clearSearch}
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                      >
+                        <X size={20} />
                       </button>
-                    </div>
+                    )}
+                    <button className="text-primary-500 hover:text-primary-600 transition-colors">
+                      <Search size={24} />
+                    </button>
                   </div>
-                  {/* Search Results */}
-                  {searchResults && (
-                    <SearchResults
-                      results={searchResults.results}
-                      total={searchResults.total}
-                      language={language}
-                      onClose={clearSearch}
-                      searchQuery={searchQuery}
-                    />
-                  )}
                 </div>
+                {/* Search Results */}
+                {searchResults && (
+                  <SearchResults
+                    results={searchResults.results}
+                    total={searchResults.total}
+                    language={language}
+                    onClose={clearSearch}
+                    searchQuery={searchQuery}
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -21,7 +21,8 @@ export type CategoryKey =
   | 'history'
   | 'politics'
   | 'economics'
-  | 'education';
+  | 'education'
+  | 'motivation';
 
 export type TranslationType = {
   common: {
@@ -55,6 +56,7 @@ export type TranslationType = {
     politics: string;
     economics: string;
     education: string;
+    motivation: string;
   };
   nav: {
     home: string;
@@ -239,7 +241,8 @@ export const translations: Record<Language, TranslationType> = {
       history: 'History',
       politics: 'Politics',
       economics: 'Economics',
-      education: 'Education'
+      education: 'Education',
+      motivation: 'Motivation',
     },
     nav: {
       home: 'Home',
@@ -422,7 +425,8 @@ export const translations: Record<Language, TranslationType> = {
       history: '历史',
       politics: '政治',
       economics: '经济',
-      education: '教育'
+      education: '教育',
+      motivation: '励志',
     },
     nav: {
       home: '首页',

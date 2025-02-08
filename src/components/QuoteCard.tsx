@@ -7,8 +7,11 @@
 
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Heart, Bookmark, Share2, X } from 'lucide-react';
 import { CategoryKey, translations } from '@/config/translations';
+import LikeButton from '@/components/LikeButton';
+import FavoriteButton from '@/components/FavoriteButton';
+import ShareButton from '@/components/ShareButton';
+import { X } from 'lucide-react';
 
 // 引号样式选项
 const QUOTE_STYLES = {
@@ -38,6 +41,7 @@ const QUOTE_STYLES = {
  * 语录卡片组件的属性类型定义
  */
 export interface QuoteCardProps {
+  id: number;
   quote: {
     quote_zh: string;
     quote_en: string;
@@ -55,9 +59,6 @@ export interface QuoteCardProps {
   isLiked?: boolean;
   isFavorited?: boolean;
   quoteStyle?: keyof typeof QUOTE_STYLES;
-  onLike?: () => void;
-  onFavorite?: () => void;
-  onShare?: () => void;
   onRemove?: () => void;
 }
 
@@ -66,6 +67,7 @@ export interface QuoteCardProps {
  * @param props - 组件属性，包含语录的所有信息
  */
 export default function QuoteCard({
+  id,
   quote,
   author,
   authorTitle,
@@ -74,9 +76,6 @@ export default function QuoteCard({
   isLiked = false,
   isFavorited = false,
   quoteStyle = 'default',
-  onLike,
-  onFavorite,
-  onShare,
   onRemove
 }: QuoteCardProps) {
   const { language } = useLanguage();
@@ -103,7 +102,8 @@ export default function QuoteCard({
     history: 'bg-[#fdf2f2] text-[#D70050]',
     politics: 'bg-[#fdf2f2] text-[#D70050]',
     economics: 'bg-[#fdf2f2] text-[#D70050]',
-    education: 'bg-[#fdf2f2] text-[#D70050]'
+    education: 'bg-[#fdf2f2] text-[#D70050]',
+    motivation: 'bg-[#fdf2f2] text-[#D70050]'
   };
 
   return (
@@ -113,7 +113,6 @@ export default function QuoteCard({
         <span className={style.className}>{style.char}</span>
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
         <blockquote className="relative z-10 pl-4">
           <p className="text-lg text-dark-900 leading-relaxed">
@@ -137,31 +136,22 @@ export default function QuoteCard({
         {/* Actions */}
         <div className="flex items-center justify-between mt-6 pt-4 border-t">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={onLike}
-              className={`flex items-center space-x-1 text-sm ${
-                isLiked ? 'text-[#D70050]' : 'text-dark-400 hover:text-[#D70050]'
-              } transition-colors`}
-            >
-              <Heart size={18} className={isLiked ? 'fill-current' : ''} />
-              <span>{likes}</span>
-            </button>
-            <button
-              onClick={onFavorite}
-              className={`flex items-center space-x-1 text-sm ${
-                isFavorited ? 'text-[#D70050]' : 'text-dark-400 hover:text-[#D70050]'
-              } transition-colors`}
-            >
-              <Bookmark size={18} className={isFavorited ? 'fill-current' : ''} />
-              <span>{t.actions.save}</span>
-            </button>
-            <button
-              onClick={onShare}
-              className="flex items-center space-x-1 text-sm text-dark-400 hover:text-[#D70050] transition-colors"
-            >
-              <Share2 size={18} />
-              <span>{t.actions.share}</span>
-            </button>
+            <LikeButton
+              quoteId={id}
+              likes={likes}
+              initialIsLiked={isLiked}
+            />
+            <FavoriteButton
+              quoteId={id}
+              initialIsFavorited={isFavorited}
+            />
+            <ShareButton
+              url={`${window.location.origin}/quotes/${id}`}
+              title="LifeQuote"
+              text={`${language === 'zh' ? quote.quote_zh : quote.quote_en} - ${
+                language === 'zh' ? author.author_zh : author.author_en
+              }`}
+            />
           </div>
 
           {onRemove && (
