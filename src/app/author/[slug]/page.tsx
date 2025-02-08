@@ -1,86 +1,24 @@
+/**
+ * 作者详情页面
+ * @module AuthorPage
+ */
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { translations, CategoryKey } from '@/config/translations';
+import { Globe2, Quote, BookOpen } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
-import { Book, Award, Calendar, MapPin, Filter, ArrowDownUp } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { translations } from '@/config/translations';
-import type { Database } from '@/types/database.types';
+import { useSupabase } from '@/contexts/SupabaseContext';
+import type { Database } from '@/lib/database.types';
 
 type Quote = Database['public']['Tables']['quotes']['Row'];
 
-// 获取页面数据
-async function getAuthorPageData(authorSlug: string) {
-  const response = await fetch('/api/quotes');
-  const quotes = await response.json();
-  const authorQuotes = quotes.filter((quote: any) => {
-    const quoteAuthorSlug = quote.author.en.toLowerCase().replace(/\s+/g, '-');
-    return quoteAuthorSlug === authorSlug;
-  });
-
-  if (authorQuotes.length === 0) {
-    return null;
-  }
-
-  const firstQuote = authorQuotes[0];
-  const authorData = {
-    name: {
-      en: firstQuote.author.en,
-      zh: firstQuote.author.zh,
-    },
-    title: {
-      en: firstQuote.authorTitle.en,
-      zh: firstQuote.authorTitle.zh,
-    },
-    period: {
-      en: firstQuote.period.en,
-      zh: firstQuote.period.zh,
-    },
-    location: {
-      en: 'Ku County, Chu State',
-      zh: '楚国苦县',
-    },
-    bio: {
-      en: 'Laozi was a great Chinese philosopher and thinker, founder of Taoism. His work "Tao Te Ching" has had a profound influence on Chinese philosophy and is an important classic of Taoist thought.',
-      zh: '老子是中国古代伟大的哲学家、思想家，道家学派创始人。其著作《道德经》对中国哲学产生了深远的影响，也是道家思想的重要经典著作。',
-    },
-    achievements: {
-      en: [
-        'Founder of Taoism',
-        'Author of Tao Te Ching',
-        'Key founder of traditional Chinese culture',
-      ],
-      zh: [
-        '道家学派创始人',
-        '《道德经》作者',
-        '中国传统文化重要奠基人',
-      ],
-    },
-    works: {
-      en: [
-        {
-          title: 'Tao Te Ching',
-          description: 'Also known as "Laozi", it is an important classic of Taoist thought.',
-        },
-      ],
-      zh: [
-        {
-          title: '道德经',
-          description: '也称《老子》，是道家思想的重要经典著作。',
-        },
-      ],
-    },
-    stats: {
-      quotes: authorQuotes.length,
-      collections: Math.floor(authorQuotes.reduce((sum: number, q: Quote) => sum + q.likes, 0) / 2),
-      shares: authorQuotes.reduce((sum: number, q: Quote) => sum + q.views, 0),
-    },
-  };
-  
-  return { authorData, authorQuotes };
-}
-
+/**
+ * 作者详情页面组件
+ */
 export default function AuthorPage({ 
   params 
 }: { 
@@ -88,111 +26,125 @@ export default function AuthorPage({
 }) {
   const { language } = useLanguage();
   const t = translations[language];
-  const [pageData, setPageData] = useState<any>(null);
+  const { supabase } = useSupabase();
+  const [author, setAuthor] = useState<any>(null);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getAuthorPageData(params.slug).then(data => {
-      setPageData(data);
-    });
-  }, [params.slug, language]);
-  
-  if (!pageData) {
+    async function loadAuthorData() {
+      try {
+        // 从 slug 中获取作者名
+        const authorName = decodeURIComponent(params.slug).replace(/-/g, ' ');
+        
+        // 获取作者信息
+        const { data: authorData, error: authorError } = await supabase
+          .from('authors')
+          .select('*')
+          .eq('name_en', authorName)
+          .single();
+
+        if (authorError) throw authorError;
+        setAuthor(authorData);
+
+        // 获取作者的语录
+        const { data: quotesData, error: quotesError } = await supabase
+          .from('quotes')
+          .select('*')
+          .eq('author_en', authorName);
+
+        if (quotesError) throw quotesError;
+        setQuotes(quotesData);
+      } catch (error) {
+        console.error('加载作者数据失败:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadAuthorData();
+  }, [params.slug, supabase]);
+
+  if (loading) {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-50 pt-16">
-          <div className="container mx-auto px-4 py-12">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-6"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            </div>
+        <div className="container py-20">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
           </div>
         </div>
       </>
     );
   }
 
-  const { quotes, authorData } = pageData;
+  if (!author) {
+    return (
+      <>
+        <Navbar />
+        <div className="container py-20">
+          <div className="text-center text-gray-500">
+            作者不存在
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 pt-16">
-        {/* Author Header */}
-        <div className="bg-white border-b">
-          <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Author Image */}
-              <div className="w-48 h-48 rounded-xl bg-gray-200 flex-shrink-0">
-                {/* 这里可以添加作者图片 */}
-              </div>
+      <main className="container py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Left Column - Author Info */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-24">
+                {/* Author Image */}
+                <div className="aspect-square bg-dark-100 rounded-xl overflow-hidden relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-secondary-500/20" />
+                  <div className="absolute inset-0 flex items-center justify-center text-primary-500">
+                    <Globe2 size={64} className="opacity-20" />
+                  </div>
+                </div>
 
-              {/* Author Info */}
-              <div className="flex-grow">
-                <h1 className="text-4xl font-serif font-bold text-gray-900 mb-2">
-                  {authorData.name[language]}
+                {/* Author Info */}
+                <h1 className="text-3xl font-[oswald] font-bold text-dark-900 mb-2">
+                  {language === 'zh' ? author.name_zh : author.name_en}
                 </h1>
-                <p className="text-xl text-gray-600 mb-4">{authorData.title[language]}</p>
+                <p className="text-dark-500 mb-4">
+                  {language === 'zh' ? author.title_zh : author.title_en}
+                </p>
+                <p className="text-dark-600 mb-6">
+                  {language === 'zh' ? author.description_zh : author.description_en}
+                </p>
 
-                {/* Quick Stats */}
-                <div className="flex gap-8 mb-6">
-                  <div>
-                    <div className="text-2xl font-bold text-primary-600">
-                      {authorData.stats.quotes}
-                    </div>
-                    <div className="text-sm text-gray-500">{t.stats.quotes}</div>
+                {/* Stats */}
+                <div className="flex items-center gap-6 text-sm text-dark-500 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Quote size={16} />
+                    <span>{quotes.length} {t.actions.quotes}</span>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-primary-600">
-                      {authorData.stats.collections}
-                    </div>
-                    <div className="text-sm text-gray-500">{t.stats.collections}</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-primary-600">
-                      {authorData.stats.shares}
-                    </div>
-                    <div className="text-sm text-gray-500">{t.stats.shares}</div>
+                  <div className="flex items-center gap-2">
+                    <BookOpen size={16} />
+                    <span>{author.categories?.length || 0} {language === 'en' ? 'categories' : '个类别'}</span>
                   </div>
                 </div>
 
-                {/* Meta Info */}
-                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Calendar size={16} />
-                    <span>{authorData.period[language]}</span>
+                {/* Categories */}
+                {author.categories && (
+                  <div className="flex flex-wrap gap-2">
+                    {author.categories.map((category: string) => (
+                      <span
+                        key={category}
+                        className="text-xs px-2 py-1 rounded-full bg-primary-50 text-primary-700"
+                      >
+                        {t.categories[category as CategoryKey]}
+                      </span>
+                    ))}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin size={16} />
-                    <span>{authorData.location[language]}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Bio & Achievements */}
-            <div>
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                <h2 className="text-xl font-medium text-gray-900 mb-4">{t.author.bio}</h2>
-                <p className="text-gray-600">{authorData.bio[language]}</p>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Award className="text-primary-600" size={20} />
-                  <h2 className="text-xl font-medium text-gray-900">{t.author.achievements}</h2>
-                </div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">主要成就</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {authorData.achievements.zh.map((achievement: string, index: number): JSX.Element => (
-                    <li key={index}>{achievement}</li>
-                  ))}
-                </ul>
+                )}
               </div>
             </div>
 
@@ -200,13 +152,23 @@ export default function AuthorPage({
             <div className="lg:col-span-2">
               <h2 className="text-xl font-medium text-gray-900 mb-6">{t.author.quotes}</h2>
               <div className="space-y-6">
-                {quotes.map((quote: any) => (
+                {quotes.map((quote) => (
                   <QuoteCard
                     key={quote.id}
-                    quote={quote.quote}
-                    author={quote.author}
-                    authorTitle={quote.authorTitle}
-                    category={quote.category}
+                    id={quote.id}
+                    quote={{
+                      quote_zh: quote.quote_zh,
+                      quote_en: quote.quote_en
+                    }}
+                    author={{
+                      author_zh: quote.author_zh,
+                      author_en: quote.author_en
+                    }}
+                    authorTitle={{
+                      author_title_zh: quote.author_title_zh || '',
+                      author_title_en: quote.author_title_en || ''
+                    }}
+                    category={quote.category as CategoryKey}
                     likes={quote.likes}
                     isLiked={false}
                   />
