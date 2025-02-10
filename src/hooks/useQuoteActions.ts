@@ -35,6 +35,41 @@ export function useQuoteActions(
   // 确保 quoteId 是数字类型
   const numericQuoteId = Number(quoteId);
 
+  // 加载用户的点赞和收藏状态
+  useEffect(() => {
+    if (!userId || !numericQuoteId || isNaN(numericQuoteId)) return;
+
+    const loadUserActions = async () => {
+      try {
+        // 检查是否已点赞
+        const { data: likeData, error: likeError } = await supabase
+          .from('quote_likes')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('quote_id', numericQuoteId)
+          .maybeSingle();
+
+        if (likeError) throw likeError;
+        setIsLiked(!!likeData);
+
+        // 检查是否已收藏
+        const { data: favoriteData, error: favoriteError } = await supabase
+          .from('quote_favorites')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('quote_id', numericQuoteId)
+          .maybeSingle();
+
+        if (favoriteError) throw favoriteError;
+        setIsFavorited(!!favoriteData);
+      } catch (error) {
+        console.error('加载用户操作状态失败:', error);
+      }
+    };
+
+    loadUserActions();
+  }, [userId, numericQuoteId, supabase]);
+
   /**
    * 处理点赞
    */
@@ -56,8 +91,7 @@ export function useQuoteActions(
         const { error } = await supabase
           .from('quote_likes')
           .delete()
-          .eq('user_id', userId)
-          .eq('quote_id', numericQuoteId);
+          .match({ user_id: userId, quote_id: numericQuoteId });
 
         if (error) throw error;
         setIsLiked(false);
@@ -108,8 +142,7 @@ export function useQuoteActions(
         const { error } = await supabase
           .from('quote_favorites')
           .delete()
-          .eq('user_id', userId)
-          .eq('quote_id', numericQuoteId);
+          .match({ user_id: userId, quote_id: numericQuoteId });
 
         if (error) throw error;
         setIsFavorited(false);
@@ -150,39 +183,6 @@ export function useQuoteActions(
   const handleCloseShareMenu = () => {
     setShowShareMenu(false);
   };
-
-  // 初始化加载用户的点赞和收藏状态
-  useEffect(() => {
-    if (!userId || !numericQuoteId || isNaN(numericQuoteId)) return;
-
-    const loadUserActions = async () => {
-      try {
-        // 检查是否已点赞
-        const { data: likeData } = await supabase
-          .from('quote_likes')
-          .select()
-          .eq('user_id', userId)
-          .eq('quote_id', numericQuoteId)
-          .single();
-
-        setIsLiked(!!likeData);
-
-        // 检查是否已收藏
-        const { data: favoriteData } = await supabase
-          .from('quote_favorites')
-          .select()
-          .eq('user_id', userId)
-          .eq('quote_id', numericQuoteId)
-          .single();
-
-        setIsFavorited(!!favoriteData);
-      } catch (error) {
-        console.error('加载用户操作状态失败:', error);
-      }
-    };
-
-    loadUserActions();
-  }, [userId, numericQuoteId, supabase]);
 
   return {
     isLiked,

@@ -21,33 +21,50 @@ alter table quote_likes enable row level security;
 alter table quote_favorites enable row level security;
 
 -- 创建点赞表的RLS策略
-create policy "用户可以查看所有点赞"
+create policy "启用认证用户读取点赞"
   on quote_likes for select
   to authenticated
   using (true);
 
-create policy "用户只能添加自己的点赞"
+create policy "启用认证用户添加点赞"
   on quote_likes for insert
   to authenticated
   with check (auth.uid() = user_id);
 
-create policy "用户只能删除自己的点赞"
+create policy "启用认证用户删除点赞"
   on quote_likes for delete
   to authenticated
   using (auth.uid() = user_id);
 
 -- 创建收藏表的RLS策略
-create policy "用户可以查看所有收藏"
+create policy "启用认证用户读取收藏"
   on quote_favorites for select
   to authenticated
   using (true);
 
-create policy "用户只能添加自己的收藏"
+create policy "启用认证用户添加收藏"
   on quote_favorites for insert
   to authenticated
   with check (auth.uid() = user_id);
 
-create policy "用户只能删除自己的收藏"
+create policy "启用认证用户删除收藏"
   on quote_favorites for delete
   to authenticated
-  using (auth.uid() = user_id); 
+  using (auth.uid() = user_id);
+
+-- 确保 quotes 表有正确的 RLS 策略
+alter table quotes enable row level security;
+
+create policy "启用公开读取语录"
+  on quotes for select
+  using (true);
+
+create policy "启用认证用户添加语录"
+  on quotes for insert
+  to authenticated
+  with check (true);
+
+create policy "启用认证用户更新语录"
+  on quotes for update
+  to authenticated
+  using (true); 

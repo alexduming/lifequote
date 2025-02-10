@@ -126,42 +126,50 @@ function SearchResults() {
         </div>
         
         <div className="space-y-6">
-          {results.results.map((quote) => (
-            <div 
-              key={quote.id}
-              id={`quote-${quote.id}`}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6"
-            >
-              <blockquote className="text-xl text-gray-800 mb-4">
-                "{language === 'zh' ? quote.quote_zh : quote.quote_en}"
-              </blockquote>
-              <div className="flex items-center justify-between text-sm">
-                <div className="space-y-1">
-                  <div>
-                    <span className="text-primary-600 font-medium">
-                      {language === 'zh' ? quote.author_zh : quote.author_en}
-                    </span>
-                    {(quote.author_title_zh || quote.author_title_en) && (
-                      <span className="text-gray-500 ml-2">
-                        {language === 'zh' ? quote.author_title_zh : quote.author_title_en}
+          {results.results.map(quote => {
+            const content = language === 'zh' ? quote.quote_zh : quote.quote_en;
+            const author = language === 'zh' ? quote.author_zh : quote.author_en;
+            const authorTitle = language === 'zh' ? quote.author_title_zh : quote.author_title_en;
+            
+            if (!content || !author) return null;
+            
+            return (
+              <div 
+                key={quote.id}
+                id={`quote-${quote.id}`}
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6"
+              >
+                <blockquote className="text-xl text-gray-800 mb-4">
+                  "{content}"
+                </blockquote>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="space-y-1">
+                    <div>
+                      <span className="text-primary-600 font-medium">
+                        {author}
                       </span>
-                    )}
+                      {authorTitle && (
+                        <span className="text-gray-500 ml-2">
+                          {authorTitle}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-gray-500">
+                      {language === 'zh' ? quote.book : quote.book_en}
+                    </div>
                   </div>
-                  <div className="text-gray-500">
-                    {language === 'zh' ? quote.book : quote.book_en}
-                  </div>
+                  {quote.book_en && (
+                    <a
+                      href={`/books/${encodeURIComponent(quote.book_en.toLowerCase().replace(/\s+/g, '-'))}`}
+                      className="btn btn-primary btn-sm"
+                    >
+                      {t.actions.viewDetails}
+                    </a>
+                  )}
                 </div>
-                {quote.book_en && (
-                  <a
-                    href={`/books/${encodeURIComponent(quote.book_en.toLowerCase().replace(/\s+/g, '-'))}`}
-                    className="btn btn-primary btn-sm"
-                  >
-                    {t.actions.viewDetails}
-                  </a>
-                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

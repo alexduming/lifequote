@@ -31,30 +31,37 @@ export default function SearchResults({ results, total, language, onClose, searc
   return (
     <div className="absolute inset-x-0 top-full mt-2">
       <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-        {results.length > 0 ? (
+        {results && results.length > 0 ? (
           <>
             {/* 搜索结果列表 */}
             <div className="divide-y">
-              {results.map((quote) => (
-                <a
-                  key={quote.id}
-                  href={`/search?q=${encodeURIComponent(searchQuery)}&highlight=${quote.id}`}
-                  className="block p-4 hover:bg-gray-50 transition-colors"
-                  onClick={onClose}
-                >
-                  <p className="text-dark-900 mb-2 line-clamp-2">
-                    {language === 'zh' ? quote.quote_zh : quote.quote_en}
-                  </p>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-dark-500">
-                      {language === 'zh' ? quote.author_zh : quote.author_en}
-                    </span>
-                    <span className="text-primary-500">
-                      {t.categories[quote.category as CategoryKey]}
-                    </span>
-                  </div>
-                </a>
-              ))}
+              {results.map((quote) => {
+                const content = language === 'zh' ? quote.quote_zh : quote.quote_en;
+                const author = language === 'zh' ? quote.author_zh : quote.author_en;
+                
+                if (!content || !author) return null;
+                
+                return (
+                  <a
+                    key={quote.id}
+                    href={`/search?q=${encodeURIComponent(searchQuery)}&highlight=${quote.id}`}
+                    className="block p-4 hover:bg-gray-50 transition-colors"
+                    onClick={onClose}
+                  >
+                    <p className="text-dark-900 mb-2 line-clamp-2">
+                      {content}
+                    </p>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-dark-500">
+                        {author}
+                      </span>
+                      <span className="text-primary-500">
+                        {t.categories[quote.category as CategoryKey]}
+                      </span>
+                    </div>
+                  </a>
+                );
+              })}
             </div>
 
             {/* 查看更多结果 */}

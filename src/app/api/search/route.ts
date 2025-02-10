@@ -37,18 +37,18 @@ export async function GET(request: NextRequest) {
     // 使用简单的搜索查询
     const searchQuery = supabase
       .from('quotes')
-      .select('*', { count: 'exact' });
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
 
     // 根据语言选择搜索字段
     if (lang === 'zh') {
-      searchQuery.or(`quote_zh.ilike.%${query}%,author_zh.ilike.%${query}%`);
+      searchQuery.or(`quote_zh.ilike.%${query}%,author_zh.ilike.%${query}%,author_title_zh.ilike.%${query}%`);
     } else {
-      searchQuery.or(`quote_en.ilike.%${query}%,author_en.ilike.%${query}%`);
+      searchQuery.or(`quote_en.ilike.%${query}%,author_en.ilike.%${query}%,author_title_en.ilike.%${query}%`);
     }
 
-    // 添加排序和分页
+    // 执行查询
     const { data: results, count, error } = await searchQuery
-      .order('created_at', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     if (error) {
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     console.log(`Found ${count || 0} results`);
     
     return NextResponse.json({
-      results,
+      results: results,
       total: count || 0,
       pagination: {
         currentPage: page,
