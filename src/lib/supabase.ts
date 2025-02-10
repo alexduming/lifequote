@@ -3,14 +3,27 @@
  * @description 创建和导出 Supabase 客户端实例，用于数据库操作
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Database } from './database.types';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
+let supabaseInstance: ReturnType<typeof createClientComponentClient<Database>> | null = null;
+
+/**
+ * 获取 Supabase 客户端实例
+ * @returns Supabase 客户端实例
+ */
+export function getSupabaseClient() {
+  if (!supabaseInstance) {
+    supabaseInstance = createClientComponentClient<Database>();
+  }
+  return supabaseInstance;
 }
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
+
+/**
+ * 重置 Supabase 客户端实例
+ */
+export function resetSupabaseClient() {
+  supabaseInstance = null;
 }
 
 /**
@@ -20,11 +33,5 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
  * 客户端实例会自动从环境变量中读取必要的配置信息。
  */
 
-/**
- * 创建 Supabase 客户端实例
- * 使用环境变量中的配置信息
- */
-export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-); 
+// 导出默认的 Supabase 实例
+export const supabase = getSupabaseClient(); 

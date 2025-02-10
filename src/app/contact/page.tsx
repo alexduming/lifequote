@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Navbar from '@/components/Navbar';
 import { MessageSquare, MessageCircle, Globe, Mail } from 'lucide-react';
 import '../icons.css';
+import Image from 'next/image';
 
 export default function ContactPage() {
   const { language } = useLanguage();
@@ -51,7 +52,7 @@ export default function ContactPage() {
       platform: "Weibo",
       name: "@Alex-大表哥",
       url: "https://weibo.com/u/1794009892",
-      icon: "icon-weibo",
+      icon: "W",
       color: "#E6162D",
       hoverBg: "hover:bg-[#E6162D]"
     },
@@ -59,7 +60,7 @@ export default function ContactPage() {
       platform: "Xiaohongshu",
       name: "Alex大表哥",
       url: "https://www.xiaohongshu.com/user/profile/64644166000000002a0080a7",
-      icon: "icon-xiaohongshu",
+      icon: "X",
       color: "#FF2742",
       hoverBg: "hover:bg-[#FF2742]"
     },
@@ -67,7 +68,7 @@ export default function ContactPage() {
       platform: "X",
       name: "Alexdbg",
       url: "https://x.com",
-      icon: "icon-twitter",
+      icon: "X",
       color: "#000000",
       hoverBg: "hover:bg-black"
     }
@@ -98,18 +99,24 @@ export default function ContactPage() {
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="social-card"
+                className="group bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all relative overflow-hidden"
               >
                 <div 
                   className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity ${social.hoverBg}`}
                 />
                 <div className="relative flex items-center gap-4">
-                  <div className="icon-container">
-                    <i className={`iconfont ${social.icon}`} style={{ color: social.color }} />
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold"
+                    style={{ 
+                      backgroundColor: `${social.color}15`,
+                      color: social.color 
+                    }}
+                  >
+                    {social.icon}
                   </div>
                   <div>
-                    <div className="platform-name">{social.platform}</div>
-                    <div className="username">{social.name}</div>
+                    <div className="text-white font-medium">{social.platform}</div>
+                    <div className="text-white/60 text-sm">{social.name}</div>
                   </div>
                 </div>
               </a>
@@ -130,14 +137,15 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-[oswald] text-white">个人微信</h3>
-                  <p className="text-white/60">Alexchenzao</p>
+                  <p className="text-white/60">微信内搜索添加：Alexchenzao</p>
                 </div>
               </div>
               <div className="aspect-square bg-white rounded-xl p-4">
-                {/* 这里放置个人微信二维码图片 */}
-                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-500">
-                  微信二维码
-                </div>
+                <img
+                  src="/wechatqrcode.png"
+                  alt="个人微信二维码"
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
 
@@ -149,14 +157,15 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-[oswald] text-white">交流群</h3>
-                  <p className="text-white/60">AI仓鼠洞</p>
+                  <p className="text-white/60">备注"入群"加入AI仓鼠洞交流群</p>
                 </div>
               </div>
               <div className="aspect-square bg-white rounded-xl p-4">
-                {/* 这里放置群聊二维码图片 */}
-                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-500">
-                  群聊二维码
-                </div>
+                <img
+                  src="/wechatqrcode.png"
+                  alt="微信群二维码"
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
           </div>

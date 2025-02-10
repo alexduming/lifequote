@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { translations } from '@/config/translations';
 import LanguageSwitch from './LanguageSwitch';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +23,7 @@ export default function Navbar() {
   const { language } = useLanguage();
   const { user, signOut } = useAuth();
   const t = translations[language];
+  const router = useRouter();
 
   const mainNavItems = [
     { href: '/daily', label: t.nav.daily },
@@ -32,8 +34,12 @@ export default function Navbar() {
   ];
 
   const handleSignOut = async () => {
-    await signOut();
-    setIsProfileOpen(false);
+    try {
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error('退出登录失败:', error);
+    }
   };
 
   return (

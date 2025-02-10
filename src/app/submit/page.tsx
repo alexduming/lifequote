@@ -81,7 +81,8 @@ export default function SubmitQuotePage() {
           author_title_zh: language === 'zh' ? formData.authorTitle : null,
           author_title_en: language === 'en' ? formData.authorTitle : null,
           category: formData.category,
-          source: formData.source,
+          source: language === 'zh' ? formData.source : null,
+          source_en: language === 'en' ? formData.source : null,
           submitted_by: user?.id,
           status: 'pending',
           language: language
