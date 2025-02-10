@@ -8,6 +8,7 @@ import { Settings, Share2, Globe, Lock } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
 import type { CategoryKey } from '@/config/translations';
+import { toast } from 'sonner';
 
 /**
  * 收藏夹详情类型定义
@@ -87,6 +88,13 @@ export default function CollectionDetailPage({
   // 加载收藏夹详情和语录
   useEffect(() => {
     async function loadCollectionDetail() {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        setError('数据库连接失败');
+        setLoading(false);
+        return;
+      }
+
       try {
         // 加载收藏夹信息
         const { data: collectionData, error: collectionError } = await supabase
@@ -144,6 +152,7 @@ export default function CollectionDetailPage({
       } catch (err: any) {
         console.error('加载收藏夹详情失败:', err.message);
         setError(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -154,6 +163,11 @@ export default function CollectionDetailPage({
 
   // 从收藏夹中移除语录
   const handleRemoveQuote = async (quoteId: number) => {
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('collection_items')
@@ -164,9 +178,10 @@ export default function CollectionDetailPage({
       if (error) throw error;
 
       setQuotes(prev => prev.filter(q => q.id !== quoteId));
+      toast.success('已从收藏夹中移除');
     } catch (err: any) {
       console.error('移除语录失败:', err.message);
-      alert('移除语录失败，请重试');
+      toast.error('移除失败，请重试');
     }
   };
 
