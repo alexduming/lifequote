@@ -9,6 +9,8 @@
 import React from 'react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SupabaseProvider } from '@/contexts/SupabaseContext';
+import { Toaster } from 'sonner';
 
 /**
  * 全局上下文提供者组件
@@ -18,10 +20,13 @@ import { AuthProvider } from '@/contexts/AuthContext';
  */
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        {children}
-      </LanguageProvider>
-    </AuthProvider>
+    <SupabaseProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          {children}
+          <Toaster />
+        </LanguageProvider>
+      </AuthProvider>
+    </SupabaseProvider>
   );
 }

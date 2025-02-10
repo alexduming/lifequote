@@ -47,7 +47,7 @@ export default function FavoritesPage() {
 
       try {
         const { data, error } = await supabase
-          .from('favorites')
+          .from('quote_favorites')
           .select(`
             quote_id,
             quotes (
@@ -63,7 +63,7 @@ export default function FavoritesPage() {
             )
           `)
           .eq('user_id', user.id)
-          .order('favorited_at', { ascending: false })
+          .order('created_at', { ascending: false })
           .returns<FavoriteWithQuote[]>();
 
         if (error) throw error;
@@ -86,26 +86,26 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="container py-20">
         <div className="max-w-4xl mx-auto">
           {/* 页面标题 */}
           <div className="flex items-center gap-3 mb-12">
-            <Bookmark size={32} className="text-white" />
-            <h1 className="text-4xl font-[oswald] font-bold text-white">
+            <Bookmark size={32} className="text-dark-900" />
+            <h1 className="text-4xl font-[oswald] font-bold text-dark-900">
               {t.favorites.title}
             </h1>
           </div>
 
           {/* 加载状态 */}
           {loading ? (
-            <div className="text-center text-white/60 py-12">
+            <div className="text-center text-dark-500 py-12">
               {t.common.loading}
             </div>
           ) : favorites.length === 0 ? (
             // 空状态
-            <div className="text-center text-white/60 py-12">
+            <div className="text-center text-dark-500 py-12">
               {t.favorites.empty}
             </div>
           ) : (

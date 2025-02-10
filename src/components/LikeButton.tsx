@@ -26,7 +26,7 @@ export default function LikeButton({
   initialIsLiked = false,
   disabled = false
 }: LikeButtonProps) {
-  const { isLiked, loading, handleLike } = useQuoteActions(quoteId, initialIsLiked, false);
+  const { isLiked, loading, handleLike, likeCount } = useQuoteActions(quoteId, initialIsLiked, false, likes);
 
   return (
     <button
@@ -37,7 +37,7 @@ export default function LikeButton({
       } transition-colors`}
     >
       <Heart size={18} className={isLiked ? 'fill-current' : ''} />
-      <span>{likes}</span>
+      <span>{likeCount}</span>
     </button>
   );
 } 

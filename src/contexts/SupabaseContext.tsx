@@ -6,26 +6,21 @@
 'use client';
 
 import { createContext, useContext } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
-
-// 创建 Supabase 客户端
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import type { Database } from '@/lib/database.types';
 
 // 创建上下文
 const SupabaseContext = createContext<{
-  supabase: SupabaseClient;
-}>({
-  supabase,
-});
+  supabase: SupabaseClient<Database>;
+} | undefined>(undefined);
 
 /**
  * Supabase Provider 组件
  */
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+  const supabase = createClientComponentClient<Database>();
+
   return (
     <SupabaseContext.Provider value={{ supabase }}>
       {children}
