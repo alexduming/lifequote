@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import { Button } from "../components/ui/button";
 import Image from 'next/image';
+import { createPortal } from 'react-dom';
 
 interface ShareMenuProps {
   url: string;
@@ -76,30 +77,100 @@ const LOGO_SVG = `<?xml version="1.0" encoding="UTF-8"?>
 export default function ShareMenu({ url, title, text, author, book, onClose }: ShareMenuProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const quoteCardRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // 生成图片
   useEffect(() => {
-    if (quoteCardRef.current) {
-      html2canvas(quoteCardRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#FFFFFF',
-        width: 900,
-        height: 1200,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('[data-logo]');
-          if (clonedElement) {
-            clonedElement.innerHTML = LOGO_SVG;
-          }
-        },
-      }).then((canvas) => {
-        setImageUrl(canvas.toDataURL('image/png'));
-      }).catch((error) => {
-        console.error('图片生成失败:', error);
-        toast.error('图片生成失败，请重试');
-      });
-    }
+    const templateElement = document.createElement('div');
+    templateElement.style.position = 'absolute';
+    templateElement.style.left = '-9999px';
+    templateElement.style.top = '0';
+    templateElement.innerHTML = `
+      <div 
+        style="
+          width: 900px;
+          height: 1200px;
+          position: relative;
+          background: white;
+          padding: 64px;
+          font-family: var(--font-oswald), sans-serif;
+        "
+      >
+        <div style="
+          position: absolute;
+          top: 80px;
+          left: 64px;
+          font-size: 200px;
+          line-height: 1;
+          color: rgba(0, 0, 0, 0.05);
+          font-family: sans-serif;
+        ">
+          "
+        </div>
+
+        <div style="height: 100%; display: flex; flex-direction: column;">
+          <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+            <div style="max-width: 42rem;">
+              <p style="
+                font-size: 70px;
+                font-weight: bold;
+                text-transform: uppercase;
+                line-height: 1.2;
+                letter-spacing: -0.02em;
+                color: rgba(0, 0, 0, 0.9);
+                margin-bottom: 48px;
+              ">
+                ${text}
+              </p>
+              
+              <p style="
+                font-size: 40px;
+                color: rgba(0, 0, 0, 0.6);
+                letter-spacing: 0.05em;
+              ">
+                — ${author}
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-top: auto; display: flex; justify-content: center; padding-bottom: 32px;">
+            <div 
+              style="width: 160px; height: 40px; display: flex; align-items: center; justify-content: center;"
+              data-logo
+            >${LOGO_SVG}</div>
+          </div>
+        </div>
+
+        <div style="
+          position: absolute;
+          inset: 32px;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+        "></div>
+      </div>
+    `;
+
+    document.body.appendChild(templateElement);
+
+    html2canvas(templateElement.firstElementChild as HTMLElement, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#FFFFFF',
+      width: 900,
+      height: 1200,
+    }).then((canvas) => {
+      setImageUrl(canvas.toDataURL('image/png'));
+      document.body.removeChild(templateElement);
+    }).catch((error) => {
+      console.error('图片生成失败:', error);
+      toast.error('图片生成失败，请重试');
+      document.body.removeChild(templateElement);
+    });
   }, [text, author]);
 
   // 社交媒体分享配置
@@ -166,56 +237,10 @@ export default function ShareMenu({ url, title, text, author, book, onClose }: S
     toast.success('图片已保存到本地');
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      {/* 隐藏的图片生成模板 */}
-      <div className="fixed -left-[9999px]">
-        <div 
-          ref={quoteCardRef} 
-          className="w-[900px] h-[1200px] relative bg-white p-16"
-          style={{
-            fontFamily: 'var(--font-oswald), sans-serif',
-          }}
-        >
-          {/* 装饰性引号 */}
-          <div className="absolute top-20 left-16 text-[200px] leading-none text-black/5 font-sans">
-            "
-          </div>
-
-          {/* 主要内容区域 */}
-          <div className="h-full flex flex-col">
-            {/* 语录内容 */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="max-w-2xl space-y-12">
-                {/* 英文内容 */}
-                <p className="text-7xl font-bold uppercase leading-tight tracking-tight text-black/90">
-                  {text}
-                </p>
-                
-                {/* 作者署名 */}
-                <p className="text-4xl text-black/60 tracking-wide">
-                  — {author}
-                </p>
-              </div>
-            </div>
-
-            {/* 底部 Logo */}
-            <div className="mt-auto flex justify-center pb-8">
-              <div 
-                className="w-40 h-10 flex items-center justify-center"
-                data-logo
-                dangerouslySetInnerHTML={{ __html: LOGO_SVG }}
-              />
-            </div>
-          </div>
-
-          {/* 装饰性边框 */}
-          <div className="absolute inset-8 border border-black/5" />
-        </div>
-      </div>
-
-      {/* 预览区域 */}
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-xl mx-4 overflow-hidden">
+  const menuContent = (
+    <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 999999 }}>
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-xl mx-4 overflow-hidden relative">
         <div className="p-4 flex justify-end">
           <Button 
             variant="ghost" 
@@ -253,4 +278,6 @@ export default function ShareMenu({ url, title, text, author, book, onClose }: S
       </div>
     </div>
   );
+
+  return mounted ? createPortal(menuContent, document.body) : null;
 } 
