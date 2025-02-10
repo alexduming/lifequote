@@ -92,21 +92,21 @@ export default async function CategoryPage({
                 {quotes.map((quote) => (
                   <QuoteCard
                     key={quote.id}
+                    id={quote.id}
                     quote={{
-                      quote_zh: quote.quote_zh || quote.content_zh,
-                      quote_en: quote.quote_en || quote.content_en
+                      zh: quote.quote_zh || quote.content_zh,
+                      en: quote.quote_en || quote.content_en
                     }}
                     author={{
-                      author_zh: quote.author_zh,
-                      author_en: quote.author_en
+                      zh: quote.author_zh,
+                      en: quote.author_en
                     }}
                     authorTitle={{
-                      author_title_zh: quote.author_title_zh || '',
-                      author_title_en: quote.author_title_en || ''
+                      zh: quote.author_title_zh || '',
+                      en: quote.author_title_en || ''
                     }}
                     category={quote.category as CategoryKey}
                     likes={quote.likes}
-                    isLiked={false}
                   />
                 ))}
               </div>

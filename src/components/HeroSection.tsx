@@ -50,12 +50,18 @@ export default function HeroSection() {
         // 确保返回的数据符合 Quote 类型
         const quotes: Quote[] = data.results.map((quote: any) => ({
           id: quote.id,
-          quote_zh: quote.quote_zh || quote.content_zh,
-          quote_en: quote.quote_en || quote.content_en,
-          author_zh: quote.author_zh,
-          author_en: quote.author_en,
-          author_title_zh: quote.author_title_zh || null,
-          author_title_en: quote.author_title_en || null,
+          quote: {
+            zh: quote.quote_zh || quote.content_zh,
+            en: quote.quote_en || quote.content_en
+          },
+          author: {
+            zh: quote.author_zh,
+            en: quote.author_en
+          },
+          authorTitle: {
+            zh: quote.author_title_zh || null,
+            en: quote.author_title_en || null
+          },
           category: quote.category,
           likes: quote.likes || 0,
           views: quote.views || 0,

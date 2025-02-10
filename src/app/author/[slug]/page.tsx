@@ -93,7 +93,7 @@ export default function AuthorPage({
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800">
       <Navbar />
       <main className="container py-20">
         <div className="max-w-7xl mx-auto">
@@ -157,20 +157,19 @@ export default function AuthorPage({
                     key={quote.id}
                     id={quote.id}
                     quote={{
-                      quote_zh: quote.quote_zh,
-                      quote_en: quote.quote_en
+                      zh: quote.quote_zh,
+                      en: quote.quote_en
                     }}
                     author={{
-                      author_zh: quote.author_zh,
-                      author_en: quote.author_en
+                      zh: quote.author_zh,
+                      en: quote.author_en
                     }}
                     authorTitle={{
-                      author_title_zh: quote.author_title_zh || '',
-                      author_title_en: quote.author_title_en || ''
+                      zh: quote.author_title_zh || '',
+                      en: quote.author_title_en || ''
                     }}
                     category={quote.category as CategoryKey}
                     likes={quote.likes}
-                    isLiked={false}
                   />
                 ))}
               </div>
@@ -178,6 +177,6 @@ export default function AuthorPage({
           </div>
         </div>
       </main>
-    </>
+    </div>
   );
 } 

@@ -250,20 +250,21 @@ export default function CollectionDetailPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {quotes.map(quote => (
+            {quotes.map((quote) => (
               <QuoteCard
                 key={quote.id}
+                id={quote.id}
                 quote={{
-                  quote_zh: quote.quote_zh,
-                  quote_en: quote.quote_en
+                  zh: quote.quote_zh,
+                  en: quote.quote_en
                 }}
                 author={{
-                  author_zh: quote.author_zh,
-                  author_en: quote.author_en
+                  zh: quote.author_zh,
+                  en: quote.author_en
                 }}
                 authorTitle={{
-                  author_title_zh: quote.author_title_zh || '',
-                  author_title_en: quote.author_title_en || ''
+                  zh: quote.author_title_zh || '',
+                  en: quote.author_title_en || ''
                 }}
                 category={quote.category as CategoryKey}
                 likes={quote.likes}
