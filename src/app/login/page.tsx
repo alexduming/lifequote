@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
