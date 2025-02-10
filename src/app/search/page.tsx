@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
@@ -39,9 +39,25 @@ function SearchResults() {
   const { language } = useLanguage();
   const t = translations[language];
   const query = searchParams?.get('q') || '';
+  const highlightId = searchParams?.get('highlight');
   
   const [results, setResults] = React.useState<{ results: Quote[]; total: number } | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+
+  // 处理高亮滚动
+  useEffect(() => {
+    if (highlightId && results?.results) {
+      const element = document.getElementById(`quote-${highlightId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 添加临时高亮效果
+        element.classList.add('highlight-quote');
+        setTimeout(() => {
+          element.classList.remove('highlight-quote');
+        }, 2000);
+      }
+    }
+  }, [highlightId, results]);
 
   React.useEffect(() => {
     const fetchResults = async () => {
@@ -111,7 +127,11 @@ function SearchResults() {
         
         <div className="space-y-6">
           {results.results.map((quote) => (
-            <div key={quote.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+            <div 
+              key={quote.id}
+              id={`quote-${quote.id}`}
+              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6"
+            >
               <blockquote className="text-xl text-gray-800 mb-4">
                 "{language === 'zh' ? quote.quote_zh : quote.quote_en}"
               </blockquote>

@@ -38,7 +38,7 @@ export default function SearchResults({ results, total, language, onClose, searc
               {results.map((quote) => (
                 <a
                   key={quote.id}
-                  href={`/quotes/${quote.id}`}
+                  href={`/search?q=${encodeURIComponent(searchQuery)}&highlight=${quote.id}`}
                   className="block p-4 hover:bg-gray-50 transition-colors"
                   onClick={onClose}
                 >
