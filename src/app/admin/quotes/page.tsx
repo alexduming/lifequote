@@ -25,7 +25,7 @@ interface PendingQuote {
   author_en: string;
   status: 'pending' | 'approved' | 'rejected';
   submitted_by: string | null;
-  submitter_email?: string;
+  submitter_email: string | null;
   created_at: string;
 }
 
@@ -137,7 +137,7 @@ export default function AdminQuotesPage() {
                 
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-gray-500">
-                    提交者: {quote.submitted_by?.email}
+                    提交者: {quote.submitter_email || '未知用户'}
                   </div>
                   <div className="space-x-4">
                     <Button
