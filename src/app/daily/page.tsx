@@ -10,34 +10,55 @@ import { translations, CategoryKey } from '@/config/translations';
 // 示例数据
 const dailyQuotes = [
   {
-    quote_zh: "千里之行，始于足下。",
-    quote_en: "The journey of a thousand miles begins with a single step.",
-    author_zh: "老子",
-    author_en: "Lao Tzu",
-    author_title_zh: "中国古代哲学家",
-    author_title_en: "Ancient Chinese Philosopher",
+    id: 1,
+    quote: {
+      zh: "千里之行，始于足下。",
+      en: "The journey of a thousand miles begins with a single step."
+    },
+    author: {
+      zh: "老子",
+      en: "Lao Tzu"
+    },
+    authorTitle: {
+      zh: "中国古代哲学家",
+      en: "Ancient Chinese Philosopher"
+    },
     category: "wisdom" as CategoryKey,
     likes: 2345,
     isLiked: false,
   },
   {
-    quote_zh: "困难之中蕴藏着机遇。",
-    quote_en: "In the middle of difficulty lies opportunity.",
-    author_zh: "阿尔伯特·爱因斯坦",
-    author_en: "Albert Einstein",
-    author_title_zh: "理论物理学家",
-    author_title_en: "Theoretical Physicist",
+    id: 2,
+    quote: {
+      zh: "困难之中蕴藏着机遇。",
+      en: "In the middle of difficulty lies opportunity."
+    },
+    author: {
+      zh: "阿尔伯特·爱因斯坦",
+      en: "Albert Einstein"
+    },
+    authorTitle: {
+      zh: "理论物理学家",
+      en: "Theoretical Physicist"
+    },
     category: "motivation" as CategoryKey,
     likes: 1876,
     isLiked: true,
   },
   {
-    quote_zh: "生活本来很简单，是我们执意要把它变复杂。",
-    quote_en: "Life is really simple, but we insist on making it complicated.",
-    author_zh: "孔子",
-    author_en: "Confucius",
-    author_title_zh: "中国哲学家",
-    author_title_en: "Chinese Philosopher",
+    id: 3,
+    quote: {
+      zh: "生活本来很简单，是我们执意要把它变复杂。",
+      en: "Life is really simple, but we insist on making it complicated."
+    },
+    author: {
+      zh: "孔子",
+      en: "Confucius"
+    },
+    authorTitle: {
+      zh: "中国哲学家",
+      en: "Chinese Philosopher"
+    },
     category: "life" as CategoryKey,
     likes: 1543,
     isLiked: false,
@@ -82,19 +103,11 @@ export default function DailyPage() {
             </h2>
           </div>
           <QuoteCard
-            quote={{
-              quote_zh: dailyQuotes[0].quote_zh,
-              quote_en: dailyQuotes[0].quote_en
-            }}
-            author={{
-              author_zh: dailyQuotes[0].author_zh,
-              author_en: dailyQuotes[0].author_en
-            }}
-            authorTitle={{
-              author_title_zh: dailyQuotes[0].author_title_zh || '',
-              author_title_en: dailyQuotes[0].author_title_en || ''
-            }}
-            category={dailyQuotes[0].category as CategoryKey}
+            id={dailyQuotes[0].id}
+            quote={dailyQuotes[0].quote}
+            author={dailyQuotes[0].author}
+            authorTitle={dailyQuotes[0].authorTitle}
+            category={dailyQuotes[0].category}
             likes={dailyQuotes[0].likes}
             isLiked={dailyQuotes[0].isLiked}
           />
@@ -106,22 +119,14 @@ export default function DailyPage() {
             {language === 'en' ? 'More Inspirations' : '更多灵感'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {dailyQuotes.slice(1).map((quote, index) => (
-              <div key={index} className="animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
+            {dailyQuotes.slice(1).map((quote) => (
+              <div key={quote.id} className="animate-fade-up" style={{ animationDelay: `${quote.id * 100}ms` }}>
                 <QuoteCard
-                  quote={{
-                    quote_zh: quote.quote_zh,
-                    quote_en: quote.quote_en
-                  }}
-                  author={{
-                    author_zh: quote.author_zh,
-                    author_en: quote.author_en
-                  }}
-                  authorTitle={{
-                    author_title_zh: quote.author_title_zh || '',
-                    author_title_en: quote.author_title_en || ''
-                  }}
-                  category={quote.category as CategoryKey}
+                  id={quote.id}
+                  quote={quote.quote}
+                  author={quote.author}
+                  authorTitle={quote.authorTitle}
+                  category={quote.category}
                   likes={quote.likes}
                   isLiked={quote.isLiked}
                 />

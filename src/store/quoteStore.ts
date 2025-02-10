@@ -9,10 +9,13 @@ import { supabase } from '@/lib/supabase';
 /**
  * 语录搜索结果的类型定义
  */
-export interface SearchResult {
+interface SearchResult {
   id: string;
-  title: string;
-  description: string;
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  category: string;
 }
 
 /**
@@ -55,8 +58,20 @@ export const useQuoteStore = create<QuoteStore>((set) => ({
     try {
       const { data, error } = await supabase
         .from('quotes')
-        .select('id, title, description')
-        .textSearch('title', query)
+        .select(`
+          id,
+          quote_zh,
+          quote_en,
+          author_zh,
+          author_en,
+          category
+        `)
+        .or(`
+          quote_zh.ilike.%${query}%,
+          quote_en.ilike.%${query}%,
+          author_zh.ilike.%${query}%,
+          author_en.ilike.%${query}%
+        `)
         .limit(5);
 
       if (error) throw error;

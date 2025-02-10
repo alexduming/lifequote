@@ -34,50 +34,46 @@ export async function GET(request: NextRequest) {
     console.log(`Searching for: "${query}" in ${lang}`);
     const startTime = Date.now();
 
-    // 构建搜索条件
-    let searchQuery = supabase
+    // 使用简单的搜索查询
+    const searchQuery = supabase
       .from('quotes')
       .select('*', { count: 'exact' });
 
     // 根据语言选择搜索字段
-    const searchFields = lang === 'zh' 
-      ? ['quote_zh', 'author_zh', 'author_title_zh', 'book']
-      : ['quote_en', 'author_en', 'author_title_en', 'book_en'];
+    if (lang === 'zh') {
+      searchQuery.or(`quote_zh.ilike.%${query}%,author_zh.ilike.%${query}%`);
+    } else {
+      searchQuery.or(`quote_en.ilike.%${query}%,author_en.ilike.%${query}%`);
+    }
 
-    const searchConditions = searchFields
-      .map(field => `${field}.ilike.%${query}%`)
-      .join(',');
-
-    searchQuery = searchQuery.or(searchConditions);
-
-    // 添加分页
-    const start = (page - 1) * limit;
-    searchQuery = searchQuery
-      .range(start, start + limit - 1)
-      .order('created_at', { ascending: false });
-
-    // 执行查询
-    const { data: results, count, error } = await searchQuery;
+    // 添加排序和分页
+    const { data: results, count, error } = await searchQuery
+      .order('created_at', { ascending: false })
+      .range((page - 1) * limit, page * limit - 1);
 
     if (error) {
+      console.error('Search query error:', error);
       throw error;
+    }
+
+    if (!results) {
+      return NextResponse.json({
+        results: [],
+        total: 0,
+        pagination: {
+          currentPage: page,
+          totalPages: 0,
+          totalItems: 0,
+        }
+      });
     }
 
     const endTime = Date.now();
     console.log(`Search completed in ${endTime - startTime}ms`);
-    
-    // 转换数据格式
-    const transformedResults = results?.map(quote => ({
-      ...quote,
-      quote_zh: quote.content_zh,
-      quote_en: quote.content_en,
-      // 删除旧字段
-      content_zh: undefined,
-      content_en: undefined,
-    })) || [];
+    console.log(`Found ${count || 0} results`);
     
     return NextResponse.json({
-      results: transformedResults,
+      results,
       total: count || 0,
       pagination: {
         currentPage: page,
@@ -93,10 +89,14 @@ export async function GET(request: NextRequest) {
       },
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Search error:', error);
     return NextResponse.json(
-      { error: '搜索失败' },
+      { 
+        error: '搜索失败',
+        details: error.message || '未知错误',
+        query: request.url
+      },
       { 
         status: 500,
         headers: {
