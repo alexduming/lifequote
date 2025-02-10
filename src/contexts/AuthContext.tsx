@@ -6,17 +6,26 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { SupabaseClient } from '@supabase/supabase-js';
+
+interface SignInResponse {
+  data: {
+    user: User | null;
+    session: Session | null;
+  } | null;
+  error: Error | null;
+}
 
 interface AuthContextType {
   user: User | null;
-  supabase: ReturnType<typeof getSupabaseClient>;
+  supabase: SupabaseClient | null;
   loading: boolean;
   isAdmin: boolean;
   signOut: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<SignInResponse>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // 登录方法
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<SignInResponse> => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -60,15 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
-        throw error;
+        return { data: null, error };
       }
 
-      // 更新用户状态
       setUser(data.user);
-      
       return { data, error: null };
+      
     } catch (error: any) {
-      console.error('登录错误:', error);
       return {
         data: null,
         error: {

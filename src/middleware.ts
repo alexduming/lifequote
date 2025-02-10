@@ -9,7 +9,13 @@ const protectedRoutes = [
   '/profile',
   '/favorites',
   '/likes',
+  '/admin/quotes',
 ];
+
+/**
+ * 管理员路由
+ */
+const adminRoutes = ['/admin/quotes'];
 
 /**
  * 中间件函数，用于处理路由保护和认证状态
@@ -27,6 +33,26 @@ export async function middleware(req: NextRequest) {
 
   // 获取当前路径
   const path = req.nextUrl.pathname;
+
+  // 检查管理员权限
+  if (adminRoutes.includes(path)) {
+    if (!session) {
+      const redirectUrl = new URL('/login', req.url);
+      redirectUrl.searchParams.set('redirectTo', path);
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // 获取用户角色
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (profile?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/', req.url));
+    }
+  }
 
   // 如果是受保护的路由且用户未登录，重定向到登录页面
   if (protectedRoutes.includes(path) && !session) {
@@ -57,5 +83,6 @@ export const config = {
     '/likes/:path*',
     '/login',
     '/register',
+    '/admin/:path*',
   ],
 }; 

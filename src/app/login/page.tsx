@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
+import { toast } from 'react-hot-toast';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -29,12 +30,24 @@ function LoginForm() {
 
     try {
       const { error: signInError } = await signIn(email, password);
-      if (signInError) throw signInError;
       
-      // 登录成功后重定向
-      router.push(redirectTo);
+      if (signInError) {
+        throw signInError;
+      }
+      
+      // 登录成功
+      toast.success(language === 'zh' ? '登录成功' : 'Login successful');
+      
+      // 等待 session 更新
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // 重定向到目标页面
+      router.replace(redirectTo || '/');
+      
     } catch (err: any) {
+      console.error('登录失败:', err);
       setError(err.message);
+      toast.error(language === 'zh' ? '登录失败' : 'Login failed');
     } finally {
       setLoading(false);
     }
