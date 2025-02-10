@@ -54,6 +54,12 @@ export default function SubmitQuotePage() {
     setLoading(true);
     setError(null);
 
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      setLoading(false);
+      return;
+    }
+
     try {
       // 验证必填字段
       const requiredFields = ['content', 'author', 'authorTitle'];

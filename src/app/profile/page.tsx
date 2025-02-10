@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
   const [username, setUsername] = useState('');
@@ -13,6 +14,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [profile, setProfile] = useState(null);
   
   const { user, supabase } = useAuth();
   const router = useRouter();
@@ -20,51 +22,61 @@ export default function ProfilePage() {
   const t = translations[language];
 
   useEffect(() => {
-    async function loadProfile() {
+    async function loadUserProfile() {
+      if (!user) return;
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        toast.error('数据库连接失败');
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('username, bio')
-          .eq('user_id', user?.id)
+          .select('*')
+          .eq('id', user.id)
           .single();
 
         if (error) throw error;
-
-        if (data) {
-          setUsername(data.username || '');
-          setBio(data.bio || '');
-        }
-      } catch (err: any) {
-        console.error('Error loading profile:', err.message);
+        setProfile(data);
+      } catch (error) {
+        console.error('加载用户资料失败:', error);
+        toast.error('加载用户资料失败');
+      } finally {
+        setLoading(false);
       }
     }
 
-    if (user) {
-      loadProfile();
-    }
+    loadUserProfile();
   }, [user, supabase]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(false);
+    if (!user) return;
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const { error: upsertError } = await supabase
         .from('user_profiles')
         .upsert({
-          user_id: user?.id,
-          username,
-          bio,
-          updated_at: new Date().toISOString(),
+          id: user.id,
+          username: username,
+          bio: bio,
+          updated_at: new Date().toISOString()
         });
 
       if (upsertError) throw upsertError;
 
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err.message);
+      toast.success('资料更新成功');
+    } catch (error) {
+      console.error('更新资料失败:', error);
+      toast.error('更新资料失败');
     } finally {
       setLoading(false);
     }
@@ -80,7 +92,7 @@ export default function ProfilePage() {
               {t.profile.title}
             </h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleUpdateProfile} className="space-y-6">
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
                   {error}

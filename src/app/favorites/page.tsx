@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { translations, CategoryKey } from '@/config/translations';
 import type { Quote } from '@/lib/database.types';
+import { toast } from 'sonner';
 
 interface FavoriteWithQuote {
   quote_id: number;
@@ -44,6 +45,12 @@ export default function FavoritesPage() {
   useEffect(() => {
     async function loadFavorites() {
       if (!user) return;
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        toast.error('数据库连接失败');
+        setLoading(false);
+        return;
+      }
 
       try {
         const { data, error } = await supabase
@@ -73,6 +80,7 @@ export default function FavoritesPage() {
         setFavorites(quotes);
       } catch (error) {
         console.error('加载收藏失败:', error);
+        toast.error('加载收藏失败');
       } finally {
         setLoading(false);
       }

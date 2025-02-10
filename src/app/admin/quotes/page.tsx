@@ -39,6 +39,13 @@ export default function AdminQuotesPage() {
 
   useEffect(() => {
     const fetchPendingQuotes = async () => {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        toast.error('数据库连接失败');
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('pending_quotes')
@@ -67,6 +74,11 @@ export default function AdminQuotesPage() {
   }, [supabase]);
 
   const handleApprove = async (quoteId: string) => {
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('quotes')
@@ -88,6 +100,11 @@ export default function AdminQuotesPage() {
   };
 
   const handleReject = async (quoteId: string) => {
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('quotes')

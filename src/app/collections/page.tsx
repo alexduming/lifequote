@@ -4,20 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
-import { Plus, Folder, Settings, Share2, Trash2 } from 'lucide-react';
+import { Plus, Folder, Settings, Share2, Trash2, Globe, Lock } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { toast } from 'sonner';
 
 /**
  * 收藏夹类型定义
  */
-type Collection = {
+interface Collection {
   id: string;
   name: string;
   description: string | null;
   is_public: boolean;
-  quote_count: number;
   created_at: string;
-};
+  user_id: string;
+  quote_count: number;
+}
 
 /**
  * 收藏夹管理页面组件
@@ -29,8 +31,8 @@ export default function CollectionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-  const [newCollectionDesc, setNewCollectionDesc] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
+  const [newCollectionDescription, setNewCollectionDescription] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
 
   const { user, supabase } = useAuth();
   const { language } = useLanguage();
@@ -39,6 +41,13 @@ export default function CollectionsPage() {
   // 加载用户的收藏夹列表
   useEffect(() => {
     async function loadCollections() {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        toast.error('数据库连接失败');
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data, error: collectionsError } = await supabase
           .from('collections')
@@ -51,15 +60,15 @@ export default function CollectionsPage() {
 
         if (collectionsError) throw collectionsError;
 
-        const collectionsWithCount = data.map(collection => ({
+        const collectionsWithCount = data?.map(collection => ({
           ...collection,
-          quote_count: collection.collection_items[0]?.count || 0
-        }));
+          quote_count: collection.collection_items?.[0]?.count || 0
+        })) || [];
 
         setCollections(collectionsWithCount);
-      } catch (err: any) {
-        console.error('加载收藏夹失败:', err.message);
-        setError(err.message);
+      } catch (error: any) {
+        console.error('加载收藏夹失败:', error);
+        toast.error('加载收藏夹失败');
       } finally {
         setLoading(false);
       }
@@ -72,16 +81,19 @@ export default function CollectionsPage() {
 
   // 创建新收藏夹
   const handleCreateCollection = async () => {
-    if (!newCollectionName.trim()) return;
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      return;
+    }
 
     try {
       const { data, error } = await supabase
         .from('collections')
         .insert({
-          user_id: user?.id,
-          name: newCollectionName.trim(),
-          description: newCollectionDesc.trim() || null,
-          is_public: isPublic
+          name: newCollectionName,
+          description: newCollectionDescription || null,
+          is_public: isPublic,
+          user_id: user?.id
         })
         .select()
         .single();
@@ -91,17 +103,21 @@ export default function CollectionsPage() {
       setCollections(prev => [{ ...data, quote_count: 0 }, ...prev]);
       setShowCreateModal(false);
       setNewCollectionName('');
-      setNewCollectionDesc('');
-      setIsPublic(false);
-    } catch (err: any) {
-      console.error('创建收藏夹失败:', err.message);
-      alert('创建收藏夹失败，请重试');
+      setNewCollectionDescription('');
+      setIsPublic(true);
+      toast.success('创建成功');
+    } catch (error: any) {
+      console.error('创建收藏夹失败:', error);
+      toast.error('创建失败');
     }
   };
 
   // 删除收藏夹
   const handleDeleteCollection = async (collectionId: string) => {
-    if (!confirm('确定要删除这个收藏夹吗？此操作不可恢复。')) return;
+    if (!supabase) {
+      toast.error('数据库连接失败');
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -112,9 +128,10 @@ export default function CollectionsPage() {
       if (error) throw error;
 
       setCollections(prev => prev.filter(c => c.id !== collectionId));
-    } catch (err: any) {
-      console.error('删除收藏夹失败:', err.message);
-      alert('删除收藏夹失败，请重试');
+      toast.success('删除成功');
+    } catch (error: any) {
+      console.error('删除收藏夹失败:', error);
+      toast.error('删除失败');
     }
   };
 
@@ -123,76 +140,61 @@ export default function CollectionsPage() {
       <Navbar />
       <div className="container py-20">
         {/* 页面标题 */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center justify-between mb-12">
           <h1 className="text-4xl font-[oswald] font-bold text-white">
-            我的收藏夹
+            {t.collections.title}
           </h1>
           <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
             <Plus size={20} />
-            <span>新建收藏夹</span>
+            <span>{t.collections.create}</span>
           </button>
         </div>
 
         {/* 收藏夹列表 */}
         {loading ? (
-          <div className="text-center text-white/60">加载中...</div>
-        ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
+          <div className="text-center text-white/60">
+            {t.common.loading}
+          </div>
         ) : collections.length === 0 ? (
           <div className="text-center text-white/60">
-            还没有创建任何收藏夹
+            {t.collections.empty}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {collections.map(collection => (
-              <div
+            {collections.map((collection) => (
+              <a
                 key={collection.id}
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-colors"
+                href={`/collections/${collection.id}`}
+                className="block bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all group"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
-                      <Folder className="text-primary-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-[oswald] text-white">
-                        {collection.name}
-                      </h3>
-                      <p className="text-sm text-white/60">
-                        {collection.quote_count} 条语录
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {/* TODO: 实现编辑功能 */}}
-                      className="p-2 text-white/60 hover:text-white transition-colors"
-                    >
-                      <Settings size={18} />
-                    </button>
-                    <button
-                      onClick={() => {/* TODO: 实现分享功能 */}}
-                      className="p-2 text-white/60 hover:text-white transition-colors"
-                    >
-                      <Share2 size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCollection(collection.id)}
-                      className="p-2 text-white/60 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-2">
+                  {collection.is_public ? (
+                    <>
+                      <Globe size={16} />
+                      <span>公开收藏夹</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={16} />
+                      <span>私密收藏夹</span>
+                    </>
+                  )}
                 </div>
+                <h3 className="text-xl font-medium text-white mb-2 group-hover:text-primary-400 transition-colors">
+                  {collection.name}
+                </h3>
                 {collection.description && (
-                  <p className="text-white/60 text-sm mb-4">
+                  <p className="text-white/60 text-sm mb-4 line-clamp-2">
                     {collection.description}
                   </p>
                 )}
-              </div>
+                <div className="text-sm text-white/40">
+                  {collection.quote_count} 条语录
+                </div>
+              </a>
             ))}
           </div>
         )}
@@ -222,8 +224,8 @@ export default function CollectionsPage() {
                     描述（可选）
                   </label>
                   <textarea
-                    value={newCollectionDesc}
-                    onChange={e => setNewCollectionDesc(e.target.value)}
+                    value={newCollectionDescription}
+                    onChange={e => setNewCollectionDescription(e.target.value)}
                     className="w-full px-4 py-2 bg-white/5 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="添加描述"
                     rows={3}
