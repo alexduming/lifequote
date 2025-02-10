@@ -18,12 +18,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import ClientLayout from '@/components/ClientLayout';
-
-// 动态导入组件以避免 SSR 问题
-const HeroSection = dynamic(() => import('@/components/HeroSection'), { ssr: false });
-const FeaturedQuotes = dynamic(() => import('@/components/FeaturedQuotes'), { ssr: false });
-const CategoriesGrid = dynamic(() => import('@/components/CategoriesGrid'), { ssr: false });
+import HeroSection from '@/components/HeroSection';
+import FeaturedQuotes from '@/components/FeaturedQuotes';
+import CategoriesGrid from '@/components/CategoriesGrid';
 
 /**
  * 首页组件
@@ -33,16 +30,14 @@ export default function Home() {
   const t = translations[language];
 
   return (
-    <ClientLayout>
-      <div className="noise-bg">
-        <Navbar />
-        <main className="min-h-screen">
-          <HeroSection />
-          <FeaturedQuotes />
-          <CategoriesGrid />
-        </main>
-        <Footer />
-      </div>
-    </ClientLayout>
+    <div className="noise-bg">
+      <Navbar />
+      <main className="min-h-screen">
+        <HeroSection />
+        <FeaturedQuotes />
+        <CategoriesGrid />
+      </main>
+      <Footer />
+    </div>
   );
 } 

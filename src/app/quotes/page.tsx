@@ -135,39 +135,39 @@ export default async function QuotesPage({
             <div className="flex-grow">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-medium text-gray-900">
-                  {translations[locale].quotes.title}
+                  所有语录 / All Quotes
                 </h2>
                 <button className="flex items-center gap-2 text-sm text-gray-500">
                   <ArrowDownUp size={16} />
-                  <span>{translations[locale].quotes.sort}</span>
+                  <span>排序 / Sort</span>
                 </button>
               </div>
 
               {/* 筛选按钮 */}
-              <button className="flex items-center gap-2">
+              <button className="flex items-center gap-2 text-gray-500 mb-6">
                 <Filter size={16} />
-                <span>{translations[locale].quotes.filter}</span>
+                <span>筛选 / Filter</span>
               </button>
 
               <div className="space-y-6">
                 {quotes.map((quote) => (
                   <QuoteCard
                     key={quote.id}
+                    id={quote.id}
                     quote={{
-                      quote_zh: quote.quote_zh || quote.content_zh,
-                      quote_en: quote.quote_en || quote.content_en
+                      zh: quote.quote_zh || '',
+                      en: quote.quote_en || ''
                     }}
                     author={{
-                      author_zh: quote.author_zh,
-                      author_en: quote.author_en
+                      zh: quote.author_zh || '',
+                      en: quote.author_en || ''
                     }}
-                    authorTitle={{
-                      author_title_zh: quote.author_title_zh || '',
-                      author_title_en: quote.author_title_en || ''
-                    }}
+                    authorTitle={quote.author_title_zh ? {
+                      zh: quote.author_title_zh,
+                      en: quote.author_title_en || ''
+                    } : undefined}
                     category={quote.category as CategoryKey}
-                    likes={quote.likes}
-                    isLiked={false}
+                    likes={quote.likes || 0}
                   />
                 ))}
               </div>

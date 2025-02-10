@@ -261,10 +261,10 @@ export const translations: Record<Language, TranslationType> = {
       submit: 'Submit Quote',
     },
     hero: {
-      title: 'Words That Inspired Humanity for 1000 Years',
-      subtitle: 'Explore the most influential thoughts in human history\nLet wisdom light your path of life',
+      title: 'WORDS THAT INSPIRED HUMANITY FOR 1000 YEARS',
+      subtitle: "Discover timeless wisdom from history's greatest minds. Find inspiration, motivation, and guidance.",
       searchPlaceholder: 'Search quotes, authors, or topics...',
-    },
+    },    
     quotes: {
       title: 'All Quotes',
       filter: 'Filter',
@@ -279,13 +279,13 @@ export const translations: Record<Language, TranslationType> = {
     },
     sections: {
       featured: {
-        title: 'Today\'s Featured',
-        subtitle: 'Daily curated classic quotes',
-        viewMore: 'View More',
+        title: 'Featured Quotes',
+        subtitle: 'Discover wisdom from great minds',
+        viewMore: 'View More'
       },
       explore: {
         title: 'Explore Topics',
-        subtitle: 'Discover wisdom in different fields',
+        subtitle: 'Discover wisdom in different fields'
       },
       stats: {
         quotes: 'quotes',
@@ -445,7 +445,7 @@ export const translations: Record<Language, TranslationType> = {
       submit: '提交语录',
     },
     hero: {
-      title: '发现生活的智慧\n感受千年的启迪',
+      title: '在过去的1000年中\n那些鼓励着全人类的句子',
       subtitle: '探索人类历史上最具影响力的思想精华\n让智慧之光照亮你的人生之路',
       searchPlaceholder: '搜索名言、作者或主题...',
     },
@@ -463,13 +463,13 @@ export const translations: Record<Language, TranslationType> = {
     },
     sections: {
       featured: {
-        title: '今日精选',
-        subtitle: '每日精心挑选的经典语录',
-        viewMore: '查看更多',
+        title: '精选语录',
+        subtitle: '发现智者的箴言',
+        viewMore: '查看更多'
       },
       explore: {
         title: '探索主题',
-        subtitle: '发现不同领域的智慧之光',
+        subtitle: '探索不同领域的智慧'
       },
       stats: {
         quotes: '条语录',

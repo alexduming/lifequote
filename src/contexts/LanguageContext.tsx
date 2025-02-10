@@ -1,5 +1,5 @@
 /**
- * @version 0.9
+ * @version 1.7.3
  * @description 语言上下文实现，包含以下功能：
  * - 支持中英文切换
  * - 本地存储语言偏好
@@ -13,9 +13,8 @@
 'use client';
 
 /**
- * 语言上下文组件
+ * 语言切换上下文
  * @module LanguageContext
- * @description 提供语言切换功能和状态管理
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
@@ -30,6 +29,9 @@ type LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+/**
+ * 语言切换上下文提供者
+ */
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [language, setLanguageState] = useState<Language>('en');
@@ -76,6 +78,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * 使用语言上下文的 Hook
+ */
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {

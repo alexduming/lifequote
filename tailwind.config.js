@@ -1,9 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -33,7 +31,6 @@ module.exports = {
           900: '#8c4d15',
         },
         dark: {
-          DEFAULT: '#1a1b1e',
           50: '#f8fafc',
           100: '#f1f5f9',
           200: '#e2e8f0',
@@ -45,18 +42,43 @@ module.exports = {
           800: '#1e293b',
           900: '#0f172a',
         },
+        pink: {
+          50: '#fdf2f8',
+          100: '#fce7f3',
+          200: '#fbcfe8',
+          300: '#f9a8d4',
+          400: '#f472b6',
+          500: '#ec4899',
+          600: '#db2777',
+          700: '#be185d',
+          800: '#9d174d',
+          900: '#831843',
+        },
+        sky: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         serif: ['Merriweather', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
-        oswald: ['var(--font-oswald)'],
+        'oswald': ['Oswald', 'sans-serif'],
         'noto-sans': ['var(--font-noto-sans)'],
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-in-out',
         'fade-up': 'fade-up 0.5s ease-out',
         'scale': 'scale 0.2s ease-in-out',
+        blob: "blob 7s infinite",
       },
       keyframes: {
         'fade-in': {
@@ -70,6 +92,20 @@ module.exports = {
         'scale': {
           '0%': { transform: 'scale(0.95)' },
           '100%': { transform: 'scale(1)' },
+        },
+        blob: {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
         },
       },
       backgroundImage: {

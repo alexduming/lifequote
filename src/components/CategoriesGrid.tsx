@@ -21,13 +21,15 @@ export default function CategoriesGrid() {
 
   return (
     <section className="container py-20">
-      <h2 className="text-4xl md:text-5xl font-[oswald] font-bold text-dark-900 mb-6 tracking-tight uppercase !leading-none">
-        {t.sections.explore.title}
-      </h2>
-      <p className="text-lg md:text-xl text-dark-500 mb-16 font-light max-w-3xl">
-        {t.sections.explore.subtitle}
-      </p>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <div className="mb-16">
+        <h2 className="text-4xl md:text-5xl font-[oswald] font-bold text-dark-900 mb-6 tracking-tight uppercase !leading-none">
+          {t.sections.explore.title}
+        </h2>
+        <p className="text-lg md:text-xl text-dark-500 font-light max-w-3xl">
+          {t.sections.explore.subtitle}
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((category) => (
           <a
             key={category.key}

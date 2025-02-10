@@ -1,9 +1,11 @@
-export type Quote = {
+export interface Quote {
   id: number;
-  content: string;
-  author: string;
-  source?: string;
-  language: string;
-  likes?: number;
-  category?: string;
-}; 
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh?: string;
+  author_title_en?: string;
+  category: string;
+  likes: number;
+} 

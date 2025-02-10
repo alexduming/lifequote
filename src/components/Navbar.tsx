@@ -28,6 +28,7 @@ export default function Navbar() {
     { href: '/books', label: t.nav.books },
     { href: '/authors', label: t.nav.authors },
     { href: '/topics', label: t.nav.topics },
+    { href: '/quotes', label: t.nav.quotes },
   ];
 
   const handleSignOut = async () => {

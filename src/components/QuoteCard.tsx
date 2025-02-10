@@ -14,45 +14,41 @@ import ShareButton from '@/components/ShareButton';
 import { X } from 'lucide-react';
 
 // 引号样式选项
-const QUOTE_STYLES = {
+export const QUOTE_STYLES = {
   default: {
-    char: '❝',
-    className: 'text-8xl text-[#fde8ee] -top-6 -left-3'
-  },
-  curly: {
     char: '"',
-    className: 'font-["Playfair_Display"] text-8xl text-[#fde8ee]'
-  },
-  heavy: {
-    char: '❝',
-    className: 'text-7xl text-[#fde8ee]'
+    className: 'text-7xl font-["Playfair_Display"] text-[#FFE5ED] absolute leading-none mix-blend-multiply'
   },
   modern: {
-    char: '„',
-    className: 'font-["Noto_Serif"] text-8xl text-[#fde8ee]'
+    char: '"',
+    className: 'text-7xl font-["Playfair_Display"] text-pink-100 absolute -top-2 left-4 leading-none mix-blend-multiply'
   },
   minimal: {
-    char: '›',
-    className: 'text-6xl text-[#fde8ee] rotate-45'
+    char: '❞',
+    className: 'text-6xl font-["Noto_Serif"] text-pink-100 absolute -top-2 left-4 leading-none mix-blend-multiply'
+  },
+  elegant: {
+    char: '❝',
+    className: 'text-6xl font-["Cormorant"] text-pink-100 absolute -top-2 left-4 leading-none mix-blend-multiply'
   }
-};
+} as const;
 
 /**
  * 语录卡片组件的属性类型定义
  */
 export interface QuoteCardProps {
-  id: number;
+  id?: string | number;
   quote: {
-    quote_zh: string;
-    quote_en: string;
+    zh: string;
+    en: string;
   };
   author: {
-    author_zh: string;
-    author_en: string;
+    zh: string;
+    en: string;
   };
-  authorTitle: {
-    author_title_zh: string;
-    author_title_en: string;
+  authorTitle?: {
+    zh: string;
+    en: string;
   };
   category: CategoryKey;
   likes: number;
@@ -61,8 +57,8 @@ export interface QuoteCardProps {
   quoteStyle?: keyof typeof QUOTE_STYLES;
   onRemove?: () => void;
   book?: {
-    book_zh?: string;
-    book_en?: string;
+    zh?: string;
+    en?: string;
   };
 }
 
@@ -90,75 +86,84 @@ export default function QuoteCard({
 
   // 在客户端设置分享 URL
   React.useEffect(() => {
-    setShareUrl(`${window.location.origin}/quotes/${id}`);
+    if (id) {
+      setShareUrl(`${window.location.origin}/quotes/${id}`);
+    }
   }, [id]);
 
   // 获取分类的翻译名称
   const categoryName = t.categories[category];
 
   // 获取当前语言的文本
-  const currentQuote = language === 'zh' ? quote.quote_zh : quote.quote_en;
-  const currentAuthor = language === 'zh' ? author.author_zh : author.author_en;
-  const currentBook = book ? (language === 'zh' ? book.book_zh : book.book_en) : undefined;
+  const currentQuote = quote[language];
+  const currentAuthor = author[language];
+  const currentAuthorTitle = authorTitle?.[language];
+  const currentBook = book?.[language];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden">
-      {/* Quote mark */}
-      <div className="absolute -top-2 -left-2 opacity-10 pointer-events-none">
-        <span className={style.className}>{style.char}</span>
-      </div>
+    <div className="group relative bg-white/80 backdrop-blur-sm rounded-xl border border-[#D70050]/10 
+      hover:shadow-lg hover:shadow-[#D70050]/5 transition-all duration-300 h-fit">
+      {/* 主要内容 */}
+      <div className="relative p-6 space-y-4">
+        {/* 装饰性引号 - 移除了固定位置，您可以手动调整 top 和 left 的值 */}
+        <div className={`${style.className} -top--2 left-3`}>
+          {style.char}
+        </div>
 
-      <div className="relative z-10">
-        <blockquote className="relative z-10 pl-4">
-          <p className="text-lg text-dark-900 leading-relaxed">
-            {currentQuote}
-          </p>
-        </blockquote>
 
-        <div className="mt-4 pl-4">
+        {/* 语录内容 */}
+        <p className="text-lg text-gray-800 leading-relaxed relative">
+          {currentQuote}
+        </p>
+
+        {/* 作者信息和分类 */}
+        <div className="flex items-center justify-between">
           <div>
-            <cite className="not-italic font-medium text-[#D70050] block">
+            <p className="font-medium text-[#D70050]">
               {currentAuthor}
-            </cite>
-            {authorTitle && (
-              <p className="text-sm text-dark-500 mt-1">
-                {language === 'zh' ? authorTitle.author_title_zh : authorTitle.author_title_en}
+            </p>
+            {currentAuthorTitle && (
+              <p className="text-sm text-gray-500">
+                {currentAuthorTitle}
               </p>
             )}
           </div>
+
+          {/* 分类标签 */}
+          <span className="px-3 py-1 text-sm bg-[#D70050]/5 text-[#D70050] rounded-full">
+            {categoryName}
+          </span>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t">
-          <div className="flex items-center space-x-4">
-            <LikeButton
-              quoteId={id}
-              likes={likes}
-              initialIsLiked={isLiked}
-            />
-            <FavoriteButton
-              quoteId={id}
-              initialIsFavorited={isFavorited}
-            />
-            <ShareButton
-              url={shareUrl}
-              title={currentAuthor}
-              text={currentQuote}
-              author={currentAuthor}
-              book={currentBook}
-            />
-          </div>
-
-          {onRemove && (
-            <button
-              onClick={onRemove}
-              className="text-dark-400 hover:text-[#D70050] transition-colors"
-            >
-              <X size={18} />
-            </button>
-          )}
+        {/* 操作按钮 */}
+        <div className="flex items-center gap-4 pt-4 border-t border-[#D70050]/10">
+          <LikeButton
+            quoteId={id ? Number(id) : 0}
+            likes={likes}
+            initialIsLiked={isLiked}
+          />
+          <FavoriteButton
+            quoteId={id ? Number(id) : 0}
+            initialIsFavorited={isFavorited}
+          />
+          <ShareButton
+            url={shareUrl}
+            title={currentAuthor}
+            text={currentQuote}
+            author={currentAuthor}
+            book={currentBook}
+          />
         </div>
       </div>
+
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="absolute top-2 right-2 text-gray-400 hover:text-[#D70050] transition-colors"
+        >
+          <X size={18} />
+        </button>
+      )}
     </div>
   );
 } 
