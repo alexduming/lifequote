@@ -110,6 +110,13 @@ export type TranslationType = {
     empty: string;
     loading: string;
     error: string;
+    showing: string;
+    sortOptions: {
+      newest: string;
+      oldest: string;
+      mostLiked: string;
+      leastLiked: string;
+    };
   };
   sections: {
     featured: {
@@ -347,7 +354,7 @@ export const translations: Record<Language, TranslationType> = {
       title: 'All Quotes',
       filter: 'Filter',
       sort: 'Sort',
-      total: '%d quotes',
+      total: '%d Quotes',
       viewAll: 'View All',
       noResults: 'No quotes found',
       searchPlaceholder: 'Search quotes...',
@@ -356,7 +363,14 @@ export const translations: Record<Language, TranslationType> = {
       source: 'Source',
       empty: 'No quotes yet',
       loading: 'Loading...',
-      error: 'Failed to load'
+      error: 'Failed to load',
+      showing: 'Showing %d results',
+      sortOptions: {
+        newest: 'Newest First',
+        oldest: 'Oldest First',
+        mostLiked: 'Most Liked',
+        leastLiked: 'Least Liked'
+      }
     },
     sections: {
       featured: {
@@ -589,19 +603,26 @@ export const translations: Record<Language, TranslationType> = {
       searchPlaceholder: '搜索名言、作者或主题...',
     },
     quotes: {
-      title: '全部语录',
+      title: '所有语录',
       filter: '筛选',
       sort: '排序',
-      total: '%d 条语录',
+      total: '共 %d 条语录',
       viewAll: '查看全部',
-      noResults: '未找到相关语录',
+      noResults: '没有找到匹配的语录',
       searchPlaceholder: '搜索语录...',
       category: '分类',
       author: '作者',
       source: '来源',
       empty: '暂无语录',
       loading: '加载中...',
-      error: '加载失败'
+      error: '加载失败',
+      showing: '显示 %d 条结果',
+      sortOptions: {
+        newest: '最新发布',
+        oldest: '最早发布',
+        mostLiked: '最多点赞',
+        leastLiked: '最少点赞'
+      }
     },
     sections: {
       featured: {
