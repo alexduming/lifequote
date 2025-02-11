@@ -181,6 +181,7 @@ export type TranslationType = {
     empty: string;
   };
   collections: {
+    title: string;
     create: string;
     edit: string;
     name: string;
@@ -367,6 +368,7 @@ export const translations: Record<Language, TranslationType> = {
       empty: 'No favorites yet',
     },
     collections: {
+      title: 'My Collections',
       create: 'Create Collection',
       edit: 'Edit Collection',
       name: 'Name',
@@ -551,6 +553,7 @@ export const translations: Record<Language, TranslationType> = {
       empty: '暂无收藏',
     },
     collections: {
+      title: '我的收藏夹',
       create: '创建收藏夹',
       edit: '编辑收藏夹',
       name: '名称',
