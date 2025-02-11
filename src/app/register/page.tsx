@@ -49,6 +49,12 @@ function RegisterForm() {
       if (signUpError) throw signUpError;
 
       if (data?.user) {
+        // 检查 supabase 是否可用
+        if (!supabase) {
+          console.error('Supabase client not initialized');
+          throw new Error('数据库连接失败');
+        }
+
         // 尝试创建用户资料
         const { error: profileError } = await supabase
           .from('user_profiles')
