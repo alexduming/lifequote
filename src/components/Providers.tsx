@@ -18,13 +18,13 @@ import { Toaster } from 'sonner';
  * @param {React.ReactNode} props.children - 子组件
  * @returns {JSX.Element} 提供者组件
  */
-export default function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SupabaseProvider>
       <AuthProvider>
         <LanguageProvider>
           {children}
-          <Toaster />
+          <Toaster position="top-center" />
         </LanguageProvider>
       </AuthProvider>
     </SupabaseProvider>

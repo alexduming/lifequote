@@ -182,7 +182,32 @@ export type TranslationType = {
   };
   favorites: {
     title: string;
-    empty: string;
+    createCollection: string;
+    loading: string;
+    noQuotes: string;
+    loadError: string;
+    loadQuotesError: string;
+    createSuccess: string;
+    createError: string;
+    updateSuccess: string;
+    updateError: string;
+    deleteSuccess: string;
+    deleteError: string;
+    editButton: string;
+    deleteButton: string;
+    createModal: {
+      title: string;
+      nameLabel: string;
+      namePlaceholder: string;
+      descriptionLabel: string;
+      descriptionPlaceholder: string;
+      publicLabel: string;
+      createButton: string;
+    };
+    editModal: {
+      title: string;
+      saveButton: string;
+    };
   };
   collections: {
     title: string;
@@ -385,7 +410,32 @@ export const translations: Record<Language, TranslationType> = {
     },
     favorites: {
       title: 'My Favorites',
-      empty: 'No favorites yet',
+      createCollection: 'New Collection',
+      loading: 'Loading...',
+      noQuotes: 'No quotes yet',
+      loadError: 'Failed to load collections',
+      loadQuotesError: 'Failed to load quotes',
+      createSuccess: 'Collection created successfully',
+      createError: 'Failed to create collection',
+      updateSuccess: 'Collection updated successfully',
+      updateError: 'Failed to update collection',
+      deleteSuccess: 'Collection deleted successfully',
+      deleteError: 'Failed to delete collection',
+      editButton: 'Edit',
+      deleteButton: 'Delete',
+      createModal: {
+        title: 'Create Collection',
+        nameLabel: 'Name',
+        namePlaceholder: 'Enter collection name',
+        descriptionLabel: 'Description',
+        descriptionPlaceholder: 'Enter collection description',
+        publicLabel: 'Public',
+        createButton: 'Create'
+      },
+      editModal: {
+        title: 'Edit Collection',
+        saveButton: 'Save'
+      }
     },
     collections: {
       title: 'My Collections',
@@ -586,7 +636,32 @@ export const translations: Record<Language, TranslationType> = {
     },
     favorites: {
       title: '我的收藏',
-      empty: '暂无收藏',
+      createCollection: '新建收藏夹',
+      loading: '加载中...',
+      noQuotes: '暂无收藏的语录',
+      loadError: '加载收藏夹失败',
+      loadQuotesError: '加载语录失败',
+      createSuccess: '收藏夹创建成功',
+      createError: '创建收藏夹失败',
+      updateSuccess: '收藏夹更新成功',
+      updateError: '更新收藏夹失败',
+      deleteSuccess: '收藏夹删除成功',
+      deleteError: '删除收藏夹失败',
+      editButton: '编辑',
+      deleteButton: '删除',
+      createModal: {
+        title: '新建收藏夹',
+        nameLabel: '名称',
+        namePlaceholder: '输入收藏夹名称',
+        descriptionLabel: '描述',
+        descriptionPlaceholder: '输入收藏夹描述',
+        publicLabel: '公开',
+        createButton: '创建'
+      },
+      editModal: {
+        title: '编辑收藏夹',
+        saveButton: '保存'
+      }
     },
     collections: {
       title: '我的收藏夹',

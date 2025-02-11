@@ -6,7 +6,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Bookmark } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import QuoteCard from '@/components/QuoteCard';
@@ -17,109 +16,118 @@ import { translations, CategoryKey } from '@/config/translations';
 import type { Quote } from '@/lib/database.types';
 import { toast } from 'sonner';
 
-interface FavoriteWithQuote {
-  quote_id: number;
-  quotes: Quote;
+interface FavoriteQuote {
+  id: number;
+  quote_zh: string;
+  quote_en: string;
+  author_zh: string;
+  author_en: string;
+  author_title_zh: string | null;
+  author_title_en: string | null;
+  category: CategoryKey;
+  likes: number;
+  views: number;
+  period_zh: string | null;
+  period_en: string | null;
+  book_zh: string | null;
+  book_en: string | null;
+  isFavorited: boolean;
 }
 
 /**
  * 收藏页面组件
  */
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<Quote[]>([]);
+  const [quotes, setQuotes] = useState<FavoriteQuote[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const { language } = useLanguage();
   const { user } = useAuth();
   const { supabase } = useSupabase();
-  const router = useRouter();
   const t = translations[language];
-
-  // 如果用户未登录，重定向到登录页面
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    }
-  }, [user, router]);
 
   // 加载收藏的语录
   useEffect(() => {
-    async function loadFavorites() {
-      if (!user) return;
-      if (!supabase) {
-        console.error('Supabase client not initialized');
-        toast.error('数据库连接失败');
-        setLoading(false);
-        return;
-      }
+    const loadFavorites = async () => {
+      if (!user || !supabase) return;
 
       try {
         const { data, error } = await supabase
-          .from('quote_favorites')
+          .from('quotes')
           .select(`
-            quote_id,
-            quotes (
-              id,
-              quote_zh,
-              quote_en,
-              author_zh,
-              author_en,
-              author_title_zh,
-              author_title_en,
-              category,
-              likes
-            )
+            id,
+            quote_zh,
+            quote_en,
+            author_zh,
+            author_en,
+            author_title_zh,
+            author_title_en,
+            category,
+            likes,
+            views,
+            period_zh,
+            period_en,
+            book_zh,
+            book_en,
+            quote_favorites!inner(user_id)
           `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .returns<FavoriteWithQuote[]>();
+          .eq('quote_favorites.user_id', user.id)
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
+        
+        // 格式化数据
+        const formattedQuotes: FavoriteQuote[] = data.map(quote => ({
+          id: quote.id,
+          quote_zh: quote.quote_zh,
+          quote_en: quote.quote_en,
+          author_zh: quote.author_zh,
+          author_en: quote.author_en,
+          author_title_zh: quote.author_title_zh,
+          author_title_en: quote.author_title_en,
+          category: quote.category as CategoryKey,
+          likes: quote.likes,
+          views: quote.views,
+          period_zh: quote.period_zh,
+          period_en: quote.period_en,
+          book_zh: quote.book_zh,
+          book_en: quote.book_en,
+          isFavorited: true
+        }));
 
-        // 转换数据结构
-        const quotes = data.map(item => item.quotes);
-        setFavorites(quotes);
+        setQuotes(formattedQuotes);
       } catch (error) {
         console.error('加载收藏失败:', error);
-        toast.error('加载收藏失败');
+        toast.error(t.favorites.loadError);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     loadFavorites();
-  }, [user, supabase]);
-
-  if (!user) {
-    return null;
-  }
+  }, [user, supabase, t]);
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <main className="container py-20">
-        <div className="max-w-4xl mx-auto">
-          {/* 页面标题 */}
-          <div className="flex items-center gap-3 mb-12">
-            <Bookmark size={32} className="text-dark-900" />
-            <h1 className="text-4xl font-[oswald] font-bold text-dark-900">
-              {t.favorites.title}
-            </h1>
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center gap-3 mb-8">
+            <Bookmark className="w-8 h-8 text-[#D70050]" />
+            <h1 className="text-3xl font-bold text-gray-900">{t.favorites.title}</h1>
           </div>
 
-          {/* 加载状态 */}
           {loading ? (
-            <div className="text-center text-dark-500 py-12">
-              {t.common.loading}
+            <div className="text-center text-gray-500 py-12">
+              {t.favorites.loading}
             </div>
-          ) : favorites.length === 0 ? (
-            // 空状态
-            <div className="text-center text-dark-500 py-12">
-              {t.favorites.empty}
+          ) : quotes.length === 0 ? (
+            <div className="text-center text-gray-500 py-12">
+              {t.favorites.noQuotes}
             </div>
           ) : (
-            // 收藏列表
-            <div className="space-y-6">
-              {favorites.map((quote) => (
+            <div className="space-y-4">
+              {quotes.map((quote) => (
                 <QuoteCard
                   key={quote.id}
                   id={quote.id}
@@ -135,9 +143,13 @@ export default function FavoritesPage() {
                     zh: quote.author_title_zh || '',
                     en: quote.author_title_en || ''
                   }}
-                  category={quote.category as CategoryKey}
+                  category={quote.category}
                   likes={quote.likes}
                   isFavorited={true}
+                  book={{
+                    zh: quote.book_zh || undefined,
+                    en: quote.book_en || undefined
+                  }}
                 />
               ))}
             </div>
