@@ -280,7 +280,7 @@ export const translations: Record<Language, TranslationType> = {
     },
     hero: {
       title: 'WORDS THAT INSPIRED HUMANITY FOR 1000 YEARS',
-      subtitle: "Discover timeless wisdom from history's greatest minds. Find inspiration, motivation, and guidance.",
+      subtitle: "Discover timeless wisdom from history's greatest minds. \nFind inspiration, motivation, and guidance.",
       searchPlaceholder: 'Search quotes, authors, or topics...',
     },    
     quotes: {

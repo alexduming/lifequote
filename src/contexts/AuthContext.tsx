@@ -26,6 +26,7 @@ interface AuthContextType {
   isAdmin: boolean;
   signOut: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<SignInResponse>;
+  signUp: (email: string, password: string) => Promise<SignInResponse>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,6 +61,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // 注册方法
+  const signUp = async (email: string, password: string): Promise<SignInResponse> => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        }
+      });
+
+      if (error) {
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (error: any) {
+      const customError = new Error(error.message || '注册失败，请稍后重试');
+      return {
+        data: null,
+        error: customError
+      };
+    }
+  };
+
   // 登录方法
   const signIn = async (email: string, password: string): Promise<SignInResponse> => {
     try {
@@ -76,11 +102,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { data, error: null };
       
     } catch (error: any) {
+      const customError = new Error(error.message || '登录失败，请稍后重试');
       return {
         data: null,
-        error: {
-          message: error.message || '登录失败，请稍后重试'
-        }
+        error: customError
       };
     }
   };
@@ -165,10 +190,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       authListener.data.subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, supabase, loading, isAdmin, signOut, signIn }}>
+    <AuthContext.Provider value={{ user, supabase, loading, isAdmin, signOut, signIn, signUp }}>
       {children}
     </AuthContext.Provider>
   );

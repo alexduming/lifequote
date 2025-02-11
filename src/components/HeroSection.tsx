@@ -84,7 +84,7 @@ export default function HeroSection() {
                 ))}
               </span>
             </h1>
-            <p className="mx-auto mt-3 max-w-md text-base text-gray-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
+            <p className="text-lg md:text-xl text-dark-500 font-light max-w-3xl text-center break-words whitespace-pre-line mt-[20px] mx-auto">
               {t.hero.subtitle}
             </p>
           </div>
