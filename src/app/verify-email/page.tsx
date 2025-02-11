@@ -14,7 +14,7 @@ import Navbar from '@/components/Navbar';
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+  const email = searchParams?.get('email') || '';
   const { language } = useLanguage();
   const t = translations[language];
 
@@ -36,7 +36,7 @@ export default function VerifyEmailPage() {
               </h1>
               
               <p className="text-white/60 mb-6">
-                {t.verifyEmail.description.replace('{email}', email || '')}
+                {t.verifyEmail.description.replace('{email}', email)}
               </p>
               
               <div className="space-y-4">
