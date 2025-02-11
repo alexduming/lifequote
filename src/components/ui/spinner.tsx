@@ -1,24 +1,20 @@
+/**
+ * 加载中动画组件
+ * @module Spinner
+ */
+
 import { cn } from "@/lib/utils";
 
-interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: "sm" | "md" | "lg";
-}
+interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
+export function Spinner({ className, ...props }: SpinnerProps) {
   return (
     <div
       className={cn(
         "animate-spin rounded-full border-2 border-current border-t-transparent",
-        {
-          "h-4 w-4": size === "sm",
-          "h-8 w-8": size === "md",
-          "h-12 w-12": size === "lg",
-        },
         className
       )}
       {...props}
-    >
-      <span className="sr-only">加载中...</span>
-    </div>
+    />
   );
 } 

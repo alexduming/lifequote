@@ -38,6 +38,7 @@ export type TranslationType = {
     search: string;
     submit: string;
     noData: string;
+    create: string;
   };
   categories: {
     wisdom: string;
@@ -90,6 +91,9 @@ export type TranslationType = {
     category: string;
     author: string;
     source: string;
+    empty: string;
+    loading: string;
+    error: string;
   };
   sections: {
     featured: {
@@ -189,6 +193,7 @@ export type TranslationType = {
     description: string;
     descriptionPlaceholder: string;
     makePublic: string;
+    empty: string;
     errors: {
       nameRequired: string;
     };
@@ -208,6 +213,17 @@ export type TranslationType = {
     notes: string;
     submit: string;
   };
+  admin: {
+    quotes: {
+      title: string;
+      empty: string;
+      loading: string;
+      error: string;
+      approve: string;
+      reject: string;
+      submitter: string;
+    };
+  };
 };
 
 export const translations: Record<Language, TranslationType> = {
@@ -224,7 +240,8 @@ export const translations: Record<Language, TranslationType> = {
       delete: 'Delete',
       search: 'Search',
       submit: 'Submit',
-      noData: 'No Data'
+      noData: 'No Data',
+      create: 'Create'
     },
     categories: {
       wisdom: 'Wisdom',
@@ -276,7 +293,10 @@ export const translations: Record<Language, TranslationType> = {
       searchPlaceholder: 'Search quotes...',
       category: 'Category',
       author: 'Author',
-      source: 'Source'
+      source: 'Source',
+      empty: 'No quotes yet',
+      loading: 'Loading...',
+      error: 'Failed to load'
     },
     sections: {
       featured: {
@@ -371,14 +391,15 @@ export const translations: Record<Language, TranslationType> = {
       title: 'My Collections',
       create: 'Create Collection',
       edit: 'Edit Collection',
-      name: 'Name',
+      name: 'Collection Name',
       namePlaceholder: 'Enter collection name',
       description: 'Description',
-      descriptionPlaceholder: 'Add description (optional)',
-      makePublic: 'Make this collection public',
+      descriptionPlaceholder: 'Enter collection description',
+      makePublic: 'Make Public',
+      empty: 'No collections yet',
       errors: {
-        nameRequired: 'Please enter a collection name',
-      },
+        nameRequired: 'Please enter a collection name'
+      }
     },
     submit: {
       title: 'Submit New Quote',
@@ -395,6 +416,17 @@ export const translations: Record<Language, TranslationType> = {
       notes: 'Notes',
       submit: 'Submit'
     },
+    admin: {
+      quotes: {
+        title: 'Pending Quotes',
+        empty: 'No pending quotes',
+        loading: 'Loading...',
+        error: 'Failed to load',
+        approve: 'Approve',
+        reject: 'Reject',
+        submitter: 'Submitted by'
+      }
+    }
   },
   zh: {
     common: {
@@ -409,7 +441,8 @@ export const translations: Record<Language, TranslationType> = {
       delete: '删除',
       search: '搜索',
       submit: '提交',
-      noData: '暂无数据'
+      noData: '暂无数据',
+      create: '创建'
     },
     categories: {
       wisdom: '智慧',
@@ -452,16 +485,19 @@ export const translations: Record<Language, TranslationType> = {
       searchPlaceholder: '搜索名言、作者或主题...',
     },
     quotes: {
-      title: '所有语录',
+      title: '全部语录',
       filter: '筛选',
       sort: '排序',
       total: '%d 条语录',
       viewAll: '查看全部',
-      noResults: '未找到语录',
+      noResults: '未找到相关语录',
       searchPlaceholder: '搜索语录...',
       category: '分类',
       author: '作者',
-      source: '来源'
+      source: '来源',
+      empty: '暂无语录',
+      loading: '加载中...',
+      error: '加载失败'
     },
     sections: {
       featured: {
@@ -556,14 +592,15 @@ export const translations: Record<Language, TranslationType> = {
       title: '我的收藏夹',
       create: '创建收藏夹',
       edit: '编辑收藏夹',
-      name: '名称',
-      namePlaceholder: '输入收藏夹名称',
+      name: '收藏夹名称',
+      namePlaceholder: '请输入收藏夹名称',
       description: '描述',
       descriptionPlaceholder: '添加描述（可选）',
       makePublic: '设为公开收藏夹',
+      empty: '暂无收藏夹',
       errors: {
-        nameRequired: '请输入收藏夹名称',
-      },
+        nameRequired: '请输入收藏夹名称'
+      }
     },
     submit: {
       title: '提交新语录',
@@ -580,5 +617,19 @@ export const translations: Record<Language, TranslationType> = {
       notes: '备注',
       submit: '提交'
     },
+    admin: {
+      quotes: {
+        title: '待审核语录',
+        empty: '暂无待审核语录',
+        loading: '加载中...',
+        error: '加载失败',
+        approve: '通过',
+        reject: '拒绝',
+        submitter: '提交者'
+      }
+    }
   },
-}; 
+};
+
+// 添加翻译键的类型定义
+export type TranslationKeys = typeof translations.en; 

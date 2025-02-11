@@ -29,10 +29,10 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const { error: signInError } = await signIn(email, password);
+      const { error } = await signIn(email, password);
       
-      if (signInError) {
-        throw signInError;
+      if (error) {
+        throw new Error(error.message);
       }
       
       // 登录成功
@@ -42,7 +42,7 @@ function LoginForm() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // 重定向到目标页面
-      router.replace(redirectTo || '/');
+      router.replace(redirectTo);
       
     } catch (err: any) {
       console.error('登录失败:', err);

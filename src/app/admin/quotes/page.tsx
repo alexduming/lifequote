@@ -36,6 +36,7 @@ export default function AdminQuotesPage() {
   const [quotes, setQuotes] = useState<PendingQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const [translating, setTranslating] = useState<string | null>(null);
+  const t = translations[language];
 
   useEffect(() => {
     const fetchPendingQuotes = async () => {
@@ -129,15 +130,18 @@ export default function AdminQuotesPage() {
     <div className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800">
       <Navbar />
       <div className="container py-20">
-        <h1 className="text-4xl font-bold text-white mb-8">待审核语录</h1>
+        <h1 className="text-4xl font-bold text-white mb-8">
+          {t.admin.quotes.title}
+        </h1>
         
         {loading ? (
           <div className="text-center">
             <Spinner className="w-8 h-8 text-pink-500" />
+            <p className="mt-4 text-white/60">{t.admin.quotes.loading}</p>
           </div>
         ) : quotes.length === 0 ? (
           <div className="text-center text-white/60">
-            暂无待审核的语录
+            {t.admin.quotes.empty}
           </div>
         ) : (
           <div className="space-y-6">

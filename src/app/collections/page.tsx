@@ -1,3 +1,8 @@
+/**
+ * 收藏夹管理页面
+ * @module CollectionsPage
+ */
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -7,6 +12,8 @@ import { translations } from '@/config/translations';
 import { Plus, Folder, Settings, Share2, Trash2, Globe, Lock } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 /**
  * 收藏夹类型定义
@@ -26,56 +33,48 @@ interface Collection {
  * @returns {JSX.Element} 收藏夹管理页面
  */
 export default function CollectionsPage() {
+  const { user, supabase } = useAuth();
+  const { language } = useLanguage();
+  const t = translations[language];
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionDescription, setNewCollectionDescription] = useState('');
   const [isPublic, setIsPublic] = useState(true);
 
-  const { user, supabase } = useAuth();
-  const { language } = useLanguage();
-  const t = translations[language];
-
-  // 加载用户的收藏夹列表
+  // 加载收藏夹列表
   useEffect(() => {
-    async function loadCollections() {
+    const loadCollections = async () => {
       if (!supabase) {
-        console.error('Supabase client not initialized');
+        console.error('数据库连接失败');
         toast.error('数据库连接失败');
         setLoading(false);
         return;
       }
 
       try {
-        const { data, error: collectionsError } = await supabase
+        const { data, error } = await supabase
           .from('collections')
-          .select(`
-            *,
-            collection_items (count)
-          `)
+          .select('*')
           .eq('user_id', user?.id)
           .order('created_at', { ascending: false });
 
-        if (collectionsError) throw collectionsError;
+        if (error) throw error;
 
-        const collectionsWithCount = data?.map(collection => ({
-          ...collection,
-          quote_count: collection.collection_items?.[0]?.count || 0
-        })) || [];
-
-        setCollections(collectionsWithCount);
+        setCollections(data || []);
       } catch (error: any) {
         console.error('加载收藏夹失败:', error);
-        toast.error('加载收藏夹失败');
+        toast.error('加载失败');
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     if (user) {
       loadCollections();
+    } else {
+      setLoading(false);
     }
   }, [user, supabase]);
 
@@ -139,95 +138,98 @@ export default function CollectionsPage() {
     <div className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800">
       <Navbar />
       <div className="container py-20">
-        {/* 页面标题 */}
-        <div className="flex items-center justify-between mb-12">
-          <h1 className="text-4xl font-[oswald] font-bold text-white">
-            {t.collections.title}
-          </h1>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-          >
-            <Plus size={20} />
-            <span>{t.collections.create}</span>
-          </button>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white">{t.collections.title}</h1>
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t.collections.create}
+          </Button>
         </div>
 
-        {/* 收藏夹列表 */}
         {loading ? (
-          <div className="text-center text-white/60">
-            {t.common.loading}
+          <div className="text-center py-20">
+            <Spinner className="w-8 h-8 text-pink-500 mx-auto" />
+            <p className="mt-4 text-white/60">{t.common.loading}</p>
           </div>
         ) : collections.length === 0 ? (
-          <div className="text-center text-white/60">
+          <div className="text-center py-20 text-white/60">
             {t.collections.empty}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {collections.map((collection) => (
-              <a
+              <div
                 key={collection.id}
-                href={`/collections/${collection.id}`}
-                className="block bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all group"
+                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10"
               >
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-2">
-                  {collection.is_public ? (
-                    <>
-                      <Globe size={16} />
-                      <span>公开收藏夹</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock size={16} />
-                      <span>私密收藏夹</span>
-                    </>
-                  )}
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {collection.name}
+                    </h3>
+                    {collection.description && (
+                      <p className="text-white/60 text-sm">
+                        {collection.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-white/60">
+                    {collection.is_public ? (
+                      <Globe className="w-4 h-4" />
+                    ) : (
+                      <Lock className="w-4 h-4" />
+                    )}
+                  </div>
                 </div>
-                <h3 className="text-xl font-medium text-white mb-2 group-hover:text-primary-400 transition-colors">
-                  {collection.name}
-                </h3>
-                {collection.description && (
-                  <p className="text-white/60 text-sm mb-4 line-clamp-2">
-                    {collection.description}
-                  </p>
-                )}
-                <div className="text-sm text-white/40">
-                  {collection.quote_count} 条语录
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/60">
+                    {collection.quote_count} 条语录
+                  </span>
+                  <div className="space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteCollection(collection.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         )}
 
         {/* 创建收藏夹模态框 */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-dark-800 rounded-xl p-6 w-full max-w-md">
               <h2 className="text-2xl font-[oswald] text-white mb-6">
-                创建新收藏夹
+                {t.collections.create}
               </h2>
               <div className="space-y-4">
                 <div>
                   <label className="block text-white/60 text-sm mb-2">
-                    名称
+                    {t.collections.name}
                   </label>
                   <input
                     type="text"
                     value={newCollectionName}
                     onChange={e => setNewCollectionName(e.target.value)}
                     className="w-full px-4 py-2 bg-white/5 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="输入收藏夹名称"
+                    placeholder={t.collections.namePlaceholder}
                   />
                 </div>
                 <div>
                   <label className="block text-white/60 text-sm mb-2">
-                    描述（可选）
+                    {t.collections.description}
                   </label>
                   <textarea
                     value={newCollectionDescription}
                     onChange={e => setNewCollectionDescription(e.target.value)}
                     className="w-full px-4 py-2 bg-white/5 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="添加描述"
+                    placeholder={t.collections.descriptionPlaceholder}
                     rows={3}
                   />
                 </div>
@@ -237,26 +239,26 @@ export default function CollectionsPage() {
                     id="isPublic"
                     checked={isPublic}
                     onChange={e => setIsPublic(e.target.checked)}
-                    className="rounded text-primary-500 focus:ring-primary-500"
+                    className="rounded border-white/20 bg-white/5 text-primary-500 focus:ring-primary-500"
                   />
                   <label htmlFor="isPublic" className="text-white/60 text-sm">
-                    公开收藏夹
+                    {t.collections.makePublic}
                   </label>
                 </div>
               </div>
               <div className="flex justify-end gap-4 mt-6">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 text-white/60 hover:text-white transition-colors"
                 >
-                  取消
-                </button>
-                <button
+                  {t.common.cancel}
+                </Button>
+                <Button
                   onClick={handleCreateCollection}
-                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  disabled={!newCollectionName.trim()}
                 >
-                  创建
-                </button>
+                  {t.common.create}
+                </Button>
               </div>
             </div>
           </div>
