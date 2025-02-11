@@ -256,6 +256,9 @@ export type TranslationType = {
     title: string;
     description: string;
     note: string;
+    success: string;
+    error: string;
+    processing: string;
   };
 };
 
@@ -491,7 +494,10 @@ export const translations: Record<Language, TranslationType> = {
     verifyEmail: {
       title: 'Verify Your Email',
       description: 'We\'ve sent a verification email to {email}. Please check your inbox and click the verification link to activate your account.',
-      note: 'If you don\'t see the email, please check your spam folder. The verification email may take a few minutes to arrive.'
+      note: 'If you don\'t see the email, please check your spam folder. The verification email may take a few minutes to arrive.',
+      success: 'Email verified successfully!',
+      error: 'Failed to verify email',
+      processing: 'Processing verification...'
     }
   },
   zh: {
@@ -725,7 +731,10 @@ export const translations: Record<Language, TranslationType> = {
     verifyEmail: {
       title: '验证你的邮箱',
       description: '我们已经发送了一封验证邮件到 {email}。请检查你的收件箱并点击验证链接来激活你的账户。',
-      note: '如果你没有收到邮件，请检查垃圾邮件文件夹。验证邮件可能需要几分钟时间才能送达。'
+      note: '如果你没有收到邮件，请检查垃圾邮件文件夹。验证邮件可能需要几分钟时间才能送达。',
+      success: '邮箱验证成功！',
+      error: '邮箱验证失败',
+      processing: '正在处理验证...'
     }
   },
 };

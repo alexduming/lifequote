@@ -86,90 +86,95 @@ export default function ShareMenu({ url, title, text, author, book, onClose }: S
 
   // 生成图片
   useEffect(() => {
-    const templateElement = document.createElement('div');
-    templateElement.style.position = 'absolute';
-    templateElement.style.left = '-9999px';
-    templateElement.style.top = '0';
-    templateElement.innerHTML = `
-      <div 
-        style="
-          width: 900px;
-          height: 1200px;
-          position: relative;
-          background: white;
-          padding: 64px;
-          font-family: var(--font-oswald), sans-serif;
-        "
-      >
-        <div style="
-          position: absolute;
-          top: 80px;
-          left: 64px;
-          font-size: 200px;
-          line-height: 1;
-          color: rgba(0, 0, 0, 0.05);
-          font-family: sans-serif;
-        ">
+    // 确保 Oswald 字体加载完成
+    document.fonts.ready.then(() => {
+      const templateElement = document.createElement('div');
+      templateElement.style.position = 'absolute';
+      templateElement.style.left = '-9999px';
+      templateElement.style.top = '0';
+      templateElement.innerHTML = `
+        <div 
+          style="
+            width: 900px;
+            height: 1200px;
+            position: relative;
+            background: white;
+            padding: 64px;
+            font-family: 'Oswald', sans-serif;
           "
-        </div>
+        >
+          <div style="
+            position: absolute;
+            top: 80px;
+            left: 64px;
+            font-size: 200px;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.05);
+            font-family: sans-serif;
+          ">
+            "
+          </div>
 
-        <div style="height: 100%; display: flex; flex-direction: column;">
-          <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
-            <div style="max-width: 42rem;">
-              <p style="
-                font-size: 70px;
-                font-weight: bold;
-                text-transform: uppercase;
-                line-height: 1.2;
-                letter-spacing: -0.02em;
-                color: rgba(0, 0, 0, 0.9);
-                margin-bottom: 48px;
-              ">
-                ${text}
-              </p>
-              
-              <p style="
-                font-size: 40px;
-                color: rgba(0, 0, 0, 0.6);
-                letter-spacing: 0.05em;
-              ">
-                — ${author}
-              </p>
+          <div style="height: 100%; display: flex; flex-direction: column;">
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+              <div style="max-width: 42rem;">
+                <p style="
+                  font-size: 70px;
+                  font-weight: 700;
+                  font-family: 'Oswald', sans-serif;
+                  text-transform: uppercase;
+                  line-height: 1.2;
+                  letter-spacing: -0.02em;
+                  color: rgba(0, 0, 0, 0.9);
+                  margin-bottom: 48px;
+                ">
+                  ${text}
+                </p>
+                
+                <p style="
+                  font-size: 40px;
+                  font-family: 'Oswald', sans-serif;
+                  color: rgba(0, 0, 0, 0.6);
+                  letter-spacing: 0.05em;
+                ">
+                  — ${author}
+                </p>
+              </div>
+            </div>
+
+            <div style="margin-top: auto; display: flex; justify-content: center; padding-bottom: 32px;">
+              <div 
+                style="width: 160px; height: 40px; display: flex; align-items: center; justify-content: center;"
+                data-logo
+              >${LOGO_SVG}</div>
             </div>
           </div>
 
-          <div style="margin-top: auto; display: flex; justify-content: center; padding-bottom: 32px;">
-            <div 
-              style="width: 160px; height: 40px; display: flex; align-items: center; justify-content: center;"
-              data-logo
-            >${LOGO_SVG}</div>
-          </div>
+          <div style="
+            position: absolute;
+            inset: 32px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+          "></div>
         </div>
+      `;
 
-        <div style="
-          position: absolute;
-          inset: 32px;
-          border: 1px solid rgba(0, 0, 0, 0.05);
-        "></div>
-      </div>
-    `;
+      document.body.appendChild(templateElement);
 
-    document.body.appendChild(templateElement);
-
-    html2canvas(templateElement.firstElementChild as HTMLElement, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#FFFFFF',
-      width: 900,
-      height: 1200,
-    }).then((canvas) => {
-      setImageUrl(canvas.toDataURL('image/png'));
-      document.body.removeChild(templateElement);
-    }).catch((error) => {
-      console.error('图片生成失败:', error);
-      toast.error('图片生成失败，请重试');
-      document.body.removeChild(templateElement);
+      html2canvas(templateElement.firstElementChild as HTMLElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FFFFFF',
+        width: 900,
+        height: 1200,
+      }).then((canvas) => {
+        setImageUrl(canvas.toDataURL('image/png'));
+        document.body.removeChild(templateElement);
+      }).catch((error) => {
+        console.error('图片生成失败:', error);
+        toast.error('图片生成失败，请重试');
+        document.body.removeChild(templateElement);
+      });
     });
   }, [text, author]);
 

@@ -1,47 +1,68 @@
+/**
+ * Supabase 认证回调处理页面
+ * @module AuthCallbackPage
+ */
+
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { translations } from '@/config/translations';
 import { toast } from 'sonner';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { supabase } = useAuth();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   useEffect(() => {
+    // 处理验证回调
     const handleAuthCallback = async () => {
-      if (!supabase) {
-        console.error('Supabase client not initialized');
+      const error = searchParams?.get('error');
+      const errorDescription = searchParams?.get('error_description');
+
+      if (error) {
+        console.error('验证错误:', error, errorDescription);
+        toast.error(errorDescription || '验证失败');
+        router.push('/login');
         return;
       }
 
       try {
-        const { error } = await supabase.auth.getSession();
-        if (error) {
-          throw error;
-        }
+        // 获取当前会话状态
+        const { data: { session }, error: sessionError } = await supabase?.auth.getSession() || {};
+        
+        if (sessionError) throw sessionError;
 
-        // 认证成功，重定向到首页
-        router.replace('/');
-        toast.success('认证成功');
-      } catch (error: any) {
-        console.error('认证回调错误:', error);
-        toast.error('认证失败');
-        router.replace('/login');
+        if (session) {
+          // 验证成功
+          toast.success(t.verifyEmail.success);
+          router.push('/');
+        } else {
+          // 未找到会话
+          toast.error(t.verifyEmail.error);
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('处理验证回调错误:', error);
+        toast.error(t.verifyEmail.error);
+        router.push('/login');
       }
     };
 
     handleAuthCallback();
-  }, [supabase, router]);
+  }, [supabase, router, searchParams]);
 
+  // 显示加载状态
   return (
     <div className="min-h-screen bg-gradient-to-b from-dark-900 to-dark-800 flex items-center justify-center">
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-white/10 rounded w-24" />
-          <div className="h-4 bg-white/10 rounded w-32" />
-        </div>
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-white/60">{t.verifyEmail.processing}</p>
       </div>
     </div>
   );

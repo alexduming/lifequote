@@ -183,17 +183,21 @@ export default function SubmitQuotePage() {
               value={formData.category}
               onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white">
                 <SelectValue placeholder={language === 'zh' ? '请选择分类' : 'Select category'} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {[
                   'Wisdom', 'Inspiration', 'Life', 'Love', 'Success',
                   'Happiness', 'Friendship', 'Family', 'Education', 'Philosophy',
-                  'Art', 'Science', 'Nature', 'Time', 'Change',
+                  'Art', 'Science', 'Nature', 'Science', 'Nature', 'Time', 'Change',
                   'Courage', 'Dream', 'Faith', 'Growth', 'Leadership'
                 ].map((category) => (
-                  <SelectItem key={category} value={category.toLowerCase()}>
+                  <SelectItem 
+                    key={category} 
+                    value={category.toLowerCase()}
+                    className="hover:bg-sky-50"
+                  >
                     {t.categories[category.toLowerCase() as CategoryKey]}
                   </SelectItem>
                 ))}
