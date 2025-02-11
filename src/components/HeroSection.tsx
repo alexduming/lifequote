@@ -75,7 +75,7 @@ export default function HeroSection() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="text-center mb-8">
             <h1 className="font-display text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl md:text-7xl">
-              <span className="block font-[oswald] bg-gradient-to-r from-[#d70050] to-[#f98d2c] bg-clip-text text-transparent animate-float whitespace-pre-line">
+              <span className="block font-[oswald] bg-gradient-to-r from-[#d70050] to-[#f98d2c] bg-clip-text text-transparent animate-float whitespace-pre-line min-h-[170px]">
                 {t.hero.title.split('\n').map((line, i) => (
                   <React.Fragment key={i}>
                     {line}
