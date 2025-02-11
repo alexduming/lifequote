@@ -22,7 +22,15 @@ export type CategoryKey =
   | 'politics'
   | 'economics'
   | 'education'
-  | 'motivation';
+  | 'motivation'
+  | 'nature'
+  | 'time'
+  | 'change'
+  | 'courage'
+  | 'dream'
+  | 'faith'
+  | 'growth'
+  | 'leadership';
 
 export type TranslationType = {
   common: {
@@ -58,6 +66,14 @@ export type TranslationType = {
     economics: string;
     education: string;
     motivation: string;
+    nature: string;
+    time: string;
+    change: string;
+    courage: string;
+    dream: string;
+    faith: string;
+    growth: string;
+    leadership: string;
   };
   nav: {
     home: string;
@@ -297,6 +313,14 @@ export const translations: Record<Language, TranslationType> = {
       economics: 'Economics',
       education: 'Education',
       motivation: 'Motivation',
+      nature: 'Nature',
+      time: 'Time',
+      change: 'Change',
+      courage: 'Courage',
+      dream: 'Dream',
+      faith: 'Faith',
+      growth: 'Growth',
+      leadership: 'Leadership'
     },
     nav: {
       home: 'Home',
@@ -533,7 +557,15 @@ export const translations: Record<Language, TranslationType> = {
       politics: '政治',
       economics: '经济',
       education: '教育',
-      motivation: '励志',
+      motivation: '动力',
+      nature: '自然',
+      time: '时间',
+      change: '变革',
+      courage: '勇气',
+      dream: '梦想',
+      faith: '信念',
+      growth: '成长',
+      leadership: '领导力'
     },
     nav: {
       home: '首页',

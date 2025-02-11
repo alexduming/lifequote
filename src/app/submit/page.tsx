@@ -190,7 +190,7 @@ export default function SubmitQuotePage() {
                 {[
                   'Wisdom', 'Inspiration', 'Life', 'Love', 'Success',
                   'Happiness', 'Friendship', 'Family', 'Education', 'Philosophy',
-                  'Art', 'Science', 'Nature', 'Science', 'Nature', 'Time', 'Change',
+                  'Art', 'Science', 'Nature', 'Time', 'Change',
                   'Courage', 'Dream', 'Faith', 'Growth', 'Leadership'
                 ].map((category) => (
                   <SelectItem 
