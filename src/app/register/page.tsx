@@ -12,12 +12,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
+import { toast } from 'sonner';
 
 function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signUp, supabase } = useAuth();
@@ -55,24 +55,10 @@ function RegisterForm() {
           throw new Error('数据库连接失败');
         }
 
-        // 尝试创建用户资料
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            user_id: data.user.id,
-            username: username || email.split('@')[0],
-          })
-          .select('*')
-          .single();
-
-        if (profileError) {
-          console.error('创建用户资料失败:', profileError);
-          // 即使资料创建失败，也继续注册流程
-        }
-
         // 显示成功消息
-        alert(t.register.success);
-        router.push('/');
+        toast.success(t.register.success);
+        // 重定向到验证页面
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       }
     } catch (error: any) {
       console.error('注册错误:', error);
@@ -91,22 +77,6 @@ function RegisterForm() {
               {t.register.title}
             </h1>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* 用户名输入框 */}
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-white/60 mb-2">
-                  {t.register.username}
-                </label>
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder={t.register.usernamePlaceholder}
-                  className="w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
               {/* 邮箱输入框 */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white/60 mb-2">

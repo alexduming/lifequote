@@ -29,25 +29,25 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
-      
-      if (error) {
-        throw new Error(error.message);
+      const { data, error } = await signIn(email, password);
+
+      if (error) throw error;
+
+      if (data?.user) {
+        // 检查邮箱是否已验证
+        if (!data.user.email_confirmed_at) {
+          setError(t.login.emailNotVerified);
+          // 重定向到验证页面
+          router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+          return;
+        }
+
+        toast.success(t.login.success);
+        router.push('/');
       }
-      
-      // 登录成功
-      toast.success(language === 'zh' ? '登录成功' : 'Login successful');
-      
-      // 等待 session 更新
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // 重定向到目标页面
-      router.replace(redirectTo);
-      
-    } catch (err: any) {
-      console.error('登录失败:', err);
-      setError(err.message);
-      toast.error(language === 'zh' ? '登录失败' : 'Login failed');
+    } catch (error: any) {
+      console.error('登录错误:', error);
+      setError(error.message || t.login.error);
     } finally {
       setLoading(false);
     }

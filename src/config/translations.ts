@@ -171,6 +171,9 @@ export type TranslationType = {
     submit: string;
     signingIn: string;
     registerLink: string;
+    emailNotVerified: string;
+    success: string;
+    error: string;
   };
   profile: {
     title: string;
@@ -248,6 +251,11 @@ export type TranslationType = {
       reject: string;
       submitter: string;
     };
+  };
+  verifyEmail: {
+    title: string;
+    description: string;
+    note: string;
   };
 };
 
@@ -399,6 +407,9 @@ export const translations: Record<Language, TranslationType> = {
       submit: 'Login',
       signingIn: 'Signing in...',
       registerLink: 'Don\'t have an account?',
+      emailNotVerified: 'Please verify your email address first',
+      success: 'Login successful',
+      error: 'Login failed, please try again'
     },
     profile: {
       title: 'Profile',
@@ -476,6 +487,11 @@ export const translations: Record<Language, TranslationType> = {
         reject: 'Reject',
         submitter: 'Submitted by'
       }
+    },
+    verifyEmail: {
+      title: 'Verify Your Email',
+      description: 'We\'ve sent a verification email to {email}. Please check your inbox and click the verification link to activate your account.',
+      note: 'If you don\'t see the email, please check your spam folder. The verification email may take a few minutes to arrive.'
     }
   },
   zh: {
@@ -625,6 +641,9 @@ export const translations: Record<Language, TranslationType> = {
       submit: '登录',
       signingIn: '登录中...',
       registerLink: '还没有账号？',
+      emailNotVerified: '请先验证你的邮箱地址',
+      success: '登录成功',
+      error: '登录失败，请重试'
     },
     profile: {
       title: '个人资料',
@@ -702,6 +721,11 @@ export const translations: Record<Language, TranslationType> = {
         reject: '拒绝',
         submitter: '提交者'
       }
+    },
+    verifyEmail: {
+      title: '验证你的邮箱',
+      description: '我们已经发送了一封验证邮件到 {email}。请检查你的收件箱并点击验证链接来激活你的账户。',
+      note: '如果你没有收到邮件，请检查垃圾邮件文件夹。验证邮件可能需要几分钟时间才能送达。'
     }
   },
 };
