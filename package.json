@@ -10,7 +10,8 @@
     "lint": "next lint",
     "convert": "node src/scripts/convert_quotes.js",
     "migrate": "tsx src/scripts/migrate_to_supabase.ts",
-    "add-quotes": "tsx src/scripts/add_quotes.ts"
+    "add-quotes": "tsx src/scripts/add_quotes.ts",
+    "create-template": "ts-node --project tsconfig.json scripts/create_quotes_template.ts"
   },
   "dependencies": {
     "@radix-ui/react-popover": "^1.1.6",
@@ -50,13 +51,13 @@
     "@shadcn/ui": "^0.0.4",
     "@types/crypto-js": "^4.2.2",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.11.16",
+    "@types/node": "^20.17.17",
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.3"
   }
 }
