@@ -5,17 +5,17 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
- * 认证回调页面组件
- * 处理认证流程完成后的回调
+ * 认证回调处理组件
+ * 处理认证流程完成后的回调逻辑
  */
-export default function AuthCallbackPage() {
+function AuthCallbackHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { language } = useLanguage();
@@ -100,16 +100,35 @@ export default function AuthCallbackPage() {
   }, [router, searchParams, language, supabase.auth]);
 
   return (
+    <div className="text-center max-w-md mx-auto px-4">
+      <h2 className="text-2xl font-semibold mb-4">
+        {language === 'zh' ? '验证处理中...' : 'Processing verification...'}
+      </h2>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-400 mx-auto mb-4"></div>
+      <p className="text-gray-600">
+        {searchParams.get('error_code') === 'otp_expired' 
+          ? (language === 'zh' ? '验证链接已过期，正在跳转到登录页面...' : 'Verification link expired, redirecting to login...')
+          : (language === 'zh' ? '请稍候，正在处理您的验证请求...' : 'Please wait while we process your verification...')}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * 认证回调页面组件
+ * 使用 Suspense 包裹回调处理组件
+ */
+export default function AuthCallbackPage() {
+  return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center max-w-md mx-auto px-4">
-        <h2 className="text-2xl font-semibold mb-4">验证处理中...</h2>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-400 mx-auto mb-4"></div>
-        <p className="text-gray-600">
-          {searchParams.get('error_code') === 'otp_expired' 
-            ? '验证链接已过期，正在跳转到登录页面...'
-            : '请稍候，正在处理您的验证请求...'}
-        </p>
-      </div>
+      <Suspense fallback={
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-400 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      }>
+        <AuthCallbackHandler />
+      </Suspense>
     </div>
   );
 } 
