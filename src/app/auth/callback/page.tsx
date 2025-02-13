@@ -6,7 +6,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
  */
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { language } = useLanguage();
   const supabase = createClientComponentClient();
 
@@ -27,35 +28,86 @@ export default function AuthCallbackPage() {
      */
     const handleAuthCallback = async () => {
       try {
-        // 获取当前会话状态
-        const { data, error: sessionError } = await supabase.auth.getSession();
+        // 检查是否有错误参数
+        const error = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
+        const errorCode = searchParams.get('error_code');
 
-        if (sessionError) throw sessionError;
-
-        if (!data?.session) {
-          throw new Error(language === 'zh' ? '无法获取会话信息' : 'Unable to get session');
+        if (error) {
+          // 处理特定错误
+          if (errorCode === 'otp_expired') {
+            throw new Error('验证链接已过期，请重新发送验证邮件');
+          } else {
+            throw new Error(errorDescription || '验证失败，请重试');
+          }
         }
 
-        // 认证成功后重定向到首页
-        router.push('/');
-        toast.success(language === 'zh' ? '登录成功' : 'Successfully logged in');
+        // 获取 URL 中的 code 参数
+        const code = searchParams.get('code');
+        
+        if (!code) {
+          throw new Error('验证链接无效，请重新发送验证邮件');
+        }
+
+        // 打印调试信息
+        console.log('Processing auth callback with code:', code);
+
+        // 交换 code 获取会话
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (exchangeError) {
+          throw exchangeError;
+        }
+
+        if (!data.session) {
+          throw new Error('No session returned');
+        }
+
+        // 验证会话是否成功设置
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Get session error:', sessionError);
+          throw sessionError;
+        }
+
+        if (!session) {
+          throw new Error('Session not established');
+        }
+
+        // 成功获取会话
+        console.log('Authentication successful');
+        toast.success(language === 'zh' ? '邮箱验证成功！' : 'Email verification successful!');
+        
+        // 延迟重定向，确保 toast 消息显示
+        setTimeout(() => {
+          router.push('/');
+          router.refresh(); // 刷新路由状态
+        }, 1500);
 
       } catch (error: any) {
         console.error('认证回调错误:', error.message);
-        toast.error(language === 'zh' ? '认证失败，请重试' : 'Authentication failed, please try again');
-        router.push('/');
+        toast.error(error.message);
+        
+        // 延迟重定向到登录页
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       }
     };
 
     handleAuthCallback();
-  }, [router, language, supabase.auth]);
+  }, [router, searchParams, language, supabase.auth]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">
-          {language === 'zh' ? '正在处理认证...' : 'Processing authentication...'}
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center max-w-md mx-auto px-4">
+        <h2 className="text-2xl font-semibold mb-4">验证处理中...</h2>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-400 mx-auto mb-4"></div>
+        <p className="text-gray-600">
+          {searchParams.get('error_code') === 'otp_expired' 
+            ? '验证链接已过期，正在跳转到登录页面...'
+            : '请稍候，正在处理您的验证请求...'}
         </p>
       </div>
     </div>

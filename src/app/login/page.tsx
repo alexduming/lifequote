@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { translations } from '@/config/translations';
 import Navbar from '@/components/Navbar';
 import { toast } from 'sonner';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const { language } = useLanguage();
   const t = translations[language];
+  const supabase = createClientComponentClient();
 
   // 获取重定向URL，如果没有则默认为首页
   const redirectTo = searchParams?.get('redirectTo') || '/';
@@ -50,6 +52,22 @@ function LoginForm() {
       setError(error.message || t.login.error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) throw error;
+
+      toast.success('验证邮件已重新发送，请查收');
+    } catch (error: any) {
+      console.error('重新发送验证邮件失败:', error);
+      toast.error('重新发送验证邮件失败，请稍后重试');
     }
   };
 

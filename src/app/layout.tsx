@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "LifeQuote - Words That Inspired Humanity for 1000 Years",
   description: "Discover inspiring quotes from history's greatest minds. Find motivation, wisdom, and inspiration through carefully curated quotes from famous people, books, and more.",
   keywords: "quotes, life quotes, inspirational quotes, motivational quotes, famous quotes, wisdom quotes",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({

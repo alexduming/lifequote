@@ -25,14 +25,17 @@ const adminRoutes = ['/admin/quotes'];
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
+  const path = req.nextUrl.pathname;
 
-  // 检查会话状态
+  // 如果是认证回调路径，跳过处理
+  if (path.startsWith('/auth/callback')) {
+    return res;
+  }
+
+  // 获取会话状态
   const {
     data: { session },
   } = await supabase.auth.getSession();
-
-  // 获取当前路径
-  const path = req.nextUrl.pathname;
 
   // 检查管理员权限
   if (adminRoutes.includes(path)) {
@@ -74,15 +77,6 @@ export async function middleware(req: NextRequest) {
  */
 export const config = {
   matcher: [
-    /*
-     * 匹配所有需要保护的路由
-     * 以及登录/注册页面
-     */
-    '/profile/:path*',
-    '/favorites/:path*',
-    '/likes/:path*',
-    '/login',
-    '/register',
-    '/admin/:path*',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }; 
