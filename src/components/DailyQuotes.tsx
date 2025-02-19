@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { translations, CategoryKey } from '@/config/translations';
 import QuoteCard from '@/components/QuoteCard';
 import type { Quote } from '@/types/quote';
+import { supabase } from '@/lib/supabase';
 
 interface DailyQuotesData {
   dailyQuote: Quote | null;
@@ -23,6 +24,7 @@ export default function DailyQuotes() {
   const t = translations[language];
   const [quotesData, setQuotesData] = useState<DailyQuotesData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [moreQuotes, setMoreQuotes] = useState<Quote[]>([]);
 
   // 获取格式化的日期
   const getFormattedDate = () => {
@@ -53,11 +55,29 @@ export default function DailyQuotes() {
   // 获取每日推荐数据
   const fetchDailyQuotes = async () => {
     try {
+      // 获取每日一句
       const response = await fetch('/api/daily');
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       
-      setQuotesData(data);
+      // 获取更多推荐语录
+      const { data: moreData, error } = await supabase
+        .from('quotes')
+        .select('*')
+        .limit(20); // 获取20条，然后随机选择6条
+
+      if (error) throw error;
+
+      // 随机选择6条语录
+      const randomQuotes = moreData ? 
+        [...moreData].sort(() => Math.random() - 0.5).slice(0, 6) : 
+        [];
+
+      setQuotesData({
+        ...data,
+        moreQuotes: randomQuotes
+      });
+      setMoreQuotes(randomQuotes);
       saveRefreshTime(data.refreshTime);
     } catch (error) {
       console.error('获取每日推荐失败:', error);
@@ -66,15 +86,45 @@ export default function DailyQuotes() {
     }
   };
 
+  // 仅更新更多推荐语录
+  const refreshMoreQuotes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select('*')
+        .limit(20);
+
+      if (error) throw error;
+
+      // 随机选择6条语录
+      const randomQuotes = data ? 
+        [...data].sort(() => Math.random() - 0.5).slice(0, 6) : 
+        [];
+
+      setMoreQuotes(randomQuotes);
+      if (quotesData) {
+        setQuotesData({
+          ...quotesData,
+          moreQuotes: randomQuotes
+        });
+      }
+    } catch (error) {
+      console.error('更新更多推荐失败:', error);
+    }
+  };
+
   useEffect(() => {
     const lastRefreshTime = getLastRefreshTime();
     if (shouldRefreshData(lastRefreshTime)) {
       fetchDailyQuotes();
     } else {
-      // 如果不需要刷新，尝试从localStorage获取缓存的数据
+      // 如果不需要刷新每日语录，仅刷新更多推荐
+      refreshMoreQuotes();
+      // 从缓存加载每日语录
       const cachedData = localStorage.getItem('dailyQuotesData');
       if (cachedData) {
-        setQuotesData(JSON.parse(cachedData));
+        const parsedData = JSON.parse(cachedData);
+        setQuotesData(parsedData);
         setIsLoading(false);
       } else {
         fetchDailyQuotes();
@@ -91,6 +141,20 @@ export default function DailyQuotes() {
     }, timeUntilMidnight);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // 监听页面可见性变化，当用户切换回页面时刷新更多推荐
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshMoreQuotes();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   // 缓存数据
@@ -186,7 +250,7 @@ export default function DailyQuotes() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quotesData.moreQuotes.map((quote) => (
+          {moreQuotes.map((quote) => (
             <QuoteCard
               key={quote.id}
               id={quote.id}

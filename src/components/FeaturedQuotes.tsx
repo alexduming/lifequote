@@ -22,13 +22,20 @@ export default function FeaturedQuotes() {
   useEffect(() => {
     async function fetchQuotes() {
       try {
+        // 获取更多的语录，然后随机选择6条
         const { data, error } = await supabase
           .from('quotes')
           .select('*')
-          .limit(6);
+          .limit(20);
 
         if (error) throw error;
-        setQuotes(data || []);
+        
+        // 随机打乱数组并选择前6条
+        const shuffledQuotes = data ? 
+          [...data].sort(() => Math.random() - 0.5).slice(0, 6) : 
+          [];
+        
+        setQuotes(shuffledQuotes);
       } catch (error) {
         console.error('Error fetching quotes:', error);
       } finally {
@@ -37,7 +44,7 @@ export default function FeaturedQuotes() {
     }
 
     fetchQuotes();
-  }, []);
+  }, []); // 依赖数组为空，只在组件挂载时执行一次
 
   if (isLoading) {
     return <div className="text-center py-20">Loading...</div>;
