@@ -41,15 +41,21 @@ export default function DailyQuotes() {
   };
 
   // 保存刷新时间到localStorage
-  const saveRefreshTime = (time: string) => {
-    localStorage.setItem('lastQuoteRefreshTime', time);
+  const saveRefreshTime = () => {
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('lastQuoteRefreshTime', today);
   };
 
   // 检查是否需要刷新数据
-  const shouldRefreshData = (lastRefreshTime: string | null) => {
+  const shouldRefreshData = () => {
+    const lastRefreshTime = getLastRefreshTime();
     if (!lastRefreshTime) return true;
+    
     const today = new Date().toISOString().split('T')[0];
-    return lastRefreshTime !== today;
+    const lastRefreshDate = new Date(lastRefreshTime);
+    const currentDate = new Date(today);
+    
+    return lastRefreshDate.getTime() < currentDate.getTime();
   };
 
   // 获取每日推荐数据
@@ -64,7 +70,7 @@ export default function DailyQuotes() {
       const { data: moreData, error } = await supabase
         .from('quotes')
         .select('*')
-        .limit(20); // 获取20条，然后随机选择6条
+        .limit(20);
 
       if (error) throw error;
 
@@ -78,7 +84,7 @@ export default function DailyQuotes() {
         moreQuotes: randomQuotes
       });
       setMoreQuotes(randomQuotes);
-      saveRefreshTime(data.refreshTime);
+      saveRefreshTime();
     } catch (error) {
       console.error('获取每日推荐失败:', error);
     } finally {
@@ -113,41 +119,51 @@ export default function DailyQuotes() {
     }
   };
 
-  useEffect(() => {
-    const lastRefreshTime = getLastRefreshTime();
-    if (shouldRefreshData(lastRefreshTime)) {
+  // 检查并更新数据
+  const checkAndUpdateQuotes = () => {
+    if (shouldRefreshData()) {
       fetchDailyQuotes();
     } else {
-      // 如果不需要刷新每日语录，仅刷新更多推荐
       refreshMoreQuotes();
-      // 从缓存加载每日语录
-      const cachedData = localStorage.getItem('dailyQuotesData');
-      if (cachedData) {
-        const parsedData = JSON.parse(cachedData);
-        setQuotesData(parsedData);
-        setIsLoading(false);
+    }
+  };
+
+  // 初始化数据
+  useEffect(() => {
+    const initializeData = () => {
+      if (shouldRefreshData()) {
+        fetchDailyQuotes();
       } else {
+        // 从缓存加载每日语录
+        const cachedData = localStorage.getItem('dailyQuotesData');
+        if (cachedData) {
+          const parsedData = JSON.parse(cachedData);
+          setQuotesData(parsedData);
+          refreshMoreQuotes();
+          setIsLoading(false);
+        } else {
+          fetchDailyQuotes();
+        }
+      }
+    };
+
+    initializeData();
+
+    // 设置定时器，检查是否需要更新
+    const checkInterval = setInterval(() => {
+      if (shouldRefreshData()) {
         fetchDailyQuotes();
       }
-    }
+    }, 60000); // 每分钟检查一次
 
-    // 设置定时器，在每天凌晨12点更新数据
-    const now = new Date();
-    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
-
-    const timer = setTimeout(() => {
-      fetchDailyQuotes();
-    }, timeUntilMidnight);
-
-    return () => clearTimeout(timer);
+    return () => clearInterval(checkInterval);
   }, []);
 
-  // 监听页面可见性变化，当用户切换回页面时刷新更多推荐
+  // 监听页面可见性变化
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        refreshMoreQuotes();
+        checkAndUpdateQuotes();
       }
     };
 
