@@ -42,8 +42,8 @@ export default function DailyQuotes() {
 
   // 保存刷新时间到localStorage
   const saveRefreshTime = () => {
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem('lastQuoteRefreshTime', today);
+    const now = new Date().toISOString();
+    localStorage.setItem('lastQuoteRefreshTime', now);
   };
 
   // 检查是否需要刷新数据
@@ -51,11 +51,11 @@ export default function DailyQuotes() {
     const lastRefreshTime = getLastRefreshTime();
     if (!lastRefreshTime) return true;
     
+    // 仅比较日期部分（年月日）
     const today = new Date().toISOString().split('T')[0];
-    const lastRefreshDate = new Date(lastRefreshTime);
-    const currentDate = new Date(today);
+    const lastRefreshDay = lastRefreshTime.split('T')[0];
     
-    return lastRefreshDate.getTime() < currentDate.getTime();
+    return lastRefreshDay !== today;
   };
 
   // 获取每日推荐数据
@@ -131,16 +131,25 @@ export default function DailyQuotes() {
   // 初始化数据
   useEffect(() => {
     const initializeData = () => {
+      // 强制检查是否需要刷新数据
       if (shouldRefreshData()) {
+        console.log('需要刷新数据，获取新的每日语录');
         fetchDailyQuotes();
       } else {
         // 从缓存加载每日语录
         const cachedData = localStorage.getItem('dailyQuotesData');
         if (cachedData) {
-          const parsedData = JSON.parse(cachedData);
-          setQuotesData(parsedData);
-          refreshMoreQuotes();
-          setIsLoading(false);
+          try {
+            const parsedData = JSON.parse(cachedData);
+            setQuotesData(parsedData);
+            
+            // 即使有缓存，也更新"更多推荐"部分
+            refreshMoreQuotes();
+            setIsLoading(false);
+          } catch (error) {
+            console.error('解析缓存数据失败:', error);
+            fetchDailyQuotes();
+          }
         } else {
           fetchDailyQuotes();
         }
@@ -149,9 +158,10 @@ export default function DailyQuotes() {
 
     initializeData();
 
-    // 设置定时器，检查是否需要更新
+    // 设置定时器，每分钟检查一次是否需要更新
     const checkInterval = setInterval(() => {
       if (shouldRefreshData()) {
+        console.log('定时检查触发更新');
         fetchDailyQuotes();
       }
     }, 60000); // 每分钟检查一次
@@ -163,7 +173,14 @@ export default function DailyQuotes() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        checkAndUpdateQuotes();
+        console.log('页面变为可见，检查更新');
+        // 当页面变为可见时，立即检查是否需要更新
+        if (shouldRefreshData()) {
+          fetchDailyQuotes();
+        } else {
+          // 即使不需要完全刷新，也可以考虑更新"更多推荐"部分
+          refreshMoreQuotes();
+        }
       }
     };
 
@@ -171,7 +188,7 @@ export default function DailyQuotes() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [quotesData]);
 
   // 缓存数据
   useEffect(() => {
